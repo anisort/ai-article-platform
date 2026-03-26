@@ -1,12 +1,101 @@
 .header-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.75rem 1.5rem;
-  border-bottom: 1px solid #2b2b2b;
-}
+  border-bottom: 0.3rem solid var(--color-ghost);
 
-.auth-buttons {
-  display: flex;
-  gap: 0.5rem;
+  .header-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 1.5rem;
+    margin-bottom: 0.5rem;
+    border-radius: 5rem;
+    background: var(--color-primary);
+
+    .left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+
+      h2 {
+        margin: 0;
+        color: white;
+      }
+    }
+
+    .center {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      padding: 0 1.5rem;
+
+      .input-group {
+        position: relative;
+        width: min(100%, 40rem);
+        margin: 0;
+        border-radius: 999px;
+        transition: box-shadow 0.2s ease, transform 0.2s ease;
+
+        .form-control {
+          width: 100%;
+          padding: 0.75rem 3rem 0.75rem 1.25rem;
+          border: none;
+          border-radius: 999px;
+          background: white;
+          color: var(--color-accent);
+          box-shadow: none;
+          transition: box-shadow 0.2s ease, background-color 0.2s ease;
+
+          &::placeholder {
+            color: var(--color-disabled);
+          }
+
+          &:focus {
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 0.1rem var(--color-ghost-light);
+          }
+        }
+
+        ion-icon {
+          position: absolute;
+          top: 50%;
+          right: -3rem;
+          transform: translateY(-50%);
+          font-size: 1.25rem;
+          color: var(--color-accent);
+          pointer-events: none;
+        }
+      }
+    }
+
+    .right {
+      .auth-buttons {
+        display: flex;
+        gap: 0.5rem;
+
+        .login {
+          border-top-left-radius: 999px;
+          border-bottom-left-radius: 999px;
+        }
+
+        .register {
+          border-top-right-radius: 999px;
+          border-bottom-right-radius: 999px;
+        }
+
+        button {
+          padding: 0.5rem 1rem;
+          color: var(--color-primary-dark);
+          background: var(--color-ghost-light);
+          border: none;
+
+          &:hover {
+            color: white;
+            background: var(--color-ghost);
+            cursor: pointer;
+          }
+        }
+      }
+
+    }
+  }
 }

@@ -1,11 +1,21 @@
 import {Component, inject, OnInit} from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import {RouterLink, RouterOutlet} from '@angular/router';
 import {AuthService} from './core/services/auth.service';
 import {HeaderComponent} from './shared/components/header/header.component';
+import {
+  IonApp,
+  IonContent,
+  IonHeader,
+  IonItem,
+  IonList,
+  IonMenu,
+  IonTitle,
+  IonToolbar
+} from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, HeaderComponent],
+  imports: [RouterOutlet, HeaderComponent, IonApp, IonMenu, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, RouterLink],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })

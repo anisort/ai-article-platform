@@ -1,17 +1,26 @@
-<div class="header-container">
-  <div class="left">
-    Platform name
-  </div>
-  <div class="right">
-    @if (!authService.isAuthenticated()) {
-      <div class="auth-buttons">
-        <button (click)="onLogin()">Login</button>
-        <button (click)="onRegister()">Register</button>
+<header class="header-container">
+  <div class="header-wrapper">
+    <div class="left">
+      <ion-menu-button menu="main-menu"></ion-menu-button>
+      <h2>Commit</h2>
+    </div>
+    <div class="center">
+      <div class="input-group">
+        <input type="text" class="form-control" placeholder="Search" aria-label="Search">
+        <ion-icon name="search-outline"></ion-icon>
       </div>
-    } @else {
-      <div class="auth-buttons">
-        <button (click)="onLogout()">Logout</button>
-      </div>
-    }
+    </div>
+    <div class="right">
+      @if (!authService.isAuthenticated()) {
+        <div class="auth-buttons">
+          <button class="login" (click)="onLogin()">Sign in</button>
+          <button class="register" (click)="onRegister()">Sign up</button>
+        </div>
+      } @else {
+        <div class="auth-buttons">
+          <button (click)="onLogout()">Logout</button>
+        </div>
+      }
+    </div>
   </div>
-</div>
+</header>
