@@ -1,0 +1,41 @@
+<!--<div class="title">IMAGE block (pos {{ block().position }})</div>-->
+
+<!--<div class="row">-->
+<!--  <input type="text" placeholder="Image URL (пока руками)" [ngModel]="block().imageUrl" (ngModelChange)="setUrl($event)" />-->
+<!--</div>-->
+
+<!--@if (block().imageUrl) {-->
+<!--  <div class="preview">-->
+<!--    <img [src]="block().imageUrl" alt="preview" />-->
+<!--  </div>-->
+<!--}-->
+
+<!--<div class="row">-->
+<!--  <input type="text" placeholder="Caption" [ngModel]="block().caption" (ngModelChange)="setCaption($event)" />-->
+<!--</div>-->
+<div class="title">IMAGE block (pos {{ block().position }})</div>
+
+<div class="row">
+  <input
+    type="file"
+    accept="image/*"
+    (change)="onFileSelected($event)" />
+</div>
+
+@if (uploading()) {
+  <div class="row">Uploading...</div>
+}
+
+@if (block().imageUrl) {
+  <div class="preview">
+    <img [src]="block().imageUrl" alt="preview" />
+  </div>
+}
+
+<div class="row">
+  <input
+    type="text"
+    placeholder="Caption"
+    [ngModel]="block().caption"
+    (ngModelChange)="setCaption($event)" />
+</div>

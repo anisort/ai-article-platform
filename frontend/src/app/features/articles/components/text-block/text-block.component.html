@@ -1,0 +1,31 @@
+<div class="text-block">
+  <div class="toolbar">
+    <label class="heading">
+      <span>H</span>
+      <select [ngModel]="headingLevel()" (ngModelChange)="setHeadingLevel($event)">
+        <option value="1">H1</option>
+        <option value="2">H2</option>
+        <option value="3">H3</option>
+        <option value="4">H4</option>
+        <option value="5">H5</option>
+        <option value="6">H6</option>
+      </select>
+      <button type="button" (click)="heading()">Apply</button>
+    </label>
+
+    <button type="button" (click)="bold()"><b>B</b></button>
+    <button type="button" (click)="italic()"><i>I</i></button>
+    <button type="button" (click)="quote()">❝</button>
+    <button type="button" (click)="link()">🔗</button>
+    <button type="button" (click)="bulletedList()">• List</button>
+    <button type="button" (click)="numberedList()">1. List</button>
+  </div>
+
+  <textarea
+    #text
+    rows="8"
+    [ngModel]="block().content"
+    (ngModelChange)="onInput($event)"
+    placeholder="Write in Markdown...">
+  </textarea>
+</div>

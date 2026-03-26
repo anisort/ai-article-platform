@@ -1,0 +1,49 @@
+<input placeholder="Title"/>
+<div class="toolbar">
+  <button type="button" (click)="addTextBlock()">Tt</button>
+  <button type="button" (click)="addImageBlock()">img</button>
+  <button type="button" (click)="addCodeBlock()">&lt;/&gt;</button>
+
+  <span class="spacer"></span>
+
+  <button type="button" (click)="logPayload()">Log payload</button>
+  <button type="button" (click)="createArticle()">
+    Publish
+  </button>
+  <button type="button" (click)="goToReview()">
+    Review
+  </button>
+</div>
+
+<div class="blocks">
+  @for (b of blocks; track b.id) {
+    <div class="block-shell">
+      <div class="block-actions">
+        <button type="button" (click)="moveUp(b.id)">↑</button>
+        <button type="button" (click)="moveDown(b.id)">↓</button>
+        <button type="button" (click)="removeBlock(b.id)">✕</button>
+      </div>
+
+      @if (b.type === 'TEXT') {
+        <app-text-block
+          [block]="b"
+          (change)="updateBlock($event)">
+        </app-text-block>
+      }
+
+      @if (b.type === 'IMAGE') {
+        <app-image-block
+          [block]="b"
+          (change)="updateBlock($event)">
+        </app-image-block>
+      }
+
+      @if (b.type === 'CODE') {
+        <app-code-block
+          [block]="b"
+          (change)="updateBlock($event)">
+        </app-code-block>
+      }
+    </div>
+  }
+</div>

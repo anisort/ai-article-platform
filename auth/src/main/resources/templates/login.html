@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Sign in</title>
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #eef2ff 0%, #f5f7ff 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+        }
+
+        .login-container {
+            width: min(90%, 400px);
+            padding: 2rem 2.5rem;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+        }
+
+        .login-container h2 {
+            margin: 0 0 1.5rem;
+            font-size: 2rem;
+            font-weight: 700;
+            text-align: center;
+            color: #222;
+        }
+
+        .login-container form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+        }
+
+        .login-container .field {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .login-container label {
+            margin-bottom: 0.35rem;
+            font-weight: 600;
+            color: #444;
+        }
+
+        .login-container input[type="text"],
+        .login-container input[type="password"] {
+            padding: 0.55rem 0.75rem;
+            font-size: 1rem;
+            border: 2px solid #ccc;
+            border-radius: 6px;
+            transition: border-color 0.25s ease, box-shadow 0.25s ease;
+            font-family: inherit;
+        }
+
+        .login-container input:focus {
+            outline: none;
+            border-color: #4c6bff;
+            box-shadow: 0 0 6px rgba(76, 107, 255, 0.4);
+        }
+
+        .login-container button[type="submit"] {
+            margin-top: 0.4rem;
+            padding: 0.7rem 1.5rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            background-color: #4c6bff;
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.15s ease;
+        }
+
+        .login-container button[type="submit"]:hover {
+            background-color: #3a50d7;
+        }
+
+        .login-container button[type="submit"]:active {
+            transform: translateY(1px);
+        }
+
+        .error-global {
+            margin-top: 0.8rem;
+            background-color: #ffe7e7;
+            border: 1px solid #ffb3b3;
+            color: #d93025;
+            padding: 0.6rem 0.8rem;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+<div class="login-container">
+    <h2>Sign in</h2>
+    <form th:action="@{/login}" method="post">
+        <div th:if="${param.error}" class="error-global">
+            Invalid login or password
+        </div>
+
+        <div class="field">
+            <label for="username">Username or email:</label>
+            <input id="username" type="text" name="username" required />
+        </div>
+
+        <div class="field">
+            <label for="password">Password:</label>
+            <input id="password" type="password" name="password" required />
+        </div>
+
+        <button id="login-btn" type="submit">Sign in</button>
+    </form>
+    <div style="text-align: center; margin-top: 1rem;">
+        <a th:href="@{/oauth2/authorization/google}"
+           style="display: inline-block; padding: 0.7rem 1.5rem; background-color: #4285F4; color: #fff; border-radius: 6px; text-decoration: none; font-weight: 600; transition: background-color 0.3s ease;">
+            Sign in with Google
+        </a>
+    </div>
+</div>
+</body>
+
+</html>

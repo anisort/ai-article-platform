@@ -1,0 +1,41 @@
+.text-block {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+
+  button, select {
+    padding: 6px 10px;
+    border-radius: 8px;
+    border: 1px solid #2b2b2b;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  .heading {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border-radius: 8px;
+    border: 1px solid #2b2b2b;
+
+    span { opacity: .8; }
+    select { padding: 4px 8px; }
+  }
+}
+
+textarea {
+  width: 95%;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #2b2b2b;
+  resize: vertical;
+  min-height: 160px;
+}

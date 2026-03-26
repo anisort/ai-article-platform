@@ -1,0 +1,31 @@
+.toolbar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 12px;
+  border-bottom: 1px solid #2b2b2b;
+}
+
+.spacer { flex: 1; }
+
+.blocks {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.block-shell {
+  border: 1px solid #2b2b2b;
+  border-radius: 10px;
+  padding: 12px;
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  gap: 12px;
+}
+
+.block-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}

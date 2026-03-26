@@ -1,0 +1,34 @@
+<div class="review">
+
+  <h1 class="title">{{ title }}</h1>
+
+  <ng-container *ngFor="let b of blocks">
+
+    <!-- TEXT -->
+    <ng-container *ngIf="isTextBlock(b)">
+      <markdown [data]="b.content"></markdown>
+    </ng-container>
+
+    <!-- IMAGE -->
+    <ng-container *ngIf="isImageBlock(b)">
+      <figure>
+        <img *ngIf="b.imageUrl" [src]="b.imageUrl" alt="" />
+        <figcaption *ngIf="b.caption">{{ b.caption }}</figcaption>
+      </figure>
+    </ng-container>
+
+    <!-- CODE -->
+    <ng-container *ngIf="isCodeBlock(b)">
+      <pre>
+        <code>{{ b.code }}</code>
+      </pre>
+    </ng-container>
+
+  </ng-container>
+
+  <div class="actions">
+    <button (click)="backToEdit()">← Back</button>
+    <button class="primary" (click)="publish()">Publish</button>
+  </div>
+
+</div>

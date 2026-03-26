@@ -1,0 +1,13 @@
+<div class="title">CODE block (pos {{ block().position }})</div>
+<div class="row">
+  <input type="text"
+         placeholder="Language (e.g. java, ts, sql)"
+         [ngModel]="block().codeLanguage"
+         (ngModelChange)="setLang($event)"/>
+</div>
+<textarea
+  rows="8"
+  [ngModel]="block().code"
+  (ngModelChange)="setCode($event)"
+  placeholder="Paste code here...">
+</textarea>

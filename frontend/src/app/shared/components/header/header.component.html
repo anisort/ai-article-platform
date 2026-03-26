@@ -1,0 +1,17 @@
+<div class="header-container">
+  <div class="left">
+    Platform name
+  </div>
+  <div class="right">
+    @if (!authService.isAuthenticated()) {
+      <div class="auth-buttons">
+        <button (click)="onLogin()">Login</button>
+        <button (click)="onRegister()">Register</button>
+      </div>
+    } @else {
+      <div class="auth-buttons">
+        <button (click)="onLogout()">Logout</button>
+      </div>
+    }
+  </div>
+</div>
