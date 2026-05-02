@@ -6,6 +6,9 @@ import { EditorBlock } from '../models/article-block.types';
 export class EditorStateService {
   title = '';
   blocks: EditorBlock[] = [];
+  isDraft = true;
+  previewImageUrl = '';
+  previewImageName = '';
 
   constructor() {
     console.log('EditorStateService created', Math.random());
@@ -20,8 +23,20 @@ export class EditorStateService {
     this.blocks = blocks;
   }
 
+  setDraft(isDraft: boolean) {
+    this.isDraft = isDraft;
+  }
+
+  setPreviewImage(previewImageUrl: string, previewImageName: string) {
+    this.previewImageUrl = previewImageUrl;
+    this.previewImageName = previewImageName;
+  }
+
   reset() {
     this.title = '';
     this.blocks = [];
+    this.isDraft = true;
+    this.previewImageUrl = '';
+    this.previewImageName = '';
   }
 }

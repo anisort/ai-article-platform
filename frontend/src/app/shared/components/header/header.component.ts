@@ -33,4 +33,8 @@ export class HeaderComponent {
   onLogout() {
     this.authService.logout();
   }
+
+  onProfile() {
+    this.router.navigate(['/profile']);
+  }
 }

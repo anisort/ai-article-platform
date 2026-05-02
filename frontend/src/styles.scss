@@ -1,12 +1,71 @@
 /* You can add global styles to this file, and also import other style files */
 @import 'bootstrap-icons/font/bootstrap-icons.css';
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap');
 
 :root {
-    --color-primary: #6FC2B3;
-    --color-primary-dark: #44A7A2;
-    --color-ghost-light: #D0FFEE;
-    --color-ghost: #B1E8DD;
-    --color-deep: #166254;
-    --color-accent: #2F9B9B;
-    --color-disabled: #C4C4C4;
+    --color-primary: #2f8f5b;
+    --color-primary-dark: #1f6d43;
+    --color-ghost-light: #f6fbf7;
+    --color-ghost: #e3f1e8;
+    --color-deep: #163c29;
+    --color-accent: #33885a;
+    --color-accent-sand: #9ac8ab;
+    --color-accent-berry: #b45179;
+    --color-accent-sky: #6ab587;
+    --color-accent-ink: #173726;
+    --color-surface-warm: #f8fcf9;
+    --color-surface-rose: #edf7f0;
+    --color-surface-base: #ffffff;
+    --color-surface-soft: #eef7f1;
+    --color-surface-panel: #e6f3ea;
+    --color-surface-elevated: #f3faf5;
+    --color-border-soft: rgba(47, 143, 91, 0.18);
+    --color-border-strong: rgba(180, 81, 121, 0.18);
+    --color-text-muted: rgba(23, 55, 38, 0.68);
+    --color-text-body: rgba(23, 55, 38, 0.84);
+    --color-overlay: rgba(16, 40, 27, 0.58);
+    --shadow-soft: 0 10px 24px rgba(26, 72, 46, 0.08);
+    --shadow-medium: 0 18px 38px rgba(26, 72, 46, 0.14);
+    --color-disabled: #8ca495;
+    --color-avatar-bg: #cfe8d8;
+    --color-avatar-border: rgba(31, 109, 67, 0.18);
+}
+
+body {
+    margin: 0;
+    background: var(--color-surface-base);
+    color: var(--color-accent-ink);
+    font-family: 'Montserrat', sans-serif;
+    transition: background 0.25s ease, color 0.25s ease;
+}
+
+body.theme-dark {
+    color-scheme: dark;
+    --color-primary: #45a86c;
+    --color-primary-dark: #2d7d4d;
+    --color-ghost-light: #132019;
+    --color-ghost: #1a2a21;
+    --color-deep: #e1f1e7;
+    --color-accent: #52b277;
+    --color-accent-sand: #78bc94;
+    --color-accent-berry: #de86a7;
+    --color-accent-sky: #85d3a2;
+    --color-accent-ink: #e6f3eb;
+    --color-surface-warm: #0d1711;
+    --color-surface-rose: #16211a;
+    --color-surface-base: #101712;
+    --color-surface-soft: #152019;
+    --color-surface-panel: #1b2b21;
+    --color-surface-elevated: #213328;
+    --color-border-soft: rgba(69, 168, 108, 0.2);
+    --color-border-strong: rgba(222, 134, 167, 0.24);
+    --color-text-muted: rgba(230, 243, 235, 0.7);
+    --color-text-body: rgba(230, 243, 235, 0.86);
+    --color-overlay: rgba(5, 8, 6, 0.72);
+    --shadow-soft: 0 12px 28px rgba(0, 0, 0, 0.24);
+    --shadow-medium: 0 22px 44px rgba(0, 0, 0, 0.34);
+    --color-disabled: #738b7b;
+    --color-avatar-bg: #284734;
+    --color-avatar-border: rgba(133, 211, 162, 0.22);
+    background: var(--color-surface-base);
 }

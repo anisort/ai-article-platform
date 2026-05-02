@@ -1,3 +1,4 @@
+import {DOCUMENT} from '@angular/common';
 import {Component, inject, OnInit} from '@angular/core';
 import {RouterLink, RouterOutlet} from '@angular/router';
 import {AuthService} from './core/services/auth.service';
@@ -20,12 +21,38 @@ import {
   styleUrl: './app.component.scss'
 })
 export class AppComponent implements OnInit {
+  private readonly document = inject(DOCUMENT);
+  private readonly themeStorageKey = 'app-theme';
+
   title = 'frontend';
+  isDarkTheme = false;
 
   authService = inject(AuthService);
 
   async ngOnInit(): Promise<void> {
+    this.initializeTheme();
     await this.authService.init();
     console.log('AuthService initialized and login attempt made.');
+  }
+
+  toggleTheme(): void {
+    this.isDarkTheme = !this.isDarkTheme;
+    this.applyTheme(this.isDarkTheme);
+  }
+
+  private initializeTheme(): void {
+    const storedTheme = localStorage.getItem(this.themeStorageKey);
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+    this.isDarkTheme = storedTheme ? storedTheme === 'dark' : prefersDark;
+    this.applyTheme(this.isDarkTheme, false);
+  }
+
+  private applyTheme(isDarkTheme: boolean, persist = true): void {
+    this.document.body.classList.toggle('theme-dark', isDarkTheme);
+
+    if (persist) {
+      localStorage.setItem(this.themeStorageKey, isDarkTheme ? 'dark' : 'light');
+    }
   }
 }

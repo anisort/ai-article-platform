@@ -1,0 +1,7 @@
+<div class="avatar" [style.--avatar-size]="size()">
+  @if (imageUrl()) {
+    <img [src]="imageUrl() || ''" [alt]="name() || 'Avatar'">
+  } @else {
+    <span>{{ initials() }}</span>
+  }
+</div>

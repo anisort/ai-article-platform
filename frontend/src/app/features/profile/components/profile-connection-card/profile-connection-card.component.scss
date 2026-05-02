@@ -1,0 +1,35 @@
+.profile-user-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.1rem;
+  border-radius: 1.35rem;
+  border: 1px solid var(--color-border-soft);
+  background: var(--color-surface-panel);
+  box-shadow: var(--shadow-soft);
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover,
+  &:focus-visible {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-medium);
+  }
+}
+
+.profile-user-card__avatar {
+  flex: 0 0 auto;
+}
+
+.profile-user-card__meta {
+  display: grid;
+  gap: 0.15rem;
+
+  strong {
+    color: var(--color-accent-ink);
+  }
+
+  span {
+    color: var(--color-text-muted);
+  }
+}

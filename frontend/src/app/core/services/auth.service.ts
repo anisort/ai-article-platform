@@ -34,4 +34,23 @@ export class AuthService {
   get token() {
     return this.oauthService.getAccessToken();
   }
+
+  get userId(): string | null {
+    const claims: any = this.oauthService.getIdentityClaims();
+    if (claims?.sub) {
+      return claims.sub;
+    }
+
+    const token = this.oauthService.getAccessToken();
+    if (!token) {
+      return null;
+    }
+
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1] ?? ''));
+      return payload?.sub ?? null;
+    } catch {
+      return null;
+    }
+  }
 }

@@ -12,7 +12,17 @@ export const routes: Routes = [
       .then(p => p.ArticleListPage)
   },
   {
+    path: 'articles/:id',
+    loadComponent: () => import('./features/articles/pages/article-detail/article-detail.page')
+      .then(p => p.ArticleDetailPage)
+  },
+  {
     path: 'edit-article',
+    loadComponent: () => import('./features/articles/pages/edit-article/edit-article.page')
+      .then(p => p.EditArticlePage)
+  },
+  {
+    path: 'edit-article/:id',
     loadComponent: () => import('./features/articles/pages/edit-article/edit-article.page')
       .then(p => p.EditArticlePage)
   },
@@ -25,5 +35,15 @@ export const routes: Routes = [
     path: 'register',
     loadComponent: () => import('./features/auth/pages/user-register/user-register.page')
       .then(p => p.UserRegisterPage)
+  },
+  {
+    path: 'profile',
+    loadComponent: () => import('./features/profile/pages/profile/profile.page')
+      .then(p => p.ProfilePage)
+  },
+  {
+    path: 'profile/:id',
+    loadComponent: () => import('./features/profile/pages/profile/profile.page')
+      .then(p => p.ProfilePage)
   }
 ];

@@ -1,0 +1,235 @@
+.article-list-page {
+  padding: 1.1rem 1.25rem 2rem;
+  background: var(--color-surface-base);
+  margin: 1rem 3rem;
+}
+
+.page-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 1.1rem;
+
+  h1 {
+    margin: 0;
+    color: var(--color-accent-ink);
+    font-size: clamp(2rem, 3vw, 3.2rem);
+    line-height: 0.95;
+  }
+}
+
+.eyebrow {
+  margin: 0 0 0.45rem;
+  color: var(--color-accent-berry);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.article-grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  grid-auto-rows: 3.9rem;
+  grid-auto-flow: dense;
+  gap: 0.9rem;
+}
+
+.article-card {
+  min-width: 0;
+}
+
+.article-card--tall {
+  grid-column: span 4;
+  grid-row: span 4;
+}
+
+.article-card--square {
+  grid-column: span 2;
+  grid-row: span 2;
+}
+
+.article-card--wide {
+  grid-column: span 6;
+  grid-row: span 2;
+}
+
+.article-card--wide-soft {
+  grid-column: span 6;
+  grid-row: span 2;
+}
+
+.article-card--hero {
+  grid-column: span 9;
+  grid-row: span 3;
+}
+
+.article-card--square-tall {
+  grid-column: span 3;
+  grid-row: span 3;
+}
+
+.card-media {
+  position: relative;
+  display: block;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 1.05rem;
+  background: var(--color-surface-panel);
+  box-shadow: var(--shadow-medium);
+  border: 1px solid var(--color-border-soft);
+  color: inherit;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-media:hover,
+.card-media:focus-visible {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-strong);
+}
+
+.card-media:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--color-accent-berry) 70%, white);
+  outline-offset: 3px;
+}
+
+.card-media img,
+.card-fallback {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.card-media img {
+  object-fit: cover;
+}
+
+.card-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  color: var(--color-accent-ink);
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.card-overlay {
+  position: absolute;
+  inset: auto 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.8rem 0.85rem 0.9rem;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, var(--color-overlay) 100%);
+  color: #ffffff;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.card-media:hover .card-overlay,
+.card-media:focus-within .card-overlay {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.card-overlay h2,
+.card-overlay p {
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card-overlay h2 {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.card-overlay p {
+  font-size: 0.84rem;
+  color: rgba(255, 255, 255, 0.84);
+}
+
+.empty-state {
+  padding: 3rem 1rem;
+  border-radius: 1.5rem;
+  background: color-mix(in srgb, var(--color-surface-elevated) 74%, var(--color-surface-rose));
+  color: var(--color-accent-ink);
+  border: 1px solid var(--color-border-strong);
+  box-shadow: var(--shadow-soft);
+  text-align: center;
+  font-size: 1.05rem;
+}
+
+@media (max-width: 1100px) {
+  .article-grid {
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+    grid-auto-rows: 3.7rem;
+  }
+
+  .article-card--tall,
+  .article-card--wide,
+  .article-card--wide-soft,
+  .article-card--hero {
+    grid-column: span 4;
+  }
+
+  .article-card--square,
+  .article-card--square-tall {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 800px) {
+  .article-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-rows: 7rem;
+  }
+
+  .article-card--tall,
+  .article-card--wide,
+  .article-card--wide-soft,
+  .article-card--hero,
+  .article-card--square,
+  .article-card--square-tall {
+    grid-column: span 1;
+  }
+
+  .article-card--tall,
+  .article-card--hero,
+  .article-card--square-tall {
+    grid-row: span 2;
+  }
+
+  .article-card--square,
+  .article-card--wide,
+  .article-card--wide-soft {
+    grid-row: span 1;
+  }
+}
+
+@media (max-width: 560px) {
+  .article-list-page {
+    padding-inline: 0.9rem;
+  }
+
+  .article-grid {
+    grid-template-columns: 1fr;
+    grid-auto-rows: 10rem;
+  }
+
+  .article-card {
+    grid-column: span 1 !important;
+    grid-row: span 1 !important;
+  }
+
+  .article-card--tall,
+  .article-card--hero,
+  .article-card--square-tall {
+    grid-row: span 2 !important;
+  }
+}

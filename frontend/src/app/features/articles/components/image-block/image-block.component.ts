@@ -4,28 +4,27 @@ import { FormsModule } from '@angular/forms';
 import { ImageBlock } from '../../models/article-block.types';
 import {finalize} from 'rxjs';
 import {UploadService} from '../../../../shared/services/upload.service';
+import {EditorBlockFrameComponent} from '../../../../shared/components/editor-block-frame/editor-block-frame.component';
 
 @Component({
   standalone: true,
   selector: 'app-image-block',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, EditorBlockFrameComponent],
   templateUrl: './image-block.component.html',
   styleUrl: './image-block.component.scss'
 })
 export class ImageBlockComponent {
-  // block = input.required<ImageBlock>();
-  // change = output<ImageBlock>();
-  //
-  // setUrl(url: string) {
-  //   this.change.emit({ ...this.block(), imageUrl: url });
-  // }
-  //
-  // setCaption(caption: string) {
-  //   this.change.emit({ ...this.block(), caption });
-  // }
-
   block = input.required<ImageBlock>();
   change = output<ImageBlock>();
+  moveUp = output<void>();
+  moveDown = output<void>();
+  remove = output<void>();
+  isDragging = input(false);
+  isDragOver = input(false);
+  dragStarted = output<string>();
+  dragEntered = output<string>();
+  dropped = output<string>();
+  dragEnded = output<void>();
 
   private readonly uploadService = inject(UploadService);
 

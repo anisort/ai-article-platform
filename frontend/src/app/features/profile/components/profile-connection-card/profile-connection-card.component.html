@@ -1,0 +1,12 @@
+<a class="profile-user-card" [routerLink]="['/profile', user().id]">
+  <app-avatar
+    class="profile-user-card__avatar"
+    [imageUrl]="user().avatar"
+    [name]="displayName()"
+    size="4.25rem" />
+
+  <div class="profile-user-card__meta">
+    <strong>{{ displayName() }}</strong>
+    <span>{{ '@' + user().username }}</span>
+  </div>
+</a>

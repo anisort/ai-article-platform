@@ -3,4 +3,5 @@ export interface UserResponse {
   username: string;
   name: string;
   email: string;
+  avatar?: string | null;
 }

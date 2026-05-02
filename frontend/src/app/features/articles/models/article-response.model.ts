@@ -3,6 +3,7 @@ import {ArticleBlockResponse} from './article-block-response.model';
 export interface ArticleResponse {
   id: string;
   title: string;
+  imageUrl?: string;
   summary: string;
   createdAt: string;
   blocks: ArticleBlockResponse[];
@@ -16,6 +17,6 @@ export interface AuthorResponse {
 }
 
 export interface ArticleWithUserResponse {
-  article: ArticleResponse;
-  author: AuthorResponse;
+  articleResponse: ArticleResponse;
+  authorResponse: AuthorResponse;
 }

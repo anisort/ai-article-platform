@@ -1,75 +1,63 @@
-<div class="register-container">
-  @if(loading()){
-    Loading...
-  } @else {
-    <form [formGroup]="registerForm">
-      <h3>Sign in</h3>
-      @if (message()) {
-        <div class="success-message">
-          {{ message() }}
-        </div>
+<section class="register-page">
+  <div class="register-shell">
+    <div class="register-copy">
+      <p class="eyebrow">Join Commit</p>
+      <h1>Create your author profile</h1>
+      <p class="lead">
+        Publish articles, build your portfolio, and keep everything in one place.
+      </p>
+    </div>
+
+    <div class="register-card">
+      @if (loading()) {
+        <div class="loading-state">Creating account...</div>
+      } @else {
+        <form class="register-form" [formGroup]="registerForm">
+          <h2>Sign up</h2>
+
+          @if (message()) {
+            <div class="status-message">
+              {{ message() }}
+            </div>
+          }
+
+          <div class="field-grid">
+            <label class="field">
+              <span>Username</span>
+              <input type="text" id="username" formControlName="username" placeholder="Choose a username" />
+            </label>
+
+            <label class="field">
+              <span>Email</span>
+              <input type="text" id="email" formControlName="email" placeholder="you@example.com" />
+            </label>
+
+            <label class="field">
+              <span>Name</span>
+              <input type="text" id="name" formControlName="name" placeholder="Your public name" />
+            </label>
+
+            <label class="field">
+              <span>Password</span>
+              <input type="password" id="password" formControlName="password" placeholder="At least 8 characters" />
+            </label>
+
+            <label class="field field--full">
+              <span>Repeat password</span>
+              <input type="password" id="repeatPassword" formControlName="repeatPassword" placeholder="Repeat your password" />
+            </label>
+          </div>
+
+          <button class="submit-button" type="submit" (click)="onRegister()" [disabled]="registerForm.invalid">
+            Sign up
+          </button>
+
+          <div class="login-row">
+            <span>Already have an account?</span>
+            <button class="login-link" type="button" (click)="onLogin()">Sign in</button>
+          </div>
+        </form>
       }
-      <div class="field">
-        <label for="username">Username:</label>
-        <input type="text" id="username" formControlName="username" />
-<!--        @if (registerForm.get("username")?.errors?.['required'] && registerForm.get('username')?.touched) {-->
-<!--          <small class="error">Username is required.</small>-->
-<!--        }-->
-<!--        @if (registerForm.get('username')?.errors?.['minlength'] && registerForm.get('username')?.touched) {-->
-<!--          <small class="error">Username cannot be less than 3 characters.</small>-->
-<!--        }-->
-<!--        @if (registerForm.get('username')?.errors?.['usernameOrEmailTaken'] && registerForm.get('username')?.touched) {-->
-<!--          <small class="error">Username is already taken.</small>-->
-<!--        }-->
-      </div>
-      <div class="field">
-        <label for="email">Email:</label>
-        <input type="text" id="email" formControlName="email" />
-<!--        @if (registerForm.get('email')?.errors?.['required'] && registerForm.get('email')?.touched) {-->
-<!--          <small class="error">Email is required.</small>-->
-<!--        }-->
-<!--        @if (registerForm.get('email')?.errors?.['email'] && registerForm.get('email')?.touched) {-->
-<!--          <small class="error">Please enter a valid email.</small>-->
-<!--        }-->
-<!--        @if (registerForm.get('email')?.errors?.['usernameOrEmailTaken'] && registerForm.get('email')?.touched) {-->
-<!--          <small class="error">Email is already taken.</small>-->
-<!--        }-->
-      </div>
-      <div class="field">
-        <label for="name">Name:</label>
-        <input type="text" id="name" formControlName="name" />
-<!--        @if (registerForm.get('name')?.errors?.['required'] && registerForm.get('name')?.touched) {-->
-<!--          <small class="error">Name is required.</small>-->
-<!--        }-->
-<!--        @if (registerForm.get('name')?.errors?.['minlength'] && registerForm.get('name')?.touched) {-->
-<!--          <small class="error">Name must be at least 3 characters.</small>-->
-<!--        }-->
-      </div>
-      <div class="field">
-        <label for="password">Password:</label>
-        <input type="password" id="password" formControlName="password"/>
-<!--        @if (registerForm.get('password')?.errors?.['required'] && registerForm.get('password')?.touched) {-->
-<!--          <small class="error">Password is required.</small>-->
-<!--        }-->
-<!--        @if (registerForm.get('password')?.errors?.['minlength'] && registerForm.get('password')?.touched) {-->
-<!--          <small class="error">Password must be at least 8 characters.</small>-->
-<!--        }-->
-<!--        @if (registerForm.get('password')?.errors?.['weakPassword'] && registerForm.get('password')?.touched) {-->
-<!--          <small class="error">Password must include uppercase, lowercase, numbers, and special characters.</small>-->
-<!--        }-->
-      </div>
-      <div class="field">
-        <label for="repeatPassword">Repeat password:</label>
-        <input type="password" id="repeatPassword" formControlName="repeatPassword" />
-<!--        @if (registerForm.get('repeatPassword')?.errors?.['required'] && registerForm.get('repeatPassword')?.touched) {-->
-<!--          <small class="error">Repeat Password is required.</small>-->
-<!--        }-->
-<!--        @if (registerForm.hasError('passwordMismatch') && registerForm.touched) {-->
-<!--          <small class="error">Passwords do not match.</small>-->
-<!--        }-->
-      </div>
-      <button type="submit" (click)="onRegister()" [disabled]="registerForm.invalid">Sign up</button>
-      <div class="login">Already have an account? <button (click)="onLogin()">Sign in</button></div>
-    </form>
-  }
-</div>
+    </div>
+  </div>
+</section>

@@ -1,49 +1,121 @@
-<input placeholder="Title"/>
-<div class="toolbar">
-  <button type="button" (click)="addTextBlock()">Tt</button>
-  <button type="button" (click)="addImageBlock()">img</button>
-  <button type="button" (click)="addCodeBlock()">&lt;/&gt;</button>
+<section class="edit-page">
+  <div class="editor-shell">
+    <div class="editor-top">
+      <p class="page-label">{{ pageTitle() }}</p>
 
-  <span class="spacer"></span>
+      @if (loadingArticle()) {
+        <div class="editor-status">Loading article...</div>
+      }
 
-  <button type="button" (click)="logPayload()">Log payload</button>
-  <button type="button" (click)="createArticle()">
-    Publish
-  </button>
-  <button type="button" (click)="goToReview()">
-    Review
-  </button>
-</div>
+      @if (loadFailed()) {
+        <div class="editor-status editor-status--error">Article could not be loaded for editing.</div>
+      }
 
-<div class="blocks">
-  @for (b of blocks; track b.id) {
-    <div class="block-shell">
-      <div class="block-actions">
-        <button type="button" (click)="moveUp(b.id)">↑</button>
-        <button type="button" (click)="moveDown(b.id)">↓</button>
-        <button type="button" (click)="removeBlock(b.id)">✕</button>
+      <div class="title-row">
+        <input
+          class="title-input"
+          type="text"
+          placeholder="Title"
+          [value]="title"
+          (input)="onTitleInput($event)">
+
+        <div class="primary-actions">
+          <button type="button" class="action-button" (click)="goToReview()">Preview</button>
+          <button type="button" class="action-button" (click)="submitArticle()">{{ submitLabel() }}</button>
+        </div>
       </div>
 
-      @if (b.type === 'TEXT') {
-        <app-text-block
-          [block]="b"
-          (change)="updateBlock($event)">
-        </app-text-block>
+      <div class="editor-meta">
+        <label class="draft-toggle">
+          <input type="checkbox" [checked]="isDraft" (change)="onDraftToggle($event)">
+          <span class="draft-box"></span>
+          <span class="draft-label">draft</span>
+        </label>
+
+        <div class="toolbar">
+          <button type="button" class="toolbar-button" (click)="addTextBlock()">
+            <ion-icon name="text-outline"></ion-icon>
+          </button>
+          <span class="toolbar-divider" aria-hidden="true"></span>
+          <button type="button" class="toolbar-button" (click)="addImageBlock()" aria-label="Add image block">
+            <ion-icon name="image-outline"></ion-icon>
+          </button>
+          <span class="toolbar-divider" aria-hidden="true"></span>
+          <button type="button" class="toolbar-button" (click)="addCodeBlock()" aria-label="Add code block">
+            <ion-icon name="code-slash-outline"></ion-icon>
+          </button>
+        </div>
+      </div>
+
+      <label class="preview-dropzone">
+        <input type="file" accept="image/*" (change)="onPreviewSelected($event)">
+        <div class="preview-icon" aria-hidden="true">
+          <ion-icon name="cloud-upload-outline"></ion-icon>
+        </div>
+        <span class="preview-text">{{ previewImageName || 'Upload preview image' }}</span>
+      </label>
+
+      @if (previewImageUploading()) {
+        <div class="preview-text">Uploading preview image...</div>
       }
 
-      @if (b.type === 'IMAGE') {
-        <app-image-block
-          [block]="b"
-          (change)="updateBlock($event)">
-        </app-image-block>
-      }
-
-      @if (b.type === 'CODE') {
-        <app-code-block
-          [block]="b"
-          (change)="updateBlock($event)">
-        </app-code-block>
+      @if (previewImageUrl) {
+        <div class="block-shell">
+          <img [src]="previewImageUrl" [alt]="previewImageName || 'Preview image'">
+        </div>
       }
     </div>
-  }
-</div>
+
+    <div class="blocks">
+      @for (b of blocks; track b.id) {
+        @if (b.type === 'TEXT') {
+          <app-text-block
+            [block]="b"
+            [isDragging]="draggedBlockId === b.id"
+            [isDragOver]="dragOverBlockId === b.id"
+            (change)="updateBlock($event)"
+            (moveUp)="moveUp(b.id)"
+            (moveDown)="moveDown(b.id)"
+            (remove)="removeBlock(b.id)"
+            (dragStarted)="onBlockDragStart($event)"
+            (dragEntered)="onBlockDragEnter($event)"
+            (dropped)="onBlockDrop($event)"
+            (dragEnded)="onBlockDragEnd()">
+          </app-text-block>
+        }
+
+        @if (b.type === 'IMAGE') {
+          <app-image-block
+            [block]="b"
+            [isDragging]="draggedBlockId === b.id"
+            [isDragOver]="dragOverBlockId === b.id"
+            (change)="updateBlock($event)"
+            (moveUp)="moveUp(b.id)"
+            (moveDown)="moveDown(b.id)"
+            (remove)="removeBlock(b.id)"
+            (dragStarted)="onBlockDragStart($event)"
+            (dragEntered)="onBlockDragEnter($event)"
+            (dropped)="onBlockDrop($event)"
+            (dragEnded)="onBlockDragEnd()">
+          </app-image-block>
+        }
+
+        @if (b.type === 'CODE') {
+          <app-code-block
+            [block]="b"
+            [isDragging]="draggedBlockId === b.id"
+            [isDragOver]="dragOverBlockId === b.id"
+            (change)="updateBlock($event)"
+            (moveUp)="moveUp(b.id)"
+            (moveDown)="moveDown(b.id)"
+            (remove)="removeBlock(b.id)"
+            (dragStarted)="onBlockDragStart($event)"
+            (dragEntered)="onBlockDragEnter($event)"
+            (dropped)="onBlockDrop($event)"
+            (dragEnded)="onBlockDragEnd()">
+          </app-code-block>
+        }
+      }
+    </div>
+  </div>
+</section>

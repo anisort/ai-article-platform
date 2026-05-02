@@ -1,101 +1,196 @@
 .header-container {
-  border-bottom: 0.3rem solid var(--color-ghost);
+  padding: 0.5rem 1rem 0.75rem;
+  background: var(--color-surface-base);
+  border-bottom: 1px solid var(--color-border-soft);
+}
+
+.header-wrapper {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(18rem, 34rem) minmax(0, 1fr);
+  align-items: center;
+  gap: 1rem;
+  padding: 0.8rem 1rem;
+  border-radius: 2rem;
+  background: color-mix(in srgb, var(--color-surface-elevated) 72%, var(--color-surface-panel));
+  box-shadow: var(--shadow-medium);
+  border: 1px solid var(--color-border-soft);
+}
+
+.left {
+  justify-self: start;
+}
+
+.brand-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.35rem 0.55rem 0.35rem 0.2rem;
+  border-radius: 1.4rem;
+  background: color-mix(in srgb, var(--color-surface-soft) 70%, var(--color-surface-rose));
+  border: 1px solid color-mix(in srgb, var(--color-surface-elevated) 68%, transparent);
+}
+
+.menu-button {
+  --color: var(--color-primary-dark);
+  --padding-start: 0.3rem;
+  --padding-end: 0.3rem;
+  --padding-top: 0.3rem;
+  --padding-bottom: 0.3rem;
+  margin: 0;
+  border-radius: 1rem;
+  background: color-mix(in srgb, var(--color-primary) 16%, transparent);
+}
+
+.brand-divider {
+  width: 1px;
+  height: 2rem;
+  background: color-mix(in srgb, var(--color-primary) 34%, transparent);
+}
+
+.brand-copy {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.brand-mark {
+  color: var(--color-accent-ink);
+  font-size: 1.7rem;
+  line-height: 1;
+  font-weight: 500;
+}
+
+.brand-sub {
+  color: var(--color-text-muted);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.center {
+  min-width: 0;
+}
+
+.search-shell {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+
+.form-control {
+  width: 100%;
+  border: 0;
+  border-radius: 999px;
+  padding: 0.9rem 3.5rem 0.9rem 1.25rem;
+  background: var(--color-surface-elevated);
+  color: var(--color-primary-dark);
+  box-sizing: border-box;
+  box-shadow: inset 0 0 0 1px var(--color-border-soft);
+}
+
+.form-control::placeholder {
+  color: color-mix(in srgb, var(--color-primary) 62%, transparent);
+}
+
+.form-control:focus {
+  outline: none;
+  box-shadow: 0 0 0 0.22rem color-mix(in srgb, var(--color-primary) 18%, transparent);
+}
+
+.search-icon {
+  position: absolute;
+  top: 50%;
+  right: 0.65rem;
+  transform: translateY(-50%);
+  width: 2.2rem;
+  height: 2.2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: rgba(190, 92, 131, 0.1);
+  color: var(--color-accent-berry);
+  pointer-events: none;
+}
+
+.search-icon ion-icon {
+  font-size: 1.2rem;
+}
+
+.right {
+  justify-self: end;
+}
+
+.auth-buttons {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.auth-buttons button {
+  border: 0;
+  border-radius: 999px;
+  padding: 0.8rem 1.05rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.18s ease, background-color 0.18s ease, color 0.18s ease;
+}
+
+.auth-buttons button:hover {
+  transform: translateY(-1px);
+}
+
+.login,
+.logout {
+  background: color-mix(in srgb, var(--color-primary) 16%, var(--color-surface-panel));
+  color: var(--color-primary-dark);
+}
+
+.register {
+  background: color-mix(in srgb, var(--color-accent-berry) 16%, var(--color-surface-rose));
+  color: var(--color-accent-berry);
+}
+
+.auth-buttons--single .logout {
+  min-width: 6.5rem;
+}
+
+@media (max-width: 900px) {
+  .header-wrapper {
+    grid-template-columns: 1fr;
+    gap: 0.85rem;
+    border-radius: 1.6rem;
+  }
+
+  .left,
+  .right {
+    justify-self: stretch;
+  }
+
+  .right {
+    display: flex;
+    justify-content: flex-end;
+  }
+}
+
+@media (max-width: 560px) {
+  .header-container {
+    padding-inline: 0.75rem;
+  }
 
   .header-wrapper {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.5rem 1.5rem;
-    margin-bottom: 0.5rem;
-    border-radius: 5rem;
-    background: var(--color-primary);
+    padding: 0.75rem;
+  }
 
-    .left {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
+  .brand-mark {
+    font-size: 1.45rem;
+  }
 
-      h2 {
-        margin: 0;
-        color: white;
-      }
-    }
+  .auth-buttons {
+    width: 100%;
+  }
 
-    .center {
-      flex: 1;
-      display: flex;
-      justify-content: center;
-      padding: 0 1.5rem;
-
-      .input-group {
-        position: relative;
-        width: min(100%, 40rem);
-        margin: 0;
-        border-radius: 999px;
-        transition: box-shadow 0.2s ease, transform 0.2s ease;
-
-        .form-control {
-          width: 100%;
-          padding: 0.75rem 3rem 0.75rem 1.25rem;
-          border: none;
-          border-radius: 999px;
-          background: white;
-          color: var(--color-accent);
-          box-shadow: none;
-          transition: box-shadow 0.2s ease, background-color 0.2s ease;
-
-          &::placeholder {
-            color: var(--color-disabled);
-          }
-
-          &:focus {
-            outline: none;
-            background: white;
-            box-shadow: 0 0 0 0.1rem var(--color-ghost-light);
-          }
-        }
-
-        ion-icon {
-          position: absolute;
-          top: 50%;
-          right: -3rem;
-          transform: translateY(-50%);
-          font-size: 1.25rem;
-          color: var(--color-accent);
-          pointer-events: none;
-        }
-      }
-    }
-
-    .right {
-      .auth-buttons {
-        display: flex;
-        gap: 0.5rem;
-
-        .login {
-          border-top-left-radius: 999px;
-          border-bottom-left-radius: 999px;
-        }
-
-        .register {
-          border-top-right-radius: 999px;
-          border-bottom-right-radius: 999px;
-        }
-
-        button {
-          padding: 0.5rem 1rem;
-          color: var(--color-primary-dark);
-          background: var(--color-ghost-light);
-          border: none;
-
-          &:hover {
-            color: white;
-            background: var(--color-ghost);
-            cursor: pointer;
-          }
-        }
-      }
-
-    }
+  .auth-buttons button {
+    flex: 1;
   }
 }

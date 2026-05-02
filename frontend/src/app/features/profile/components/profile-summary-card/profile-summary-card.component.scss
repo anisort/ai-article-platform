@@ -1,0 +1,91 @@
+.profile-meta {
+  display: grid;
+  gap: 1rem;
+}
+
+.profile-meta__main {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.profile-meta__footer {
+  display: flex;
+  justify-content: flex-start;
+  width: 100%;
+}
+
+.profile-identify {
+  display: grid;
+  gap: 0.15rem;
+
+  strong {
+    color: var(--color-accent-ink);
+    font-size: 1.05rem;
+  }
+
+  span {
+    color: var(--color-text-muted);
+  }
+}
+
+.profile-stats {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-left: auto;
+  flex-wrap: wrap;
+}
+
+.profile-stat {
+  border: 1px solid transparent;
+  display: grid;
+  gap: 0.15rem;
+  min-width: 6rem;
+  padding: 0.8rem 1rem;
+  border-radius: 1rem;
+  background: color-mix(in srgb, var(--color-surface-base) 78%, white);
+  text-align: center;
+  cursor: pointer;
+
+  strong {
+    color: var(--color-accent-ink);
+    font-size: 1.15rem;
+  }
+
+  span {
+    color: var(--color-text-muted);
+    font-size: 0.88rem;
+  }
+}
+
+.profile-stat--active {
+  border-color: color-mix(in srgb, var(--color-accent-berry) 45%, var(--color-border-soft));
+  background: color-mix(in srgb, var(--color-surface-rose) 34%, var(--color-surface-panel));
+}
+
+.profile-follow-button,
+.profile-back-button {
+  border: 1px solid var(--color-border-soft);
+  border-radius: 999px;
+  padding: 0.85rem 1.2rem;
+  color: var(--color-accent-berry);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.profile-follow-button {
+  background: color-mix(in srgb, var(--color-surface-rose) 42%, var(--color-surface-panel));
+}
+
+.profile-back-button {
+  background: var(--color-surface-panel);
+}
+
+@media (max-width: 600px) {
+  .profile-stats {
+    margin-left: 0;
+  }
+}

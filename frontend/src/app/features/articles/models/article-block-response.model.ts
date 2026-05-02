@@ -1,10 +1,10 @@
 export interface ArticleBlockResponse {
   id: string;
   position: number;
-  type: string;
+  type: 'TEXT' | 'IMAGE' | 'CODE';
   content?: string;
   codeLanguage?: string;
   code?: string;
   imageUrl?: string;
-  caption?: string;
+  imageCaption?: string;
 }

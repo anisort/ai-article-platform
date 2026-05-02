@@ -1,15 +1,25 @@
 <header class="header-container">
   <div class="header-wrapper">
     <div class="left">
-      <ion-menu-button menu="main-menu"></ion-menu-button>
-      <h2>Commit</h2>
-    </div>
-    <div class="center">
-      <div class="input-group">
-        <input type="text" class="form-control" placeholder="Search" aria-label="Search">
-        <ion-icon name="search-outline"></ion-icon>
+      <div class="brand-chip">
+        <ion-menu-button class="menu-button" menu="main-menu"></ion-menu-button>
+        <span class="brand-divider" aria-hidden="true"></span>
+        <div class="brand-copy">
+          <span class="brand-mark">Commit</span>
+          <span class="brand-sub">AI article platform</span>
+        </div>
       </div>
     </div>
+
+    <div class="center">
+      <label class="search-shell" aria-label="Search articles">
+        <input type="text" class="form-control" placeholder="Search request">
+        <span class="search-icon">
+          <ion-icon name="search-outline"></ion-icon>
+        </span>
+      </label>
+    </div>
+
     <div class="right">
       @if (!authService.isAuthenticated()) {
         <div class="auth-buttons">
@@ -18,7 +28,8 @@
         </div>
       } @else {
         <div class="auth-buttons">
-          <button (click)="onLogout()">Logout</button>
+          <button class="login" (click)="onProfile()">Profile</button>
+          <button class="logout" (click)="onLogout()">Logout</button>
         </div>
       }
     </div>

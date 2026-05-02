@@ -1,0 +1,47 @@
+<div class="profile-meta">
+  <div class="profile-meta__main">
+    <app-avatar
+      [imageUrl]="profile().avatar"
+      [name]="displayName()"
+      size="4.25rem" />
+
+    <div class="profile-identify">
+      <strong>{{ displayName() }}</strong>
+      <span>{{ profileHandle() }}</span>
+      @if (profile().email) {
+        <span>{{ profile().email }}</span>
+      }
+    </div>
+
+    @if (profile().ownProfile) {
+      <div class="profile-stats">
+        <button
+          type="button"
+          class="profile-stat"
+          [class.profile-stat--active]="connectionTab() === 'following'"
+          (click)="connectionSelect.emit('following')">
+          <strong>{{ followingCount() }}</strong>
+          <span>Following</span>
+        </button>
+        <button
+          type="button"
+          class="profile-stat"
+          [class.profile-stat--active]="connectionTab() === 'followers'"
+          (click)="connectionSelect.emit('followers')">
+          <strong>{{ followersCount() }}</strong>
+          <span>Followers</span>
+        </button>
+      </div>
+    }
+
+    @if (canFollow()) {
+      <button
+        type="button"
+        class="profile-follow-button"
+        [disabled]="followLoading()"
+        (click)="followToggle.emit()">
+        {{ profile().following ? 'Unfollow' : 'Follow' }}
+      </button>
+    }
+  </div>
+</div>

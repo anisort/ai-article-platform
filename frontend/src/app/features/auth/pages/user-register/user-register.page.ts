@@ -1,3 +1,4 @@
+import {CommonModule} from '@angular/common';
 import {Component, DestroyRef, inject, OnInit, signal} from '@angular/core';
 import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {UserRegisterService} from '../../services/user-register.service';
@@ -7,7 +8,9 @@ import {finalize, tap} from 'rxjs';
 
 @Component({
   selector: 'app-user-register',
+  standalone: true,
   imports: [
+    CommonModule,
     ReactiveFormsModule
   ],
   templateUrl: './user-register.page.html',

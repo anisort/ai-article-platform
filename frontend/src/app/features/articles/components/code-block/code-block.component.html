@@ -1,13 +1,29 @@
-<div class="title">CODE block (pos {{ block().position }})</div>
-<div class="row">
-  <input type="text"
-         placeholder="Language (e.g. java, ts, sql)"
-         [ngModel]="block().codeLanguage"
-         (ngModelChange)="setLang($event)"/>
-</div>
-<textarea
-  rows="8"
-  [ngModel]="block().code"
-  (ngModelChange)="setCode($event)"
-  placeholder="Paste code here...">
-</textarea>
+<app-editor-block-frame
+  [blockId]="block().id"
+  [compact]="true"
+  [isDragging]="isDragging()"
+  [isDragOver]="isDragOver()"
+  (moveUp)="moveUp.emit()"
+  (moveDown)="moveDown.emit()"
+  (remove)="remove.emit()"
+  (dragStarted)="dragStarted.emit($event)"
+  (dragEntered)="dragEntered.emit($event)"
+  (dropped)="dropped.emit($event)"
+  (dragEnded)="dragEnded.emit()">
+  <div class="code-block">
+    <div class="row">
+      <input
+        type="text"
+        placeholder="Programming language"
+        [ngModel]="block().codeLanguage"
+        (ngModelChange)="setLang($event)"/>
+    </div>
+
+    <textarea
+      rows="8"
+      [ngModel]="block().code"
+      (ngModelChange)="setCode($event)"
+      placeholder="Code input">
+    </textarea>
+  </div>
+</app-editor-block-frame>

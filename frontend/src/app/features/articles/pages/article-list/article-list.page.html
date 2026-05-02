@@ -1,1 +1,28 @@
-<p>article-list.page works!</p>
+<section class="article-list-page">
+  @if (articles().length) {
+    <div class="article-grid">
+      @for (article of articles(); track article.id; let i = $index) {
+        <article class="article-card" [ngClass]="cardClass(i)">
+          <a class="card-media" [routerLink]="['/articles', article.id]">
+            @if (article.imageUrl) {
+              <img [src]="article.imageUrl" [alt]="article.title">
+            } @else {
+              <div class="card-fallback">{{ article.title }}</div>
+            }
+          </a>
+
+          <div class="card-overlay">
+            <h2 [title]="article.title">
+              <a [routerLink]="['/articles', article.id]">{{ article.title }}</a>
+            </h2>
+            <p>
+              <a [routerLink]="['/profile', article.author.id]" [title]="authorName(article)">{{ authorName(article) }}</a>
+            </p>
+          </div>
+        </article>
+      }
+    </div>
+  } @else {
+    <div class="empty-state">No published articles yet.</div>
+  }
+</section>

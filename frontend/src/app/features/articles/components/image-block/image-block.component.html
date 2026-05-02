@@ -1,41 +1,40 @@
-<!--<div class="title">IMAGE block (pos {{ block().position }})</div>-->
+<app-editor-block-frame
+  [blockId]="block().id"
+  [compact]="true"
+  [isDragging]="isDragging()"
+  [isDragOver]="isDragOver()"
+  (moveUp)="moveUp.emit()"
+  (moveDown)="moveDown.emit()"
+  (remove)="remove.emit()"
+  (dragStarted)="dragStarted.emit($event)"
+  (dragEntered)="dragEntered.emit($event)"
+  (dropped)="dropped.emit($event)"
+  (dragEnded)="dragEnded.emit()">
+  <div class="image-block">
+    <label class="upload-dropzone">
+      <input
+        type="file"
+        accept="image/*"
+        (change)="onFileSelected($event)" />
 
-<!--<div class="row">-->
-<!--  <input type="text" placeholder="Image URL (пока руками)" [ngModel]="block().imageUrl" (ngModelChange)="setUrl($event)" />-->
-<!--</div>-->
+      @if (block().imageUrl) {
+        <div class="preview">
+          <img [src]="block().imageUrl" alt="preview" />
+        </div>
+      } @else {
+        <div class="upload-placeholder">
+          <div class="upload-icon">+</div>
+          <div class="upload-text">{{ uploading() ? 'Uploading...' : 'Upload image' }}</div>
+        </div>
+      }
+    </label>
 
-<!--@if (block().imageUrl) {-->
-<!--  <div class="preview">-->
-<!--    <img [src]="block().imageUrl" alt="preview" />-->
-<!--  </div>-->
-<!--}-->
-
-<!--<div class="row">-->
-<!--  <input type="text" placeholder="Caption" [ngModel]="block().caption" (ngModelChange)="setCaption($event)" />-->
-<!--</div>-->
-<div class="title">IMAGE block (pos {{ block().position }})</div>
-
-<div class="row">
-  <input
-    type="file"
-    accept="image/*"
-    (change)="onFileSelected($event)" />
-</div>
-
-@if (uploading()) {
-  <div class="row">Uploading...</div>
-}
-
-@if (block().imageUrl) {
-  <div class="preview">
-    <img [src]="block().imageUrl" alt="preview" />
+    <div class="row">
+      <input
+        type="text"
+        placeholder="Caption"
+        [ngModel]="block().caption"
+        (ngModelChange)="setCaption($event)" />
+    </div>
   </div>
-}
-
-<div class="row">
-  <input
-    type="text"
-    placeholder="Caption"
-    [ngModel]="block().caption"
-    (ngModelChange)="setCaption($event)" />
-</div>
+</app-editor-block-frame>

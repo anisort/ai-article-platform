@@ -1,0 +1,72 @@
+<section class="article-detail-page">
+  @if (loading()) {
+    <div class="article-state-card">
+      <p class="article-state-label">Loading article</p>
+      <h1>Preparing the page...</h1>
+    </div>
+  } @else if (notFound()) {
+    <div class="article-state-card">
+      <p class="article-state-label">Not found</p>
+      <h1>Article is unavailable.</h1>
+      <a routerLink="/articles">Back to articles</a>
+    </div>
+  } @else if (articleData()) {
+    <article class="article-shell">
+      <header class="article-hero">
+        <a class="article-back" routerLink="/articles">All articles</a>
+        <p class="article-meta">
+          <a [routerLink]="['/profile', authorData()?.id]">{{ authorName() }}</a>
+          <span>·</span>
+          <span>{{ articleData()?.createdAt | date:'mediumDate' }}</span>
+        </p>
+        <h1>{{ articleData()?.title }}</h1>
+        @if (canLike()) {
+          <button
+            type="button"
+            class="article-like-button"
+            [class.article-like-button--active]="liked()"
+            [disabled]="likeLoading()"
+            (click)="toggleLike()">
+            {{ liked() ? 'Unlike article' : 'Like article' }}
+          </button>
+        }
+        @if (articleData()?.summary) {
+          <p class="article-summary">{{ articleData()?.summary }}</p>
+        }
+        @if (articleData()?.imageUrl) {
+          <div class="article-cover">
+            <img [src]="articleData()?.imageUrl" [alt]="articleData()?.title || 'Article image'">
+          </div>
+        }
+      </header>
+
+      <section class="article-content">
+        @for (block of articleData()?.blocks ?? []; track block.id) {
+          @if (isTextBlock(block) && block.content) {
+            <div class="article-block article-block--text">
+              <markdown [data]="block.content"></markdown>
+            </div>
+          }
+
+          @if (isImageBlock(block) && block.imageUrl) {
+            <figure class="article-block article-block--image">
+              <img [src]="block.imageUrl" [alt]="block.imageCaption || articleData()?.title || 'Article image'">
+              @if (block.imageCaption) {
+                <figcaption>{{ block.imageCaption }}</figcaption>
+              }
+            </figure>
+          }
+
+          @if (isCodeBlock(block) && block.code) {
+            <section class="article-block article-block--code">
+              @if (block.codeLanguage) {
+                <p class="code-language">{{ block.codeLanguage }}</p>
+              }
+              <pre><code>{{ block.code }}</code></pre>
+            </section>
+          }
+        }
+      </section>
+    </article>
+  }
+</section>

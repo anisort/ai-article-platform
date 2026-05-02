@@ -1,0 +1,138 @@
+<section class="profile-page">
+  <div class="profile-shell">
+    <header class="profile-hero">
+      <p class="profile-eyebrow">{{ isOwnProfile() ? 'Author space' : 'Public profile' }}</p>
+      <h1>{{ profileTitle() }}</h1>
+      <p class="profile-copy">{{ profileCopy() }}</p>
+
+      @if (profile()) {
+        <app-profile-summary-card
+          [profile]="profile()!"
+          [connectionTab]="connectionTab()"
+          [followLoading]="followLoading()"
+          [canFollow]="canFollow()"
+          (connectionSelect)="setConnectionTab($event)"
+          (followToggle)="toggleFollow()"
+          (backToArticles)="closeConnectionTab()" />
+      }
+    </header>
+
+    @if (unauthorized()) {
+      <section class="profile-state">
+        <p class="profile-state__label">Authorization required</p>
+        <h2>Sign in to see your profile.</h2>
+        <a routerLink="/articles">Back to articles</a>
+      </section>
+    } @else if (notFound()) {
+      <section class="profile-state">
+        <p class="profile-state__label">Not found</p>
+        <h2>Profile is unavailable.</h2>
+        <a routerLink="/articles">Back to articles</a>
+      </section>
+    } @else {
+      @if (showArticlesSection()) {
+        <nav class="profile-tabs" aria-label="Profile tabs">
+          <button
+            type="button"
+            class="profile-tab"
+            [class.profile-tab--active]="activeTab() === 'published'"
+            (click)="setTab('published')">
+            Published
+            <span>{{ tabCount('published') }}</span>
+          </button>
+
+          @if (isOwnProfile()) {
+            <button
+              type="button"
+              class="profile-tab"
+              [class.profile-tab--active]="activeTab() === 'drafts'"
+              (click)="setTab('drafts')">
+              Drafts
+              <span>{{ tabCount('drafts') }}</span>
+            </button>
+            <button
+              type="button"
+              class="profile-tab"
+              [class.profile-tab--active]="activeTab() === 'liked'"
+              (click)="setTab('liked')">
+              Liked
+              <span>{{ tabCount('liked') }}</span>
+            </button>
+          }
+        </nav>
+      }
+
+      @if (loading()) {
+        <section class="profile-state">
+          <p class="profile-state__label">Loading</p>
+          <h2>Collecting profile data...</h2>
+        </section>
+      } @else if (showArticlesSection() && isOwnProfile() && visibleArticles().length) {
+        <div class="profile-grid">
+          @for (article of ownArticleCards(); track article.id) {
+            <app-profile-article-card [article]="article" />
+          }
+        </div>
+      } @else if (showArticlesSection() && !isOwnProfile() && visiblePublishedPreviews().length) {
+        <div class="profile-grid">
+          @for (article of publishedArticleCards(); track article.id) {
+            <app-profile-article-card [article]="article" />
+          }
+        </div>
+      } @else if (showArticlesSection()) {
+        <section class="profile-state">
+          <p class="profile-state__label">
+            {{
+              !isOwnProfile()
+                ? 'Published'
+                : activeTab() === 'published'
+                  ? 'Published'
+                  : activeTab() === 'drafts'
+                    ? 'Drafts'
+                    : 'Liked'
+            }}
+          </p>
+          <h2>{{ isOwnProfile() ? 'No content in this section yet.' : 'This author has no published articles yet.' }}</h2>
+          <a [routerLink]="!isOwnProfile() || activeTab() === 'liked' ? '/articles' : '/edit-article'">
+            {{ !isOwnProfile() || activeTab() === 'liked' ? 'Explore articles' : 'Create article' }}
+          </a>
+        </section>
+      }
+    }
+  </div>
+
+  @if (isOwnProfile() && connectionTab()) {
+    <div class="profile-modal-backdrop" (click)="closeConnectionTab()">
+      <section class="profile-modal" (click)="$event.stopPropagation()">
+        <div class="profile-modal__head">
+          <div>
+            <p class="profile-state__label">{{ modalTitle() }}</p>
+            <h2>{{ modalTitle() }}</h2>
+          </div>
+          <button type="button" class="profile-modal__close" (click)="closeConnectionTab()">Close</button>
+        </div>
+
+        @if (modalUsers().length) {
+          <div class="profile-users">
+            @for (user of modalUsers(); track user.id) {
+              <div (click)="closeConnectionTab()">
+                <app-profile-connection-card [user]="user" />
+              </div>
+            }
+          </div>
+        } @else {
+          <section class="profile-state profile-state--modal">
+            <p class="profile-state__label">{{ modalTitle() }}</p>
+            <h2>
+              {{
+                connectionTab() === 'following'
+                  ? 'You are not following anyone yet.'
+                  : 'No one is following you yet.'
+              }}
+            </h2>
+          </section>
+        }
+      </section>
+    </div>
+  }
+</section>

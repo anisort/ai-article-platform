@@ -9,19 +9,29 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TextBlock } from '../../models/article-block.types';
+import {EditorBlockFrameComponent} from '../../../../shared/components/editor-block-frame/editor-block-frame.component';
 
 type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
 
 @Component({
   standalone: true,
   selector: 'app-text-block',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, EditorBlockFrameComponent],
   templateUrl: './text-block.component.html',
   styleUrl: './text-block.component.scss',
 })
 export class TextBlockComponent {
   block = input.required<TextBlock>();
   change = output<TextBlock>();
+  moveUp = output<void>();
+  moveDown = output<void>();
+  remove = output<void>();
+  isDragging = input(false);
+  isDragOver = input(false);
+  dragStarted = output<string>();
+  dragEntered = output<string>();
+  dropped = output<string>();
+  dragEnded = output<void>();
 
   text = viewChild.required<ElementRef<HTMLTextAreaElement>>('text');
 
