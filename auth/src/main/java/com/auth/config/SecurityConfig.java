@@ -18,6 +18,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.MediaType;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -61,34 +62,6 @@ public class SecurityConfig {
     @Value("${auth.issuer-uri}")
     private String issuerUri;
 
-//    @Bean
-//    @Order(1)
-//    public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http)
-//            throws Exception {
-//        OAuth2AuthorizationServerConfigurer authorizationServerConfigurer =
-//                OAuth2AuthorizationServerConfigurer.authorizationServer();
-//
-//        http
-//                .securityMatcher(authorizationServerConfigurer.getEndpointsMatcher())
-//                .cors(Customizer.withDefaults())
-//                .with(authorizationServerConfigurer, (authorizationServer) ->
-//                        authorizationServer
-//                                .oidc(Customizer.withDefaults())
-//                )
-//                .authorizeHttpRequests((authorize) ->
-//                        authorize
-//                                .anyRequest().authenticated()
-//                )
-//                .exceptionHandling((exceptions) -> exceptions
-//                        .defaultAuthenticationEntryPointFor(
-//                                new LoginUrlAuthenticationEntryPoint("/login"),
-//                                new MediaTypeRequestMatcher(MediaType.TEXT_HTML)
-//                        )
-//                );
-//
-//        return http.build();
-//    }
-
     @Bean
     @Order(1)
     public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http)
@@ -122,8 +95,12 @@ public class SecurityConfig {
             throws Exception {
         http
                 .authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers("/login", "/api/v1/users/**", "/.well-known/appspecific/**", "/error")
-                        .permitAll()
+                        .requestMatchers("/login", "/.well-known/appspecific/**", "/error").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/users/me").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/users/*/follow").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/users/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/users").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/users/batch").permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
@@ -223,27 +200,6 @@ public class SecurityConfig {
                 context.getClaims().subject(String.valueOf(custom.getId()));
                 context.getClaims().claim("role", custom.getRole().name());
             }
-//            else if (principal instanceof org.springframework.security.oauth2.core.user.OAuth2User user) {
-//                Object id = user.getAttribute("id"); // github id
-//                if (id != null) {
-//                    String githubSub = id.toString();
-//
-//                    CustomUserDetails custom = userRepository.findByGithubSub(githubSub)
-//                            .orElseGet(() -> {
-//                                CustomUserDetails nu = new CustomUserDetails();
-//                                nu.setGithubSub(githubSub);
-//                                nu.setEmail(user.getAttribute("email"));
-//                                nu.setName(user.getAttribute("name"));
-//                                nu.setAvatar(user.getAttribute("avatar_url"));
-//                                nu.setRole(Role.USER);
-//                                nu.setUsername((String) user.getAttribute("login")); // github login
-//                                return userRepository.save(nu);
-//                            });
-//
-//                    context.getClaims().subject(String.valueOf(custom.getId()));
-//                    context.getClaims().claim("role", custom.getRole().name());
-//                }
-//            }
         };
     }
 
@@ -312,6 +268,4 @@ public class SecurityConfig {
     ForwardedHeaderFilter forwardedHeaderFilter() {
         return new ForwardedHeaderFilter();
     }
-
-
 }

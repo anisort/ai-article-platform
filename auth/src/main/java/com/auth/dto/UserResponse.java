@@ -9,7 +9,8 @@ public record UserResponse(
         @NotNull UUID id,
         @NotNull String username,
         @NotNull String email,
-        @NotNull String name
+        @NotNull String name,
+        String avatar
         ) {
     public static UserResponse fromEntity(CustomUserDetails user) {
         if (user == null) return null;
@@ -17,6 +18,7 @@ public record UserResponse(
                 user.getId(),
                 user.getUsername(),
                 user.getEmail(),
-                user.getName());
+                user.getName(),
+                user.getAvatar());
     }
 }
