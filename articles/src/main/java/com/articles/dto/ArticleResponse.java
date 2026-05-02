@@ -9,6 +9,7 @@ import java.util.UUID;
 public record ArticleResponse(
         UUID id,
         String title,
+        String imageUrl,
         String summary,
         ZonedDateTime createdAt,
         List<ArticleBlockResponse> blocks,
@@ -18,6 +19,7 @@ public record ArticleResponse(
         return new ArticleResponse(
                 a.getId(),
                 a.getTitle(),
+                a.getImageUrl(),
                 a.getSummary(),
                 a.getCreatedAt(),
                 a.getBlocks().stream()

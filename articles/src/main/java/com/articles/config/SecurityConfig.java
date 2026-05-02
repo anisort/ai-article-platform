@@ -2,6 +2,7 @@ package com.articles.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -22,6 +23,10 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(authorize -> authorize
                         //.requestMatchers("/api/chats/**", "/api/messages/**").hasAnyRole("ADMIN", "USER")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/articles/**").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/articles/**").authenticated()
+                        .requestMatchers("/api/v1/articles/me").authenticated()
+                        .requestMatchers("/api/v1/articles/me/likes").authenticated()
                         .requestMatchers("/api/v1/articles/**").permitAll()
                         .anyRequest().authenticated()
                 )

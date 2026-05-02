@@ -1,6 +1,7 @@
 package com.articles.services;
 
 import com.articles.dto.AuthorResponse;
+import com.articles.dto.UserProfilePreviewResponse;
 import com.articles.entities.Article;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
@@ -40,5 +41,12 @@ public class UserService {
                         AuthorResponse::id,
                         author -> author
                 ));
+    }
+
+    public UserProfilePreviewResponse getUser(UUID id) {
+        return restClient.get()
+                .uri("/api/v1/users/{id}", id)
+                .retrieve()
+                .body(UserProfilePreviewResponse.class);
     }
 }
