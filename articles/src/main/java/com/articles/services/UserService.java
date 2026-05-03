@@ -3,6 +3,7 @@ package com.articles.services;
 import com.articles.dto.AuthorResponse;
 import com.articles.dto.UserProfilePreviewResponse;
 import com.articles.entities.Article;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
@@ -17,7 +18,7 @@ public class UserService {
 
     private final RestClient restClient;
 
-    public UserService(RestClient restClient) {
+    public UserService(@Qualifier("userRestClient") RestClient restClient) {
         this.restClient = restClient;
     }
 

@@ -1,18 +1,24 @@
 package com.articles.services;
 
 import com.articles.dto.ArticleWithUserResponse;
+import com.articles.dto.ArticleEmbeddingDocument;
+import com.articles.dto.ArticleEmbeddingDraft;
 import com.articles.dto.AuthorResponse;
 import com.articles.dto.CreateArticleRequest;
 import com.articles.dto.LikedArticlesResponse;
 import com.articles.dto.PublishedArticlePreviewResponse;
 import com.articles.dto.ToggleArticleLikeResponse;
 import com.articles.entities.Article;
+import com.articles.entities.ArticleBlock;
+import com.articles.entities.BlockType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
@@ -22,11 +28,18 @@ public class ArticleFacadeService {
     private final ArticleService articleService;
     private final ArticleLikeService articleLikeService;
     private final UserService userService;
+    private final LlmIntegrationService llmIntegrationService;
 
-    public ArticleFacadeService(ArticleService articleService, ArticleLikeService articleLikeService, UserService userService) {
+    public ArticleFacadeService(
+            ArticleService articleService,
+            ArticleLikeService articleLikeService,
+            UserService userService,
+            LlmIntegrationService llmIntegrationService
+    ) {
         this.articleService = articleService;
         this.articleLikeService = articleLikeService;
         this.userService = userService;
+        this.llmIntegrationService = llmIntegrationService;
     }
 
     public List<ArticleWithUserResponse> getArticles() {
@@ -77,14 +90,18 @@ public class ArticleFacadeService {
     public ArticleWithUserResponse create(CreateArticleRequest request, UUID authorId) {
         Article article = articleService.create(request, authorId);
         Map<UUID, AuthorResponse> authors = userService.getAuthors(List.of(article));
-        return ArticleWithUserResponse.mapToResponse(article, authors.get(article.getAuthorId()));
+        AuthorResponse author = authors.get(article.getAuthorId());
+        syncArticleEmbedding(article, author);
+        return ArticleWithUserResponse.mapToResponse(article, author);
     }
 
     public ArticleWithUserResponse update(UUID articleId, CreateArticleRequest request, UUID requesterId) {
         Article article = getOwnedArticle(articleId, requesterId);
         Article updatedArticle = articleService.update(article, request);
         Map<UUID, AuthorResponse> authors = userService.getAuthors(List.of(updatedArticle));
-        return ArticleWithUserResponse.mapToResponse(updatedArticle, authors.get(updatedArticle.getAuthorId()));
+        AuthorResponse author = authors.get(updatedArticle.getAuthorId());
+        syncArticleEmbedding(updatedArticle, author);
+        return ArticleWithUserResponse.mapToResponse(updatedArticle, author);
     }
 
     public ToggleArticleLikeResponse toggleLike(UUID articleId, UUID userId) {
@@ -118,5 +135,50 @@ public class ArticleFacadeService {
         }
 
         return article;
+    }
+
+    private void syncArticleEmbedding(Article article, AuthorResponse author) {
+        String authorName = author == null ? "Unknown" : author.name();
+        ArticleEmbeddingDraft draft = new ArticleEmbeddingDraft(
+                article.getId(),
+                buildArticleText(article),
+                article.getTitle(),
+                authorName,
+                article.getImageUrl()
+        );
+
+        String description = llmIntegrationService.generateDescription(draft);
+        ArticleEmbeddingDocument document = new ArticleEmbeddingDocument(
+                article.getId(),
+                description,
+                article.getTitle(),
+                authorName,
+                article.getImageUrl()
+        );
+        llmIntegrationService.addToVectorStore(document);
+    }
+
+    private String buildArticleText(Article article) {
+        return article.getBlocks().stream()
+                .sorted((a, b) -> Integer.compare(a.getPosition(), b.getPosition()))
+                .map(this::toTextPart)
+                .filter(Objects::nonNull)
+                .filter(part -> !part.isBlank())
+                .collect(Collectors.joining("\n\n"));
+    }
+
+    private String toTextPart(ArticleBlock block) {
+        if (block.getType() == BlockType.TEXT) {
+            return block.getContent();
+        }
+        if (block.getType() == BlockType.CODE) {
+            String code = block.getCode();
+            if (code == null || code.isBlank()) {
+                return null;
+            }
+            String lang = block.getCodeLanguage() == null ? "" : block.getCodeLanguage();
+            return "```" + lang + "\n" + code + "\n```";
+        }
+        return null;
     }
 }
