@@ -28,6 +28,14 @@ public class ArticleApi {
         return articleFacadeService.getPublishedArticles();
     }
 
+    @GetMapping("/search")
+    public List<PublishedArticlePreviewResponse> searchArticles(
+            @RequestParam String query,
+            @RequestParam(defaultValue = "title") String mode
+    ) {
+        return articleFacadeService.searchPublishedArticles(query, mode);
+    }
+
     @GetMapping("/me")
     public List<ArticleWithUserResponse> getMyArticles(@AuthenticationPrincipal Jwt jwt) {
         UUID authorId = UUID.fromString(jwt.getSubject());

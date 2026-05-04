@@ -110,7 +110,8 @@
   border-radius: 999px;
   background: rgba(190, 92, 131, 0.1);
   color: var(--color-accent-berry);
-  pointer-events: none;
+  border: 0;
+  cursor: pointer;
 }
 
 .search-icon ion-icon {

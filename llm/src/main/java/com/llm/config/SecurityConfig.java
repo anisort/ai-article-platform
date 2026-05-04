@@ -23,7 +23,9 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.POST, "/api/v1/advisor/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/advisor/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/search/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/search/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2

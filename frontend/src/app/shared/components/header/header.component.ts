@@ -17,6 +17,7 @@ import {IonIcon, IonMenuButton} from '@ionic/angular/standalone';
 export class HeaderComponent {
   authService = inject(AuthService);
   router = inject(Router);
+  searchQuery = '';
 
   constructor() {
     addIcons({ searchOutline })
@@ -36,5 +37,15 @@ export class HeaderComponent {
 
   onProfile() {
     this.router.navigate(['/profile']);
+  }
+
+  onSearchSubmit(query: string) {
+    this.searchQuery = query;
+    this.router.navigate(['/articles'], {
+      queryParams: {
+        q: query.trim() || null,
+      },
+      queryParamsHandling: 'merge',
+    });
   }
 }

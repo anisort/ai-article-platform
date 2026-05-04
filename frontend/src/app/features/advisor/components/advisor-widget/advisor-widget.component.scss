@@ -1,0 +1,70 @@
+.advisor-fab {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  border: 0;
+  border-radius: 999px;
+  padding: 0.7rem 1rem;
+  background: var(--color-accent-berry);
+  color: #fff;
+  z-index: 1000;
+}
+
+.advisor-panel {
+  position: fixed;
+  right: 1rem;
+  bottom: 4.25rem;
+  width: min(24rem, calc(100vw - 2rem));
+  height: 30rem;
+  background: var(--color-surface-elevated);
+  border: 1px solid var(--color-border-soft);
+  border-radius: 0.75rem;
+  box-shadow: var(--shadow-strong);
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  z-index: 1000;
+}
+
+.advisor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  border-bottom: 1px solid var(--color-border-soft);
+}
+
+.advisor-messages {
+  padding: 0.75rem;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.message {
+  max-width: 85%;
+  padding: 0.5rem 0.65rem;
+  border-radius: 0.5rem;
+  background: var(--color-surface-panel);
+}
+
+.message :last-child {
+  margin-bottom: 0;
+}
+
+.message--user {
+  margin-left: auto;
+  background: color-mix(in srgb, var(--color-primary) 18%, var(--color-surface-panel));
+}
+
+.advisor-input {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border-top: 1px solid var(--color-border-soft);
+}
+
+.advisor-input input {
+  width: 100%;
+}

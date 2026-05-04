@@ -1,15 +1,16 @@
 <section class="edit-page">
-  <div class="editor-shell">
-    <div class="editor-top">
-      <p class="page-label">{{ pageTitle() }}</p>
+  <div class="editor-shell" [style.--assistant-width.rem]="assistantOpen() ? assistantWidth() : 0">
+    <div class="editor-main">
+      <div class="editor-top">
+        <p class="page-label">{{ pageTitle() }}</p>
 
-      @if (loadingArticle()) {
-        <div class="editor-status">Loading article...</div>
-      }
+        @if (loadingArticle()) {
+          <div class="editor-status">Loading article...</div>
+        }
 
-      @if (loadFailed()) {
-        <div class="editor-status editor-status--error">Article could not be loaded for editing.</div>
-      }
+        @if (loadFailed()) {
+          <div class="editor-status editor-status--error">Article could not be loaded for editing.</div>
+        }
 
       <div class="title-row">
         <input
@@ -59,63 +60,143 @@
         <div class="preview-text">Uploading preview image...</div>
       }
 
-      @if (previewImageUrl) {
-        <div class="block-shell">
-          <img [src]="previewImageUrl" [alt]="previewImageName || 'Preview image'">
+        @if (previewImageUrl) {
+          <div class="block-shell preview-image-shell">
+            <img [src]="previewImageUrl" [alt]="previewImageName || 'Preview image'">
+          </div>
+        }
+      </div>
+
+      <div class="editor-content">
+        <div class="blocks">
+          @for (b of blocks; track b.id) {
+          @if (b.type === 'TEXT') {
+            <app-text-block
+              [block]="b"
+              [isDragging]="draggedBlockId === b.id"
+              [isDragOver]="dragOverBlockId === b.id"
+              (change)="updateBlock($event)"
+              (moveUp)="moveUp(b.id)"
+              (moveDown)="moveDown(b.id)"
+              (remove)="removeBlock(b.id)"
+              (dragStarted)="onBlockDragStart($event)"
+              (dragEntered)="onBlockDragEnter($event)"
+              (dropped)="onBlockDrop($event)"
+              (dragEnded)="onBlockDragEnd()">
+            </app-text-block>
+          }
+
+          @if (b.type === 'IMAGE') {
+            <app-image-block
+              [block]="b"
+              [isDragging]="draggedBlockId === b.id"
+              [isDragOver]="dragOverBlockId === b.id"
+              (change)="updateBlock($event)"
+              (moveUp)="moveUp(b.id)"
+              (moveDown)="moveDown(b.id)"
+              (remove)="removeBlock(b.id)"
+              (dragStarted)="onBlockDragStart($event)"
+              (dragEntered)="onBlockDragEnter($event)"
+              (dropped)="onBlockDrop($event)"
+              (dragEnded)="onBlockDragEnd()">
+            </app-image-block>
+          }
+
+          @if (b.type === 'CODE') {
+            <app-code-block
+              [block]="b"
+              [isDragging]="draggedBlockId === b.id"
+              [isDragOver]="dragOverBlockId === b.id"
+              (change)="updateBlock($event)"
+              (moveUp)="moveUp(b.id)"
+              (moveDown)="moveDown(b.id)"
+              (remove)="removeBlock(b.id)"
+              (dragStarted)="onBlockDragStart($event)"
+              (dragEntered)="onBlockDragEnter($event)"
+              (dropped)="onBlockDrop($event)"
+              (dragEnded)="onBlockDragEnd()">
+            </app-code-block>
+          }
+          }
         </div>
-      }
+      </div>
     </div>
 
-    <div class="blocks">
-      @for (b of blocks; track b.id) {
-        @if (b.type === 'TEXT') {
-          <app-text-block
-            [block]="b"
-            [isDragging]="draggedBlockId === b.id"
-            [isDragOver]="dragOverBlockId === b.id"
-            (change)="updateBlock($event)"
-            (moveUp)="moveUp(b.id)"
-            (moveDown)="moveDown(b.id)"
-            (remove)="removeBlock(b.id)"
-            (dragStarted)="onBlockDragStart($event)"
-            (dragEntered)="onBlockDragEnter($event)"
-            (dropped)="onBlockDrop($event)"
-            (dragEnded)="onBlockDragEnd()">
-          </app-text-block>
-        }
+    <aside class="assistant-panel" [class.assistant-panel--open]="assistantOpen()">
+      <div class="assistant-panel__header">
+        <strong>Article Assistant</strong>
+        <div class="assistant-panel__header-actions">
+          @if (articleId) {
+            <button type="button" class="assistant-button" (click)="createAssistantChat()">New chat</button>
+          }
+          <button type="button" class="assistant-button" (click)="toggleAssistant()">Close</button>
+        </div>
+      </div>
+      <div class="assistant-panel__resize">
+        <label for="assistant-width">Width</label>
+        <input
+          id="assistant-width"
+          type="range"
+          min="20"
+          max="40"
+          step="1"
+          [value]="assistantWidth()"
+          (input)="onAssistantWidthChange($event)"
+        >
+        <span>{{ assistantWidth() }}rem</span>
+      </div>
 
-        @if (b.type === 'IMAGE') {
-          <app-image-block
-            [block]="b"
-            [isDragging]="draggedBlockId === b.id"
-            [isDragOver]="dragOverBlockId === b.id"
-            (change)="updateBlock($event)"
-            (moveUp)="moveUp(b.id)"
-            (moveDown)="moveDown(b.id)"
-            (remove)="removeBlock(b.id)"
-            (dragStarted)="onBlockDragStart($event)"
-            (dragEntered)="onBlockDragEnter($event)"
-            (dropped)="onBlockDrop($event)"
-            (dragEnded)="onBlockDragEnd()">
-          </app-image-block>
-        }
+      @if (!articleId) {
+        <div class="assistant-empty">Save article first to use persistent assistant chats.</div>
+      } @else {
+        <div class="assistant-chats">
+          @for (chat of assistantChats(); track chat.id) {
+            <button
+              type="button"
+              class="assistant-chat-item"
+              [class.assistant-chat-item--active]="selectedChatId() === chat.id"
+              (click)="selectAssistantChat(chat.id)">
+              {{ chat.title }}
+            </button>
+          }
+        </div>
 
-        @if (b.type === 'CODE') {
-          <app-code-block
-            [block]="b"
-            [isDragging]="draggedBlockId === b.id"
-            [isDragOver]="dragOverBlockId === b.id"
-            (change)="updateBlock($event)"
-            (moveUp)="moveUp(b.id)"
-            (moveDown)="moveDown(b.id)"
-            (remove)="removeBlock(b.id)"
-            (dragStarted)="onBlockDragStart($event)"
-            (dragEntered)="onBlockDragEnter($event)"
-            (dropped)="onBlockDrop($event)"
-            (dragEnded)="onBlockDragEnd()">
-          </app-code-block>
+        @if (selectedChatId()) {
+          <div class="assistant-mode">
+            <label><input type="radio" name="assistantMode" value="THINKING" [(ngModel)]="assistantMode"> Thinking</label>
+            <label><input type="radio" name="assistantMode" value="CODE" [(ngModel)]="assistantMode"> Code</label>
+            <label><input type="radio" name="assistantMode" value="PRECISE" [(ngModel)]="assistantMode"> Precise</label>
+          </div>
+
+          <div class="assistant-messages">
+            @for (message of assistantMessages(); track message.id) {
+              <div class="assistant-message" [class.assistant-message--user]="message.role === 'USER'">
+                <div [innerHTML]="renderMarkdown(message.content)"></div>
+                @if (message.role === 'ASSISTANT') {
+                  <div class="assistant-message__actions">
+                    <button type="button" class="assistant-button" (click)="addAssistantAsText(message.content)">To text</button>
+                    <button type="button" class="assistant-button" (click)="addAssistantAsCode(message.content)">To code</button>
+                  </div>
+                }
+              </div>
+            }
+            @if (assistantLoading()) {
+              <div class="assistant-message">Thinking...</div>
+            }
+          </div>
+
+          <div class="assistant-input">
+            <textarea [(ngModel)]="assistantInput" rows="3" placeholder="Ask assistant..."></textarea>
+            <button type="button" class="assistant-button" (click)="sendAssistantMessage()" [disabled]="assistantLoading()">Send</button>
+          </div>
+        } @else {
+          <div class="assistant-empty">Create or pick a chat.</div>
         }
       }
-    </div>
+    </aside>
+
+    <button type="button" class="assistant-toggle" (click)="toggleAssistant()">
+      {{ assistantOpen() ? 'Hide assistant' : 'Assistant' }}
+    </button>
   </div>
 </section>

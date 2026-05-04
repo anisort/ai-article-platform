@@ -1,0 +1,33 @@
+<button class="advisor-fab" type="button" (click)="toggle()" aria-label="Open advisor">
+  Advisor
+</button>
+
+@if (isOpen()) {
+  <section class="advisor-panel">
+    <header class="advisor-header">
+      <strong>Advisor</strong>
+      <button type="button" (click)="clearSession()">Clear</button>
+    </header>
+
+    <div class="advisor-messages">
+      @for (message of messages(); track $index) {
+        <div class="message" [class.message--user]="message.role === 'user'">
+          <div [innerHTML]="renderMarkdown(message.text)"></div>
+        </div>
+      }
+      @if (isLoading()) {
+        <div class="message">Thinking...</div>
+      }
+    </div>
+
+    <div class="advisor-input">
+      <input
+        type="text"
+        [(ngModel)]="input"
+        placeholder="Ask about articles"
+        (keydown.enter)="send()"
+      />
+      <button type="button" (click)="send()" [disabled]="isLoading()">Send</button>
+    </div>
+  </section>
+}

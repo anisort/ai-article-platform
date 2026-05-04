@@ -3,6 +3,7 @@ import {Component, inject, OnInit} from '@angular/core';
 import {RouterLink, RouterOutlet} from '@angular/router';
 import {AuthService} from './core/services/auth.service';
 import {HeaderComponent} from './shared/components/header/header.component';
+import {AdvisorWidgetComponent} from './features/advisor/components/advisor-widget/advisor-widget.component';
 import {
   IonApp,
   IonContent,
@@ -16,7 +17,7 @@ import {
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, HeaderComponent, IonApp, IonMenu, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, RouterLink],
+  imports: [RouterOutlet, HeaderComponent, AdvisorWidgetComponent, IonApp, IonMenu, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, RouterLink],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })

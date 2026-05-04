@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -56,6 +57,50 @@ public class ArticleFacadeService {
         return articles.stream()
                 .map(article -> PublishedArticlePreviewResponse.fromEntity(article, authors.get(article.getAuthorId())))
                 .toList();
+    }
+
+    public List<PublishedArticlePreviewResponse> searchPublishedArticles(String query, String mode) {
+        if (query == null || query.isBlank()) {
+            return getPublishedArticles();
+        }
+
+        if ("semantic".equalsIgnoreCase(mode)) {
+            List<UUID> articleIds = llmIntegrationService.searchArticleIds(query);
+            if (articleIds.isEmpty()) {
+                return List.of();
+            }
+
+            List<Article> articles = articleService.getPublishedArticlesByIds(articleIds);
+            Map<UUID, Article> byId = articles.stream().collect(Collectors.toMap(Article::getId, Function.identity()));
+            Map<UUID, AuthorResponse> authors = userService.getAuthors(articles);
+
+            return articleIds.stream()
+                    .map(byId::get)
+                    .filter(Objects::nonNull)
+                    .map(article -> PublishedArticlePreviewResponse.fromEntity(article, authors.get(article.getAuthorId())))
+                    .toList();
+        }
+
+        String normalizedQuery = query.trim().toLowerCase();
+        List<Article> articles = articleService.getPublishedArticles();
+        Map<UUID, AuthorResponse> authors = userService.getAuthors(articles);
+        return articles.stream()
+                .filter(article -> matchesTitleOrAuthor(article, authors.get(article.getAuthorId()), normalizedQuery))
+                .map(article -> PublishedArticlePreviewResponse.fromEntity(article, authors.get(article.getAuthorId())))
+                .toList();
+    }
+
+    private boolean matchesTitleOrAuthor(Article article, AuthorResponse author, String query) {
+        if (article.getTitle() != null && article.getTitle().toLowerCase().contains(query)) {
+            return true;
+        }
+
+        if (author == null) {
+            return false;
+        }
+
+        return (author.name() != null && author.name().toLowerCase().contains(query))
+                || (author.username() != null && author.username().toLowerCase().contains(query));
     }
 
     public List<ArticleWithUserResponse> getMyArticles(UUID authorId) {

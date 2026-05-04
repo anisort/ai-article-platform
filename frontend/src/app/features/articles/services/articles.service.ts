@@ -20,6 +20,20 @@ export class ArticlesService {
       .pipe(map(items => items.map(item => this.toPublishedPreview(item))));
   }
 
+  search(query: string, mode: SearchMode): Observable<PublishedArticlePreview[]> {
+    const normalizedQuery = query.trim();
+    if (!normalizedQuery) {
+      return this.list();
+    }
+
+    return this.http.get<PublishedArticlePreview[]>(`${this.apiUrl}/search`, {
+      params: {
+        query: normalizedQuery,
+        mode,
+      },
+    });
+  }
+
   listMine(): Observable<ArticleWithUserResponse[]> {
     return this.http
       .get<ArticleWithUserResponse[]>(`${this.apiUrl}/me`)
@@ -84,6 +98,8 @@ export class ArticlesService {
     };
   }
 }
+
+export type SearchMode = 'title' | 'semantic';
 
 interface LegacyArticleWithUserResponse {
   articleResponse: {

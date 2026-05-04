@@ -12,12 +12,19 @@
     </div>
 
     <div class="center">
-      <label class="search-shell" aria-label="Search articles">
-        <input type="text" class="form-control" placeholder="Search request">
-        <span class="search-icon">
+      <div class="search-shell" aria-label="Search articles">
+        <input
+          #searchInput
+          type="text"
+          class="form-control"
+          placeholder="Search request"
+          [value]="searchQuery"
+          (keydown.enter)="onSearchSubmit(searchInput.value)"
+        >
+        <button type="button" class="search-icon" (click)="onSearchSubmit(searchInput.value)" aria-label="Search">
           <ion-icon name="search-outline"></ion-icon>
-        </span>
-      </label>
+        </button>
+      </div>
     </div>
 
     <div class="right">

@@ -1,4 +1,25 @@
 <section class="article-list-page">
+  <div class="search-mode-controls" role="radiogroup" aria-label="Search type">
+    <label>
+      <input
+        type="radio"
+        name="searchMode"
+        [checked]="searchMode() === 'semantic'"
+        (change)="onModeChange('semantic')"
+      />
+      Semantic
+    </label>
+    <label>
+      <input
+        type="radio"
+        name="searchMode"
+        [checked]="searchMode() === 'title'"
+        (change)="onModeChange('title')"
+      />
+      Title + author
+    </label>
+  </div>
+
   @if (articles().length) {
     <div class="article-grid">
       @for (article of articles(); track article.id; let i = $index) {

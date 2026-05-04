@@ -2,6 +2,7 @@ import {Component, inject, signal} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
+import { FormsModule } from '@angular/forms';
 
 import { EditorBlock, TextBlock, ImageBlock, CodeBlock } from '../../models/article-block.types';
 import { TextBlockComponent } from '../../components/text-block/text-block.component';
@@ -18,6 +19,13 @@ import {addIcons} from 'ionicons';
 import {cloudUploadOutline, codeSlashOutline, imageOutline, textOutline} from 'ionicons/icons';
 import {UploadService} from '../../../../shared/services/upload.service';
 import {finalize} from 'rxjs';
+import {
+  ArticleAssistantChat,
+  ArticleAssistantMessage,
+  AssistantResponseMode
+} from '../../../advisor/models/article-assistant.model';
+import { ArticleAssistantService } from '../../../advisor/services/article-assistant.service';
+import { marked } from 'marked';
 
 function uuid(): string {
   return Math.random().toString(16).slice(2) + '-' + Date.now().toString(16);
@@ -26,7 +34,7 @@ function uuid(): string {
 @Component({
   standalone: true,
   selector: 'app-edit-article-page',
-  imports: [CommonModule, TextBlockComponent, ImageBlockComponent, CodeBlockComponent, IonIcon],
+  imports: [CommonModule, FormsModule, TextBlockComponent, ImageBlockComponent, CodeBlockComponent, IonIcon],
   templateUrl: './edit-article.page.html',
   styleUrls: ['./edit-article.page.scss'],
 })
@@ -42,12 +50,21 @@ export class EditArticlePage {
   draggedBlockId: string | null = null;
   dragOverBlockId: string | null = null;
   articleId: string | null = null;
+  assistantChats = signal<ArticleAssistantChat[]>([]);
+  selectedChatId = signal<string | null>(null);
+  assistantMessages = signal<ArticleAssistantMessage[]>([]);
+  assistantInput = '';
+  assistantMode: AssistantResponseMode = 'THINKING';
+  assistantLoading = signal(false);
+  assistantOpen = signal(false);
+  assistantWidth = signal(26);
 
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private editorState = inject(EditorStateService);
   private articlesService = inject(ArticlesService);
   private uploadService = inject(UploadService);
+  private articleAssistantService = inject(ArticleAssistantService);
 
   constructor() {
     addIcons({ imageOutline, textOutline, codeSlashOutline, cloudUploadOutline })
@@ -56,6 +73,7 @@ export class EditArticlePage {
 
     if (this.articleId) {
       this.loadArticleForEditing(this.articleId);
+      this.loadAssistantChats(this.articleId);
     } else {
       this.restoreDraftState();
     }
@@ -212,6 +230,114 @@ export class EditArticlePage {
     this.blocks = this.blocks.map((b, idx) => ({ ...b, position: idx + 1 }) as EditorBlock);
   }
 
+  renderMarkdown(text: string): string {
+    return marked.parse(text, { breaks: true }) as string;
+  }
+
+  createAssistantChat() {
+    if (!this.articleId) {
+      return;
+    }
+
+    const title = `Chat ${this.assistantChats().length + 1}`;
+    this.articleAssistantService.createChat(this.articleId, title).subscribe(chat => {
+      this.assistantChats.update(chats => [chat, ...chats]);
+      this.selectedChatId.set(chat.id);
+      this.assistantMessages.set([]);
+    });
+  }
+
+  selectAssistantChat(chatId: string) {
+    this.selectedChatId.set(chatId);
+    if (!this.articleId) {
+      return;
+    }
+    this.articleAssistantService.listMessages(this.articleId, chatId).subscribe(messages => {
+      this.assistantMessages.set(messages);
+    });
+  }
+
+  sendAssistantMessage() {
+    if (!this.articleId || !this.selectedChatId() || !this.assistantInput.trim() || this.assistantLoading()) {
+      return;
+    }
+
+    const userMessage: ArticleAssistantMessage = {
+      id: `tmp-${Date.now()}`,
+      role: 'USER',
+      content: this.assistantInput.trim(),
+      createdAt: new Date().toISOString()
+    };
+
+    this.assistantMessages.update(messages => [...messages, userMessage]);
+    const prompt = this.assistantInput.trim();
+    this.assistantInput = '';
+    this.assistantLoading.set(true);
+
+    this.articleAssistantService
+      .sendMessage(this.articleId, this.selectedChatId()!, prompt, this.assistantMode)
+      .pipe(finalize(() => this.assistantLoading.set(false)))
+      .subscribe({
+        next: response => {
+          this.assistantMessages.update(messages => [...messages, response.assistantMessage]);
+        },
+        error: () => {
+          this.assistantMessages.update(messages => [
+            ...messages,
+            {
+              id: `err-${Date.now()}`,
+              role: 'ASSISTANT',
+              content: 'Assistant request failed. Try again.',
+              createdAt: new Date().toISOString()
+            }
+          ]);
+        }
+      });
+  }
+
+  addAssistantAsText(content: string) {
+    const b: TextBlock = { id: uuid(), type: 'TEXT', position: this.blocks.length + 1, content };
+    this.blocks = [...this.blocks, b];
+    this.syncState();
+  }
+
+  addAssistantAsCode(content: string) {
+    const parsed = this.extractCode(content);
+    const b: CodeBlock = {
+      id: uuid(),
+      type: 'CODE',
+      position: this.blocks.length + 1,
+      codeLanguage: parsed.language,
+      code: parsed.code
+    };
+    this.blocks = [...this.blocks, b];
+    this.syncState();
+  }
+
+  toggleAssistant() {
+    this.assistantOpen.update(value => !value);
+  }
+
+  onAssistantWidthChange(event: Event) {
+    const target = event.target as HTMLInputElement;
+    const width = Number(target.value);
+    if (Number.isFinite(width)) {
+      this.assistantWidth.set(width);
+    }
+  }
+
+  private extractCode(content: string): { language: string; code: string } {
+    const match = content.match(/```(\w+)?\n([\s\S]*?)```/);
+    if (!match) {
+      return { language: '', code: content };
+    }
+
+    return {
+      language: match[1] ?? '',
+      code: (match[2] ?? '').trim()
+    };
+  }
+
   goToReview() {
     this.syncState();
     this.router.navigate(['/review-article']);
@@ -319,6 +445,18 @@ export class EditArticlePage {
         this.loadingArticle.set(false);
         this.loadFailed.set(true);
       }
+    });
+  }
+
+  private loadAssistantChats(articleId: string) {
+    this.articleAssistantService.listChats(articleId).subscribe(chats => {
+      this.assistantChats.set(chats);
+      if (!chats.length) {
+        return;
+      }
+
+      this.selectedChatId.set(chats[0].id);
+      this.selectAssistantChat(chats[0].id);
     });
   }
 

@@ -9,6 +9,8 @@ import java.util.UUID;
 
 public interface ArticleRepository extends JpaRepository<Article, UUID> {
     List<Article> findByPublishedTrueOrderByCreatedAtDesc();
+    List<Article> findByPublishedTrueAndTitleContainingIgnoreCaseOrderByCreatedAtDesc(String title);
+    List<Article> findByIdInAndPublishedTrue(List<UUID> ids);
     List<Article> findByAuthorIdOrderByCreatedAtDesc(UUID authorId);
     List<Article> findByAuthorIdAndPublishedTrueOrderByCreatedAtDesc(UUID authorId);
 

@@ -30,6 +30,14 @@ public class ArticleService {
         return articleRepository.findByPublishedTrueOrderByCreatedAtDesc();
     }
 
+    public List<Article> searchPublishedArticlesByTitle(String query) {
+        return articleRepository.findByPublishedTrueAndTitleContainingIgnoreCaseOrderByCreatedAtDesc(query);
+    }
+
+    public List<Article> getPublishedArticlesByIds(List<UUID> ids) {
+        return articleRepository.findByIdInAndPublishedTrue(ids);
+    }
+
     public List<Article> getArticlesByAuthor(UUID authorId) {
         return articleRepository.findByAuthorIdOrderByCreatedAtDesc(authorId);
     }

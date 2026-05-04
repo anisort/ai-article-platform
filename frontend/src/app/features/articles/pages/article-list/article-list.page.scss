@@ -4,6 +4,20 @@
   margin: 1rem 3rem;
 }
 
+.search-mode-controls {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  color: var(--color-primary-dark);
+
+  label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    cursor: pointer;
+  }
+}
+
 .page-head {
   display: flex;
   align-items: flex-end;
