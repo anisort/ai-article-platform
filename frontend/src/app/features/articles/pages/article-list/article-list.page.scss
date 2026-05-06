@@ -137,7 +137,7 @@
   flex-direction: column;
   gap: 0.35rem;
   padding: 0.8rem 0.85rem 0.9rem;
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, var(--color-overlay) 100%);
+  background: var(--color-overlay);
   color: #ffffff;
   opacity: 0;
   transform: translateY(10px);

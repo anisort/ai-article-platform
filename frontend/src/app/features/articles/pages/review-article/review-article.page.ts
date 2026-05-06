@@ -15,7 +15,6 @@ import { Router } from '@angular/router';
 import { MarkdownModule } from 'ngx-markdown';
 
 import { EditorStateService } from '../../state/editor-state.service';
-import {CodeBlock, EditorBlock, ImageBlock, TextBlock} from '../../models/article-block.types';
 
 @Component({
   standalone: true,
@@ -27,16 +26,14 @@ import {CodeBlock, EditorBlock, ImageBlock, TextBlock} from '../../models/articl
 export class ReviewArticlePage {
 
   title = '';
-  blocks: EditorBlock[] = [];
+  markdownContent = '';
 
   constructor(
     private router: Router,
     private editorState: EditorStateService
   ) {
     this.title = editorState.title;
-    this.blocks = editorState.blocks;
-
-    console.log('REVIEW state blocks:', editorState.blocks);
+    this.markdownContent = editorState.markdownContent;
 
     // if (!this.blocks.length) {
     //   this.router.navigate(['/edit-article']);
@@ -48,18 +45,6 @@ export class ReviewArticlePage {
   }
 
   publish() {
-    console.log('Publish article', { title: this.title, blocks: this.blocks });
-  }
-
-  isTextBlock(b: EditorBlock): b is TextBlock {
-    return b.type === 'TEXT';
-  }
-
-  isImageBlock(b: EditorBlock): b is ImageBlock {
-    return b.type === 'IMAGE';
-  }
-
-  isCodeBlock(b: EditorBlock): b is CodeBlock {
-    return b.type === 'CODE';
+    console.log('Publish article', { title: this.title, markdownContent: this.markdownContent });
   }
 }

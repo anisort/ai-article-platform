@@ -12,9 +12,7 @@
   padding: 2rem;
   border: 1px solid var(--color-border-soft);
   border-radius: 1.5rem;
-  background:
-    radial-gradient(circle at top right, color-mix(in srgb, var(--color-surface-rose) 65%, transparent), transparent 40%),
-    var(--color-surface-panel);
+  background: var(--color-surface-panel);
   box-shadow: var(--shadow-soft);
 
   h1 {
@@ -44,8 +42,7 @@
   gap: 1rem;
   padding: 1.75rem;
   border-radius: 2rem;
-  background:
-    linear-gradient(135deg, color-mix(in srgb, var(--color-surface-panel) 82%, white), var(--color-surface-base));
+  background: var(--color-surface-elevated);
   border: 1px solid var(--color-border-soft);
   box-shadow: var(--shadow-medium);
 

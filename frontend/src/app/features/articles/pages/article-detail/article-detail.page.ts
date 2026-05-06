@@ -6,7 +6,6 @@ import { MarkdownModule } from 'ngx-markdown';
 
 import { AuthService } from '../../../../core/services/auth.service';
 import { ArticlesService } from '../../services/articles.service';
-import { ArticleBlockResponse } from '../../models/article-block-response.model';
 import { ArticleWithUserResponse } from '../../models/article-response.model';
 import { ArticleLikesService } from '../../../profile/services/article-likes.service';
 
@@ -82,16 +81,12 @@ export class ArticleDetailPage implements OnInit {
     });
   }
 
-  isTextBlock(block: ArticleBlockResponse): boolean {
-    return block.type === 'TEXT';
-  }
-
-  isImageBlock(block: ArticleBlockResponse): boolean {
-    return block.type === 'IMAGE';
-  }
-
-  isCodeBlock(block: ArticleBlockResponse): boolean {
-    return block.type === 'CODE';
+  contentMarkdown(): string {
+    const article = this.articleData();
+    if (!article) {
+      return '';
+    }
+    return article.markdownContent ?? '';
   }
 
   private loadLikeState(articleId: string): void {

@@ -1,11 +1,10 @@
 // editor-state.service.ts
 import { Injectable } from '@angular/core';
-import { EditorBlock } from '../models/article-block.types';
 
 @Injectable({ providedIn: 'root' })
 export class EditorStateService {
   title = '';
-  blocks: EditorBlock[] = [];
+  markdownContent = '';
   isDraft = true;
   previewImageUrl = '';
   previewImageName = '';
@@ -19,8 +18,8 @@ export class EditorStateService {
     this.title = t;
   }
 
-  setBlocks(blocks: EditorBlock[]) {
-    this.blocks = blocks;
+  setMarkdownContent(markdownContent: string) {
+    this.markdownContent = markdownContent;
   }
 
   setDraft(isDraft: boolean) {
@@ -34,7 +33,7 @@ export class EditorStateService {
 
   reset() {
     this.title = '';
-    this.blocks = [];
+    this.markdownContent = '';
     this.isDraft = true;
     this.previewImageUrl = '';
     this.previewImageName = '';

@@ -1,25 +1,12 @@
-<section class="edit-page">
-  <div class="editor-shell" [style.--assistant-width.rem]="assistantOpen() ? assistantWidth() : 0">
-    <div class="editor-main">
-      <div class="editor-top">
-        <p class="page-label">{{ pageTitle() }}</p>
-
-        @if (loadingArticle()) {
-          <div class="editor-status">Loading article...</div>
-        }
-
-        @if (loadFailed()) {
-          <div class="editor-status editor-status--error">Article could not be loaded for editing.</div>
-        }
+<section class="edit-page" [class.edit-page--assistant-open]="assistantOpen()" [style.--assistant-width.px]="assistantWidthPx()">
+  <div class="edit-content">
+    <div class="editor-top">
+      <p class="page-label">{{ pageTitle() }}</p>
+      @if (loadingArticle()) { <div class="editor-status">Loading article...</div> }
+      @if (loadFailed()) { <div class="editor-status editor-status--error">Article could not be loaded for editing.</div> }
 
       <div class="title-row">
-        <input
-          class="title-input"
-          type="text"
-          placeholder="Title"
-          [value]="title"
-          (input)="onTitleInput($event)">
-
+        <input class="title-input" type="text" placeholder="Title" [value]="title" (input)="onTitleInput($event)">
         <div class="primary-actions">
           <button type="button" class="action-button" (click)="goToReview()">Preview</button>
           <button type="button" class="action-button" (click)="submitArticle()">{{ submitLabel() }}</button>
@@ -27,176 +14,173 @@
       </div>
 
       <div class="editor-meta">
-        <label class="draft-toggle">
-          <input type="checkbox" [checked]="isDraft" (change)="onDraftToggle($event)">
-          <span class="draft-box"></span>
-          <span class="draft-label">draft</span>
-        </label>
-
-        <div class="toolbar">
-          <button type="button" class="toolbar-button" (click)="addTextBlock()">
-            <ion-icon name="text-outline"></ion-icon>
-          </button>
-          <span class="toolbar-divider" aria-hidden="true"></span>
-          <button type="button" class="toolbar-button" (click)="addImageBlock()" aria-label="Add image block">
-            <ion-icon name="image-outline"></ion-icon>
-          </button>
-          <span class="toolbar-divider" aria-hidden="true"></span>
-          <button type="button" class="toolbar-button" (click)="addCodeBlock()" aria-label="Add code block">
-            <ion-icon name="code-slash-outline"></ion-icon>
-          </button>
-        </div>
-      </div>
-
-      <label class="preview-dropzone">
-        <input type="file" accept="image/*" (change)="onPreviewSelected($event)">
-        <div class="preview-icon" aria-hidden="true">
-          <ion-icon name="cloud-upload-outline"></ion-icon>
-        </div>
-        <span class="preview-text">{{ previewImageName || 'Upload preview image' }}</span>
-      </label>
-
-      @if (previewImageUploading()) {
-        <div class="preview-text">Uploading preview image...</div>
-      }
-
-        @if (previewImageUrl) {
-          <div class="block-shell preview-image-shell">
-            <img [src]="previewImageUrl" [alt]="previewImageName || 'Preview image'">
+        <div class="editor-meta-left">
+          <label class="draft-toggle">
+            <input type="checkbox" [checked]="isDraft" (change)="onDraftToggle($event)">
+            <span class="draft-box"></span>
+            <span class="draft-label">draft</span>
+          </label>
+          <div class="cover-control">
+            <button type="button" class="cover-button" (click)="toggleCoverDialog()">{{ previewImageUrl ? 'Cover set' : 'Cover' }}</button>
           </div>
-        }
-      </div>
-
-      <div class="editor-content">
-        <div class="blocks">
-          @for (b of blocks; track b.id) {
-          @if (b.type === 'TEXT') {
-            <app-text-block
-              [block]="b"
-              [isDragging]="draggedBlockId === b.id"
-              [isDragOver]="dragOverBlockId === b.id"
-              (change)="updateBlock($event)"
-              (moveUp)="moveUp(b.id)"
-              (moveDown)="moveDown(b.id)"
-              (remove)="removeBlock(b.id)"
-              (dragStarted)="onBlockDragStart($event)"
-              (dragEntered)="onBlockDragEnter($event)"
-              (dropped)="onBlockDrop($event)"
-              (dragEnded)="onBlockDragEnd()">
-            </app-text-block>
-          }
-
-          @if (b.type === 'IMAGE') {
-            <app-image-block
-              [block]="b"
-              [isDragging]="draggedBlockId === b.id"
-              [isDragOver]="dragOverBlockId === b.id"
-              (change)="updateBlock($event)"
-              (moveUp)="moveUp(b.id)"
-              (moveDown)="moveDown(b.id)"
-              (remove)="removeBlock(b.id)"
-              (dragStarted)="onBlockDragStart($event)"
-              (dragEntered)="onBlockDragEnter($event)"
-              (dropped)="onBlockDrop($event)"
-              (dragEnded)="onBlockDragEnd()">
-            </app-image-block>
-          }
-
-          @if (b.type === 'CODE') {
-            <app-code-block
-              [block]="b"
-              [isDragging]="draggedBlockId === b.id"
-              [isDragOver]="dragOverBlockId === b.id"
-              (change)="updateBlock($event)"
-              (moveUp)="moveUp(b.id)"
-              (moveDown)="moveDown(b.id)"
-              (remove)="removeBlock(b.id)"
-              (dragStarted)="onBlockDragStart($event)"
-              (dragEntered)="onBlockDragEnter($event)"
-              (dropped)="onBlockDrop($event)"
-              (dragEnded)="onBlockDragEnd()">
-            </app-code-block>
-          }
-          }
+        </div>
+        <div class="toolbar">
+          <div class="toolbar-group">
+            <div class="heading-dropdown">
+              <button type="button" class="toolbar-chip toolbar-chip--select" (click)="toggleHeadingDropdown()" title="Heading">
+                <span>{{ headingLabel() }}</span><ion-icon name="chevron-down-outline"></ion-icon>
+              </button>
+              @if (headingDropdownOpen) {
+                <div class="heading-dropdown-menu">
+                  <button type="button" class="heading-option" (click)="selectHeading(1)">H1</button>
+                  <button type="button" class="heading-option" (click)="selectHeading(2)">H2</button>
+                  <button type="button" class="heading-option" (click)="selectHeading(3)">H3</button>
+                  <button type="button" class="heading-option" (click)="selectHeading(4)">H4</button>
+                </div>
+              }
+            </div>
+            <button type="button" class="toolbar-icon toolbar-icon--accent" (click)="applyHeadingLevel()" title="Apply"><ion-icon name="checkmark-outline"></ion-icon></button>
+          </div>
+          <div class="toolbar-group">
+            <button type="button" class="toolbar-icon toolbar-icon--text" (click)="addBold()" title="Bold">B</button>
+            <button type="button" class="toolbar-icon toolbar-icon--text toolbar-icon--italic" (click)="addItalic()" title="Italic">i</button>
+            <button type="button" class="toolbar-icon toolbar-icon--text toolbar-icon--underline" (click)="appendWrap('<u>', '</u>', 'underlined text')" title="Underline">U</button>
+          </div>
+          <div class="toolbar-group">
+            <button type="button" class="toolbar-icon" (click)="addQuote()" title="Quote"><ion-icon name="text-outline"></ion-icon></button>
+            <button type="button" class="toolbar-icon" (click)="addLink()" title="Link"><ion-icon name="link-outline"></ion-icon></button>
+            <button type="button" class="toolbar-icon" (click)="addImageMarkdown()" title="Image"><ion-icon name="image-outline"></ion-icon></button>
+            <button type="button" class="toolbar-icon" (click)="addCode()" title="Code"><ion-icon name="code-slash-outline"></ion-icon></button>
+            <button type="button" class="toolbar-icon" (click)="openImageLibrary()" title="Image folder"><ion-icon name="folder-open-outline"></ion-icon></button>
+          </div>
+          <div class="toolbar-group">
+            <button type="button" class="toolbar-icon" (click)="addList()" title="Bullet list"><ion-icon name="list-outline"></ion-icon></button>
+            <button type="button" class="toolbar-icon" (click)="addNumberedList()" title="Numbered list"><ion-icon name="reorder-three-outline"></ion-icon></button>
+          </div>
         </div>
       </div>
     </div>
 
+    <div class="editor-grid">
+      <div class="editor-tabs">
+        <button type="button" class="editor-tab" [class.editor-tab--active]="editorTab === 'write'" (click)="setEditorTab('write')">Write</button>
+        <button type="button" class="editor-tab" [class.editor-tab--active]="editorTab === 'preview'" (click)="setEditorTab('preview')">Preview</button>
+        @if (articleId) {
+          <button type="button" class="editor-tab editor-tab--assistant" (click)="toggleAssistant()">{{ assistantOpen() ? 'Hide assistant' : 'Assistant' }}</button>
+        }
+      </div>
+      @if (editorTab === 'write') {
+        <textarea #markdownInput class="markdown-input" [value]="markdownContent" (input)="onContentInput($event)" placeholder="Write your article in Markdown..."></textarea>
+      } @else {
+        <article class="preview-pane" [innerHTML]="renderMarkdown(markdownContent)"></article>
+      }
+    </div>
+  </div>
+
+  @if (articleId) {
     <aside class="assistant-panel" [class.assistant-panel--open]="assistantOpen()">
+      <div
+        class="assistant-resize-handle"
+        title="Resize assistant"
+        role="separator"
+        aria-orientation="vertical"
+        (mousedown)="onAssistantResizeStart($event)">
+      </div>
       <div class="assistant-panel__header">
         <strong>Article Assistant</strong>
         <div class="assistant-panel__header-actions">
-          @if (articleId) {
-            <button type="button" class="assistant-button" (click)="createAssistantChat()">New chat</button>
-          }
+          <button type="button" class="assistant-button" (click)="createAssistantChat()">New chat</button>
           <button type="button" class="assistant-button" (click)="toggleAssistant()">Close</button>
         </div>
       </div>
-      <div class="assistant-panel__resize">
-        <label for="assistant-width">Width</label>
-        <input
-          id="assistant-width"
-          type="range"
-          min="20"
-          max="40"
-          step="1"
-          [value]="assistantWidth()"
-          (input)="onAssistantWidthChange($event)"
-        >
-        <span>{{ assistantWidth() }}rem</span>
-      </div>
-
-      @if (!articleId) {
-        <div class="assistant-empty">Save article first to use persistent assistant chats.</div>
-      } @else {
-        <div class="assistant-chats">
-          @for (chat of assistantChats(); track chat.id) {
-            <button
-              type="button"
-              class="assistant-chat-item"
-              [class.assistant-chat-item--active]="selectedChatId() === chat.id"
-              (click)="selectAssistantChat(chat.id)">
-              {{ chat.title }}
-            </button>
-          }
-        </div>
-
-        @if (selectedChatId()) {
-          <div class="assistant-mode">
-            <label><input type="radio" name="assistantMode" value="THINKING" [(ngModel)]="assistantMode"> Thinking</label>
-            <label><input type="radio" name="assistantMode" value="CODE" [(ngModel)]="assistantMode"> Code</label>
-            <label><input type="radio" name="assistantMode" value="PRECISE" [(ngModel)]="assistantMode"> Precise</label>
-          </div>
-
-          <div class="assistant-messages">
-            @for (message of assistantMessages(); track message.id) {
-              <div class="assistant-message" [class.assistant-message--user]="message.role === 'USER'">
-                <div [innerHTML]="renderMarkdown(message.content)"></div>
-                @if (message.role === 'ASSISTANT') {
-                  <div class="assistant-message__actions">
-                    <button type="button" class="assistant-button" (click)="addAssistantAsText(message.content)">To text</button>
-                    <button type="button" class="assistant-button" (click)="addAssistantAsCode(message.content)">To code</button>
-                  </div>
-                }
-              </div>
-            }
-            @if (assistantLoading()) {
-              <div class="assistant-message">Thinking...</div>
-            }
-          </div>
-
-          <div class="assistant-input">
-            <textarea [(ngModel)]="assistantInput" rows="3" placeholder="Ask assistant..."></textarea>
-            <button type="button" class="assistant-button" (click)="sendAssistantMessage()" [disabled]="assistantLoading()">Send</button>
-          </div>
-        } @else {
-          <div class="assistant-empty">Create or pick a chat.</div>
+      <div class="assistant-chats">
+        @for (chat of assistantChats(); track chat.id) {
+          <button type="button" class="assistant-chat-item" [class.assistant-chat-item--active]="selectedChatId() === chat.id" (click)="selectAssistantChat(chat.id)">{{ chat.title }}</button>
         }
+      </div>
+      @if (selectedChatId()) {
+        <div class="assistant-mode">
+          <label><input type="radio" name="assistantMode" value="THINKING" [(ngModel)]="assistantMode"> Thinking</label>
+          <label><input type="radio" name="assistantMode" value="CODE" [(ngModel)]="assistantMode"> Code</label>
+          <label><input type="radio" name="assistantMode" value="PRECISE" [(ngModel)]="assistantMode"> Precise</label>
+        </div>
+        <div class="assistant-messages" (click)="onAssistantMessagesClick($event)">
+          @for (message of assistantMessages(); track message.id) {
+            <div class="assistant-message" [class.assistant-message--user]="message.role === 'USER'">
+              <div class="assistant-message__content" [innerHTML]="renderAssistantMarkdown(message.content)"></div>
+              @if (message.role === 'ASSISTANT') {
+                <button type="button" class="assistant-message__insert" (click)="insertAssistantMessage(message.content)">Insert</button>
+              }
+            </div>
+          }
+          @if (assistantLoading()) { <div class="assistant-message">Thinking...</div> }
+        </div>
+        <div class="assistant-input">
+          <textarea [(ngModel)]="assistantInput" rows="3" placeholder="Ask assistant..."></textarea>
+          <button type="button" class="assistant-button" (click)="sendAssistantMessage()" [disabled]="assistantLoading()">Send</button>
+        </div>
+      } @else {
+        <div class="assistant-empty">Create or pick a chat.</div>
       }
     </aside>
+  }
 
-    <button type="button" class="assistant-toggle" (click)="toggleAssistant()">
-      {{ assistantOpen() ? 'Hide assistant' : 'Assistant' }}
-    </button>
-  </div>
+  @if (imageLibraryOpen()) {
+    <div class="image-library-modal-backdrop" (click)="closeImageLibrary()"></div>
+    <section class="image-library-modal">
+      <div class="image-library__header">
+        <strong>Article Images</strong>
+        <div class="image-library__header-actions">
+          @if (articleId) {
+            <label class="image-library__upload"><input type="file" accept="image/*" (change)="onArticleImageSelected($event)">Add image</label>
+          }
+          <button type="button" class="image-item__button" (click)="closeImageLibrary()">Close</button>
+        </div>
+      </div>
+      @if (!articleId) {
+        <p class="image-library__empty">Save article first to manage article image folder.</p>
+      } @else if (articleImageUploading()) {
+        <p class="image-library__empty">Uploading image...</p>
+      } @else if (!articleImages().length) {
+        <p class="image-library__empty">No images yet.</p>
+      } @else {
+        <div class="image-library__grid">
+          @for (image of articleImages(); track image.id) {
+            <figure class="image-item">
+              <img [src]="image.imageUrl" alt="Article image">
+              <div class="image-item__actions">
+                <button type="button" class="image-item__button" (click)="insertArticleImage(image)">Insert</button>
+                <button type="button" class="image-item__button image-item__button--danger" (click)="removeArticleImage(image)">Delete</button>
+              </div>
+            </figure>
+          }
+        </div>
+      }
+    </section>
+  }
+
+  @if (coverDialogOpen()) {
+    <div class="cover-modal-backdrop" (click)="closeCoverDialog()"></div>
+    <section class="cover-modal" role="dialog" aria-modal="true" aria-label="Cover image dialog">
+      @if (!previewImageUrl) {
+        <label class="cover-upload">
+          <input type="file" accept="image/*" (change)="onPreviewSelected($event)">
+          Choose image
+        </label>
+      } @else {
+        <img class="cover-preview" [src]="previewImageUrl" alt="Article cover">
+        <div class="cover-actions">
+          <label class="cover-upload">
+            <input type="file" accept="image/*" (change)="onPreviewSelected($event)">
+            Replace
+          </label>
+          <button type="button" class="cover-remove" (click)="removeCoverImage()">Remove</button>
+        </div>
+      }
+      @if (previewImageUploading()) {
+        <div class="cover-status">Uploading...</div>
+      }
+      <button type="button" class="cover-close" (click)="closeCoverDialog()">Close</button>
+    </section>
+  }
 </section>

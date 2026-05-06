@@ -1,55 +1,63 @@
-import {Component, inject, signal} from '@angular/core';
+import { Component, ElementRef, OnDestroy, ViewChild, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
+import { IonIcon } from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import {
+  chevronDownOutline,
+  cloudUploadOutline,
+  checkmarkOutline,
+  codeSlashOutline,
+  folderOpenOutline,
+  imageOutline,
+  linkOutline,
+  listOutline,
+  reorderThreeOutline,
+  textOutline
+} from 'ionicons/icons';
+import { finalize } from 'rxjs';
+import { marked } from 'marked';
 
-import { EditorBlock, TextBlock, ImageBlock, CodeBlock } from '../../models/article-block.types';
-import { TextBlockComponent } from '../../components/text-block/text-block.component';
-import { ImageBlockComponent } from '../../components/image-block/image-block.component';
-import { CodeBlockComponent } from '../../components/code-block/code-block.component';
 import { EditorStateService } from '../../state/editor-state.service';
-import {ArticlesService} from '../../services/articles.service';
-import { ArticleBlockResponse, } from '../../models/article-block-response.model';
+import { ArticlesService } from '../../services/articles.service';
 import { ArticleWithUserResponse } from '../../models/article-response.model';
-import {CreateArticleRequest} from '../../models/create-article-request.model';
-import {CreateArticleBlockRequest} from '../../models/create-article-block-request.model';
-import {IonIcon} from '@ionic/angular/standalone';
-import {addIcons} from 'ionicons';
-import {cloudUploadOutline, codeSlashOutline, imageOutline, textOutline} from 'ionicons/icons';
-import {UploadService} from '../../../../shared/services/upload.service';
-import {finalize} from 'rxjs';
+import { CreateArticleRequest } from '../../models/create-article-request.model';
+import { UploadService } from '../../../../shared/services/upload.service';
+import { ArticleImage } from '../../models/article-image.model';
 import {
   ArticleAssistantChat,
   ArticleAssistantMessage,
   AssistantResponseMode
 } from '../../../advisor/models/article-assistant.model';
 import { ArticleAssistantService } from '../../../advisor/services/article-assistant.service';
-import { marked } from 'marked';
-
-function uuid(): string {
-  return Math.random().toString(16).slice(2) + '-' + Date.now().toString(16);
-}
 
 @Component({
   standalone: true,
   selector: 'app-edit-article-page',
-  imports: [CommonModule, FormsModule, TextBlockComponent, ImageBlockComponent, CodeBlockComponent, IonIcon],
+  imports: [CommonModule, FormsModule, IonIcon],
   templateUrl: './edit-article.page.html',
   styleUrls: ['./edit-article.page.scss'],
 })
-export class EditArticlePage {
-  blocks: EditorBlock[] = [];
+export class EditArticlePage implements OnDestroy {
+  @ViewChild('markdownInput') markdownInput?: ElementRef<HTMLTextAreaElement>;
+
   title = '';
+  markdownContent = '';
+  headingLevel: 1 | 2 | 3 | 4 = 2;
+  headingDropdownOpen = false;
   isDraft = true;
   previewImageName = '';
   previewImageUrl = '';
   previewImageUploading = signal(false);
+  articleImageUploading = signal(false);
+  coverDialogOpen = signal(false);
   loadingArticle = signal(false);
   loadFailed = signal(false);
-  draggedBlockId: string | null = null;
-  dragOverBlockId: string | null = null;
-  articleId: string | null = null;
+  articleImages = signal<ArticleImage[]>([]);
+  imageLibraryOpen = signal(false);
+  editorTab: 'write' | 'preview' = 'write';
   assistantChats = signal<ArticleAssistantChat[]>([]);
   selectedChatId = signal<string | null>(null);
   assistantMessages = signal<ArticleAssistantMessage[]>([]);
@@ -57,7 +65,11 @@ export class EditArticlePage {
   assistantMode: AssistantResponseMode = 'THINKING';
   assistantLoading = signal(false);
   assistantOpen = signal(false);
-  assistantWidth = signal(26);
+  assistantWidthPx = signal(448);
+  articleId: string | null = null;
+  private isResizingAssistant = false;
+  private onAssistantResizeMove?: (event: MouseEvent) => void;
+  private onAssistantResizeUp?: () => void;
 
   private router = inject(Router);
   private route = inject(ActivatedRoute);
@@ -67,178 +79,375 @@ export class EditArticlePage {
   private articleAssistantService = inject(ArticleAssistantService);
 
   constructor() {
-    addIcons({ imageOutline, textOutline, codeSlashOutline, cloudUploadOutline })
-
+    addIcons({
+      checkmarkOutline,
+      chevronDownOutline,
+      cloudUploadOutline,
+      codeSlashOutline,
+      folderOpenOutline,
+      imageOutline,
+      linkOutline,
+      listOutline,
+      reorderThreeOutline,
+      textOutline
+    });
     this.articleId = this.route.snapshot.paramMap.get('id');
-
     if (this.articleId) {
       this.loadArticleForEditing(this.articleId);
+      this.loadArticleImages(this.articleId);
       this.loadAssistantChats(this.articleId);
     } else {
       this.restoreDraftState();
     }
   }
 
-  trackById = (_: number, b: EditorBlock) => b.id;
+  ngOnDestroy() {
+    this.stopAssistantResize();
+  }
 
   private syncState() {
     this.editorState.setTitle(this.title);
-    this.editorState.setBlocks(this.blocks);
+    this.editorState.setMarkdownContent(this.markdownContent);
     this.editorState.setDraft(this.isDraft);
     this.editorState.setPreviewImage(this.previewImageUrl, this.previewImageName);
   }
 
   onTitleInput(event: Event) {
-    const target = event.target as HTMLInputElement;
-    this.title = target.value;
+    this.title = (event.target as HTMLInputElement).value;
+    this.syncState();
+  }
+
+  onContentInput(event: Event) {
+    this.markdownContent = (event.target as HTMLTextAreaElement).value;
     this.syncState();
   }
 
   onDraftToggle(event: Event) {
-    const target = event.target as HTMLInputElement;
-    this.isDraft = target.checked;
+    this.isDraft = (event.target as HTMLInputElement).checked;
     this.syncState();
-  }
-
-  onPreviewSelected(event: Event) {
-    const target = event.target as HTMLInputElement;
-    const file = target.files?.[0];
-
-    if (!file) {
-      return;
-    }
-
-    this.previewImageName = file.name;
-    this.previewImageUploading.set(true);
-
-    this.uploadService
-      .uploadFile(file)
-      .pipe(finalize(() => this.previewImageUploading.set(false)))
-      .subscribe({
-        next: response => {
-          this.previewImageUrl = response.url;
-          this.syncState();
-        },
-        error: err => {
-          console.error('Preview upload failed', err);
-        }
-      });
-  }
-
-  addTextBlock() {
-    const b: TextBlock = { id: uuid(), type: 'TEXT', position: this.blocks.length + 1, content: '' };
-    this.blocks = [...this.blocks, b];
-    this.syncState();
-  }
-
-  addImageBlock() {
-    const b: ImageBlock = { id: uuid(), type: 'IMAGE', position: this.blocks.length + 1, caption: '' };
-    this.blocks = [...this.blocks, b];
-    this.syncState();
-  }
-
-  addCodeBlock() {
-    const b: CodeBlock = { id: uuid(), type: 'CODE', position: this.blocks.length + 1, codeLanguage: '', code: '' };
-    this.blocks = [...this.blocks, b];
-    this.syncState();
-  }
-
-  updateBlock(updated: EditorBlock) {
-    this.blocks = this.blocks.map(b => (b.id === updated.id ? updated : b));
-    this.renumber();
-    this.syncState();
-  }
-
-  removeBlock(id: string) {
-    this.blocks = this.blocks.filter(b => b.id !== id);
-    this.renumber();
-    this.syncState();
-  }
-
-  moveUp(id: string) {
-    const i = this.blocks.findIndex(b => b.id === id);
-    if (i <= 0) return;
-
-    const copy = [...this.blocks];
-    [copy[i - 1], copy[i]] = [copy[i], copy[i - 1]];
-    this.blocks = copy;
-
-    this.renumber();
-    this.syncState();
-  }
-
-  moveDown(id: string) {
-    const i = this.blocks.findIndex(b => b.id === id);
-    if (i < 0 || i >= this.blocks.length - 1) return;
-
-    const copy = [...this.blocks];
-    [copy[i], copy[i + 1]] = [copy[i + 1], copy[i]];
-    this.blocks = copy;
-
-    this.renumber();
-    this.syncState();
-  }
-
-  onBlockDragStart(id: string) {
-    this.draggedBlockId = id;
-    this.dragOverBlockId = null;
-  }
-
-  onBlockDragEnter(id: string) {
-    if (!this.draggedBlockId || this.draggedBlockId === id) {
-      this.dragOverBlockId = null;
-      return;
-    }
-
-    this.dragOverBlockId = id;
-  }
-
-  onBlockDrop(targetId: string) {
-    if (!this.draggedBlockId || this.draggedBlockId === targetId) {
-      this.clearDragState();
-      return;
-    }
-
-    const sourceIndex = this.blocks.findIndex(b => b.id === this.draggedBlockId);
-    const targetIndex = this.blocks.findIndex(b => b.id === targetId);
-
-    if (sourceIndex < 0 || targetIndex < 0) {
-      this.clearDragState();
-      return;
-    }
-
-    const nextBlocks = [...this.blocks];
-    const [draggedBlock] = nextBlocks.splice(sourceIndex, 1);
-    nextBlocks.splice(targetIndex, 0, draggedBlock);
-
-    this.blocks = nextBlocks;
-    this.renumber();
-    this.syncState();
-    this.clearDragState();
-  }
-
-  onBlockDragEnd() {
-    this.clearDragState();
-  }
-
-  private clearDragState() {
-    this.draggedBlockId = null;
-    this.dragOverBlockId = null;
-  }
-
-  private renumber() {
-    this.blocks = this.blocks.map((b, idx) => ({ ...b, position: idx + 1 }) as EditorBlock);
   }
 
   renderMarkdown(text: string): string {
     return marked.parse(text, { breaks: true }) as string;
   }
 
-  createAssistantChat() {
-    if (!this.articleId) {
+  renderAssistantMarkdown(text: string): string {
+    const html = marked.parse(text, { breaks: true }) as string;
+    return html.replace(/(<pre><code[^>]*>)([\s\S]*?)(<\/code><\/pre>)/g, (full, openTag: string, codeHtml: string, closeTag: string) => {
+      const langMatch = openTag.match(/language-([a-zA-Z0-9_-]+)/);
+      const language = langMatch?.[1] ?? '';
+      const decoded = this.decodeHtml(codeHtml);
+      const payload = encodeURIComponent(decoded);
+      return `<div class="assistant-code-block"><div class="assistant-code-block__actions"><button type="button" class="assistant-code-block__edit" data-code="${payload}" data-language="${language}">Edit code</button></div>${openTag}${codeHtml}${closeTag}</div>`;
+    });
+  }
+
+  headingLabel(): string {
+    return `h${this.headingLevel}`;
+  }
+
+  toggleHeadingDropdown() {
+    this.headingDropdownOpen = !this.headingDropdownOpen;
+  }
+
+  selectHeading(level: 1 | 2 | 3 | 4) {
+    this.headingLevel = level;
+    this.headingDropdownOpen = false;
+  }
+
+  applyHeadingLevel() {
+    const textarea = this.markdownInput?.nativeElement;
+    if (!textarea) {
+      this.appendBlock(`${'#'.repeat(this.headingLevel)} Heading`);
       return;
     }
 
+    const value = this.markdownContent;
+    const start = textarea.selectionStart ?? 0;
+    const end = textarea.selectionEnd ?? start;
+    const lineStart = value.lastIndexOf('\n', Math.max(0, start - 1)) + 1;
+    const lineEndRaw = value.indexOf('\n', end);
+    const lineEnd = lineEndRaw === -1 ? value.length : lineEndRaw;
+    const selected = value.slice(lineStart, lineEnd);
+    const prefix = `${'#'.repeat(this.headingLevel)} `;
+    const updatedLine = selected.replace(/^\s{0,3}#{1,6}\s+/, '').trim().length
+      ? `${prefix}${selected.replace(/^\s{0,3}#{1,6}\s+/, '')}`
+      : `${prefix}`;
+
+    this.markdownContent = value.slice(0, lineStart) + updatedLine + value.slice(lineEnd);
+    this.syncState();
+    queueMicrotask(() => {
+      const caret = lineStart + updatedLine.length;
+      textarea.focus();
+      textarea.setSelectionRange(caret, caret);
+    });
+  }
+
+  appendWrap(prefix: string, suffix: string, placeholder: string) {
+    const textarea = this.markdownInput?.nativeElement;
+    if (!textarea) {
+      return;
+    }
+    const value = this.markdownContent;
+    const start = textarea.selectionStart ?? 0;
+    const end = textarea.selectionEnd ?? start;
+    const selected = value.slice(start, end);
+    const content = selected || placeholder;
+    const replacement = `${prefix}${content}${suffix}`;
+    this.markdownContent = value.slice(0, start) + replacement + value.slice(end);
+    this.syncState();
+    queueMicrotask(() => {
+      textarea.focus();
+      if (selected) {
+        textarea.setSelectionRange(start, start + replacement.length);
+      } else {
+        const caret = start + prefix.length + content.length;
+        textarea.setSelectionRange(caret, caret);
+      }
+    });
+  }
+
+  appendBlock(text: string, placeholder = '') {
+    const textarea = this.markdownInput?.nativeElement;
+    if (!textarea) {
+      return;
+    }
+    const value = this.markdownContent;
+    const start = textarea.selectionStart ?? 0;
+    const end = textarea.selectionEnd ?? start;
+    const selected = value.slice(start, end);
+    const replacement = selected ? text.replace(placeholder, selected) : text;
+    this.markdownContent = value.slice(0, start) + replacement + value.slice(end);
+    this.syncState();
+    queueMicrotask(() => {
+      textarea.focus();
+      const caret = start + replacement.length;
+      textarea.setSelectionRange(caret, caret);
+    });
+  }
+
+  addBold() { this.appendWrap('**', '**', 'bold text'); }
+  addItalic() { this.appendWrap('*', '*', 'italic text'); }
+  addLink() { this.appendWrap('[', '](https://example.com)', 'link text'); }
+  addList() { this.applyLinePrefix('- '); }
+  addNumberedList() { this.applyNumberedList(); }
+  addQuote() { this.applyLinePrefix('> '); }
+  addCode() { this.appendBlock('```ts\n{{selection}}\n```', '{{selection}}'); }
+  addImageMarkdown() { this.appendBlock('![caption]({{selection}})', '{{selection}}'); }
+
+  private applyLinePrefix(prefix: string) {
+    const textarea = this.markdownInput?.nativeElement;
+    if (!textarea) {
+      return;
+    }
+    const value = this.markdownContent;
+    const start = textarea.selectionStart ?? 0;
+    const end = textarea.selectionEnd ?? start;
+    const blockStart = value.lastIndexOf('\n', Math.max(0, start - 1)) + 1;
+    const blockEndRaw = value.indexOf('\n', end);
+    const blockEnd = blockEndRaw === -1 ? value.length : blockEndRaw;
+    const blockText = value.slice(blockStart, blockEnd);
+    const transformed = blockText
+      .split('\n')
+      .map(line => `${prefix}${line}`)
+      .join('\n');
+
+    this.markdownContent = value.slice(0, blockStart) + transformed + value.slice(blockEnd);
+    this.syncState();
+    queueMicrotask(() => {
+      textarea.focus();
+      textarea.setSelectionRange(blockStart, blockStart + transformed.length);
+    });
+  }
+
+  private applyNumberedList() {
+    const textarea = this.markdownInput?.nativeElement;
+    if (!textarea) {
+      return;
+    }
+    const value = this.markdownContent;
+    const start = textarea.selectionStart ?? 0;
+    const end = textarea.selectionEnd ?? start;
+    const blockStart = value.lastIndexOf('\n', Math.max(0, start - 1)) + 1;
+    const blockEndRaw = value.indexOf('\n', end);
+    const blockEnd = blockEndRaw === -1 ? value.length : blockEndRaw;
+    const blockText = value.slice(blockStart, blockEnd);
+    const transformed = blockText
+      .split('\n')
+      .map((line, idx) => `${idx + 1}. ${line}`)
+      .join('\n');
+
+    this.markdownContent = value.slice(0, blockStart) + transformed + value.slice(blockEnd);
+    this.syncState();
+    queueMicrotask(() => {
+      textarea.focus();
+      textarea.setSelectionRange(blockStart, blockStart + transformed.length);
+    });
+  }
+
+  onPreviewSelected(event: Event) {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+
+    this.previewImageName = file.name;
+    this.previewImageUploading.set(true);
+
+    this.uploadService.uploadFile(file)
+      .pipe(finalize(() => this.previewImageUploading.set(false)))
+      .subscribe({
+        next: response => {
+          this.previewImageUrl = response.url;
+          this.previewImageName = file.name;
+          this.syncState();
+          this.coverDialogOpen.set(false);
+        },
+        error: err => console.error('Preview upload failed', err),
+      });
+  }
+
+  onArticleImageSelected(event: Event) {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file || !this.articleId) return;
+
+    this.articleImageUploading.set(true);
+    this.uploadService.uploadFile(file)
+      .pipe(finalize(() => this.articleImageUploading.set(false)))
+      .subscribe({
+        next: response => {
+          this.articlesService.addImage(this.articleId!, response.url).subscribe({
+            next: image => this.articleImages.update(images => [image, ...images]),
+            error: err => console.error('Failed to save article image', err),
+          });
+        },
+        error: err => console.error('Article image upload failed', err),
+      });
+  }
+
+  openImageLibrary() {
+    this.imageLibraryOpen.set(true);
+  }
+
+  closeImageLibrary() {
+    this.imageLibraryOpen.set(false);
+  }
+
+  toggleCoverDialog() {
+    this.coverDialogOpen.update(value => !value);
+  }
+
+  closeCoverDialog() {
+    this.coverDialogOpen.set(false);
+  }
+
+  removeCoverImage() {
+    this.previewImageUrl = '';
+    this.previewImageName = '';
+    this.syncState();
+  }
+
+  setEditorTab(tab: 'write' | 'preview') {
+    this.editorTab = tab;
+  }
+
+  removeArticleImage(image: ArticleImage) {
+    if (!this.articleId) return;
+    this.articlesService.deleteImage(this.articleId, image.id).subscribe({
+      next: () => this.articleImages.update(images => images.filter(i => i.id !== image.id)),
+      error: err => console.error('Failed to delete image', err),
+    });
+  }
+
+  insertArticleImage(image: ArticleImage) {
+    this.appendBlock(`![image](${image.imageUrl})`);
+  }
+
+  insertAssistantMessage(content: string) {
+    const insert = () => {
+      const textarea = this.markdownInput?.nativeElement;
+      if (!textarea) {
+        this.markdownContent = `${this.markdownContent}${this.markdownContent ? '\n\n' : ''}${content}`;
+        this.syncState();
+        return;
+      }
+
+      const value = this.markdownContent;
+      const start = textarea.selectionStart ?? value.length;
+      const end = textarea.selectionEnd ?? start;
+      const replacement = `${content}\n`;
+      this.markdownContent = value.slice(0, start) + replacement + value.slice(end);
+      this.syncState();
+
+      queueMicrotask(() => {
+        const caret = start + replacement.length;
+        textarea.focus();
+        textarea.setSelectionRange(caret, caret);
+      });
+    };
+
+    if (this.editorTab !== 'write') {
+      this.editorTab = 'write';
+      setTimeout(insert, 0);
+      return;
+    }
+
+    insert();
+  }
+
+  onAssistantMessagesClick(event: MouseEvent) {
+    const target = event.target as HTMLElement | null;
+    const editButton = target?.closest('.assistant-code-block__edit') as HTMLElement | null;
+    if (!editButton) {
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    const payload = editButton.getAttribute('data-code');
+    const language = editButton.getAttribute('data-language') ?? '';
+    if (!payload) {
+      return;
+    }
+
+    const code = decodeURIComponent(payload);
+    const fenced = `\`\`\`${language}\n${code}\n\`\`\`\n`;
+    this.insertAssistantMessage(fenced);
+  }
+
+  onAssistantResizeStart(event: MouseEvent) {
+    if (window.innerWidth <= 1200) {
+      return;
+    }
+    event.preventDefault();
+    this.isResizingAssistant = true;
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+
+    this.onAssistantResizeMove = (moveEvent: MouseEvent) => {
+      if (!this.isResizingAssistant) {
+        return;
+      }
+      const minWidth = 320;
+      const maxWidth = Math.max(minWidth, Math.floor(window.innerWidth * 0.55));
+      const next = Math.round(window.innerWidth - moveEvent.clientX);
+      const width = Math.min(maxWidth, Math.max(minWidth, next));
+      this.assistantWidthPx.set(width);
+    };
+
+    this.onAssistantResizeUp = () => {
+      this.stopAssistantResize();
+    };
+
+    document.addEventListener('mousemove', this.onAssistantResizeMove);
+    document.addEventListener('mouseup', this.onAssistantResizeUp);
+  }
+
+  toggleAssistant() {
+    this.assistantOpen.update(value => !value);
+  }
+
+  createAssistantChat() {
+    if (!this.articleId) return;
     const title = `Chat ${this.assistantChats().length + 1}`;
     this.articleAssistantService.createChat(this.articleId, title).subscribe(chat => {
       this.assistantChats.update(chats => [chat, ...chats]);
@@ -249,9 +458,7 @@ export class EditArticlePage {
 
   selectAssistantChat(chatId: string) {
     this.selectedChatId.set(chatId);
-    if (!this.articleId) {
-      return;
-    }
+    if (!this.articleId) return;
     this.articleAssistantService.listMessages(this.articleId, chatId).subscribe(messages => {
       this.assistantMessages.set(messages);
     });
@@ -262,80 +469,23 @@ export class EditArticlePage {
       return;
     }
 
-    const userMessage: ArticleAssistantMessage = {
-      id: `tmp-${Date.now()}`,
-      role: 'USER',
-      content: this.assistantInput.trim(),
-      createdAt: new Date().toISOString()
-    };
-
-    this.assistantMessages.update(messages => [...messages, userMessage]);
     const prompt = this.assistantInput.trim();
+    this.assistantMessages.update(messages => [
+      ...messages,
+      { id: `tmp-${Date.now()}`, role: 'USER', content: prompt, createdAt: new Date().toISOString() }
+    ]);
     this.assistantInput = '';
     this.assistantLoading.set(true);
 
-    this.articleAssistantService
-      .sendMessage(this.articleId, this.selectedChatId()!, prompt, this.assistantMode)
+    this.articleAssistantService.sendMessage(this.articleId, this.selectedChatId()!, prompt, this.assistantMode)
       .pipe(finalize(() => this.assistantLoading.set(false)))
       .subscribe({
-        next: response => {
-          this.assistantMessages.update(messages => [...messages, response.assistantMessage]);
-        },
-        error: () => {
-          this.assistantMessages.update(messages => [
-            ...messages,
-            {
-              id: `err-${Date.now()}`,
-              role: 'ASSISTANT',
-              content: 'Assistant request failed. Try again.',
-              createdAt: new Date().toISOString()
-            }
-          ]);
-        }
+        next: response => this.assistantMessages.update(messages => [...messages, response.assistantMessage]),
+        error: () => this.assistantMessages.update(messages => [
+          ...messages,
+          { id: `err-${Date.now()}`, role: 'ASSISTANT', content: 'Assistant request failed. Try again.', createdAt: new Date().toISOString() }
+        ])
       });
-  }
-
-  addAssistantAsText(content: string) {
-    const b: TextBlock = { id: uuid(), type: 'TEXT', position: this.blocks.length + 1, content };
-    this.blocks = [...this.blocks, b];
-    this.syncState();
-  }
-
-  addAssistantAsCode(content: string) {
-    const parsed = this.extractCode(content);
-    const b: CodeBlock = {
-      id: uuid(),
-      type: 'CODE',
-      position: this.blocks.length + 1,
-      codeLanguage: parsed.language,
-      code: parsed.code
-    };
-    this.blocks = [...this.blocks, b];
-    this.syncState();
-  }
-
-  toggleAssistant() {
-    this.assistantOpen.update(value => !value);
-  }
-
-  onAssistantWidthChange(event: Event) {
-    const target = event.target as HTMLInputElement;
-    const width = Number(target.value);
-    if (Number.isFinite(width)) {
-      this.assistantWidth.set(width);
-    }
-  }
-
-  private extractCode(content: string): { language: string; code: string } {
-    const match = content.match(/```(\w+)?\n([\s\S]*?)```/);
-    if (!match) {
-      return { language: '', code: content };
-    }
-
-    return {
-      language: match[1] ?? '',
-      code: (match[2] ?? '').trim()
-    };
   }
 
   goToReview() {
@@ -343,22 +493,12 @@ export class EditArticlePage {
     this.router.navigate(['/review-article']);
   }
 
-    logPayload() {
-    console.log(
-      this.blocks.map(b => {
-        if (b.type === 'TEXT') return { position: b.position, type: 'PARAGRAPH', content: b.content };
-        if (b.type === 'IMAGE') return { position: b.position, type: 'IMAGE', imageUrl: b.imageUrl, imageCaption: b.caption };
-        return { position: b.position, type: 'CODE', codeLanguage: b.codeLanguage, code: b.code };
-      })
-    );
-  }
-
   submitArticle() {
     const request: CreateArticleRequest = {
       title: this.title,
       imageUrl: this.previewImageUrl,
       published: !this.isDraft,
-      blocks: this.mapBlocks()
+      markdownContent: this.markdownContent,
     };
 
     const request$ = this.articleId
@@ -367,44 +507,10 @@ export class EditArticlePage {
 
     request$.subscribe({
       next: res => {
-        console.log(this.articleId ? 'Article updated' : 'Article created', res);
         this.editorState.reset();
         this.router.navigate(['/articles', res.articleResponse.id]);
       },
-      error: err => {
-        console.error(err);
-      }
-    });
-
-  }
-
-  private mapBlocks(): CreateArticleBlockRequest[] {
-    return this.blocks.map(b => {
-      switch (b.type) {
-
-        case 'TEXT':
-          return {
-            position: b.position,
-            type: 'TEXT',
-            content: b.content
-          };
-
-        case 'IMAGE':
-          return {
-            position: b.position,
-            type: 'IMAGE',
-            imageUrl: b.imageUrl,
-            imageCaption: b.caption
-          };
-
-        case 'CODE':
-          return {
-            position: b.position,
-            type: 'CODE',
-            codeLanguage: b.codeLanguage,
-            code: b.code
-          };
-      }
+      error: err => console.error(err),
     });
   }
 
@@ -417,17 +523,11 @@ export class EditArticlePage {
   }
 
   private restoreDraftState() {
-    if (this.editorState.title) {
-      this.title = this.editorState.title;
-    }
-    if (this.editorState.blocks.length) {
-      this.blocks = this.editorState.blocks.map(b => ({ ...b })) as EditorBlock[];
-    }
+    this.title = this.editorState.title || '';
+    this.markdownContent = this.editorState.markdownContent || '';
     this.isDraft = this.editorState.isDraft;
-    if (this.editorState.previewImageUrl) {
-      this.previewImageUrl = this.editorState.previewImageUrl;
-      this.previewImageName = this.editorState.previewImageName;
-    }
+    this.previewImageUrl = this.editorState.previewImageUrl || '';
+    this.previewImageName = this.editorState.previewImageName || '';
   }
 
   private loadArticleForEditing(articleId: string) {
@@ -448,13 +548,19 @@ export class EditArticlePage {
     });
   }
 
+  private loadArticleImages(articleId: string) {
+    this.articlesService.listImages(articleId).subscribe({
+      next: images => this.articleImages.set(images),
+      error: err => console.error('Failed to load article images', err),
+    });
+  }
+
   private loadAssistantChats(articleId: string) {
     this.articleAssistantService.listChats(articleId).subscribe(chats => {
       this.assistantChats.set(chats);
       if (!chats.length) {
         return;
       }
-
       this.selectedChatId.set(chats[0].id);
       this.selectAssistantChat(chats[0].id);
     });
@@ -462,44 +568,30 @@ export class EditArticlePage {
 
   private applyArticle(article: ArticleWithUserResponse) {
     const data = article.articleResponse;
-
     this.title = data.title;
     this.previewImageUrl = data.imageUrl ?? '';
     this.previewImageName = data.imageUrl ? 'Current preview image' : '';
     this.isDraft = !data.published;
-    this.blocks = data.blocks
-      .slice()
-      .sort((left, right) => left.position - right.position)
-      .map(block => this.mapBlockToEditor(block));
+    this.markdownContent = data.markdownContent ?? '';
   }
 
-  private mapBlockToEditor(block: ArticleBlockResponse): EditorBlock {
-    switch (block.type) {
-      case 'TEXT':
-        return {
-          id: block.id,
-          type: 'TEXT',
-          position: block.position,
-          content: block.content ?? '',
-        };
+  private decodeHtml(value: string): string {
+    const textarea = document.createElement('textarea');
+    textarea.innerHTML = value;
+    return textarea.value;
+  }
 
-      case 'IMAGE':
-        return {
-          id: block.id,
-          type: 'IMAGE',
-          position: block.position,
-          imageUrl: block.imageUrl,
-          caption: block.imageCaption ?? '',
-        };
-
-      case 'CODE':
-        return {
-          id: block.id,
-          type: 'CODE',
-          position: block.position,
-          codeLanguage: block.codeLanguage ?? '',
-          code: block.code ?? '',
-        };
+  private stopAssistantResize() {
+    this.isResizingAssistant = false;
+    document.body.style.cursor = '';
+    document.body.style.userSelect = '';
+    if (this.onAssistantResizeMove) {
+      document.removeEventListener('mousemove', this.onAssistantResizeMove);
+      this.onAssistantResizeMove = undefined;
+    }
+    if (this.onAssistantResizeUp) {
+      document.removeEventListener('mouseup', this.onAssistantResizeUp);
+      this.onAssistantResizeUp = undefined;
     }
   }
 }

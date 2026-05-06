@@ -41,31 +41,9 @@
       </header>
 
       <section class="article-content">
-        @for (block of articleData()?.blocks ?? []; track block.id) {
-          @if (isTextBlock(block) && block.content) {
-            <div class="article-block article-block--text">
-              <markdown [data]="block.content"></markdown>
-            </div>
-          }
-
-          @if (isImageBlock(block) && block.imageUrl) {
-            <figure class="article-block article-block--image">
-              <img [src]="block.imageUrl" [alt]="block.imageCaption || articleData()?.title || 'Article image'">
-              @if (block.imageCaption) {
-                <figcaption>{{ block.imageCaption }}</figcaption>
-              }
-            </figure>
-          }
-
-          @if (isCodeBlock(block) && block.code) {
-            <section class="article-block article-block--code">
-              @if (block.codeLanguage) {
-                <p class="code-language">{{ block.codeLanguage }}</p>
-              }
-              <pre><code>{{ block.code }}</code></pre>
-            </section>
-          }
-        }
+        <div class="article-block article-block--text">
+          <markdown [data]="contentMarkdown()"></markdown>
+        </div>
       </section>
     </article>
   }

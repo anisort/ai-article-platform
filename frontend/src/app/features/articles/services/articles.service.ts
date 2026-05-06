@@ -3,9 +3,9 @@ import { environment } from '../../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { CreateArticleRequest } from '../models/create-article-request.model';
 import { map, Observable } from 'rxjs';
-import { ArticleBlockResponse } from '../models/article-block-response.model';
 import { ArticleWithUserResponse } from '../models/article-response.model';
 import { PublishedArticlePreview } from '../models/published-article-preview.model';
+import { ArticleImage } from '../models/article-image.model';
 
 @Injectable({
   providedIn: 'root'
@@ -62,6 +62,18 @@ export class ArticlesService {
       .pipe(map(response => this.normalizeArticle(response)));
   }
 
+  listImages(articleId: string): Observable<ArticleImage[]> {
+    return this.http.get<ArticleImage[]>(`${this.apiUrl}/${articleId}/images`);
+  }
+
+  addImage(articleId: string, imageUrl: string): Observable<ArticleImage> {
+    return this.http.post<ArticleImage>(`${this.apiUrl}/${articleId}/images`, { imageUrl });
+  }
+
+  deleteImage(articleId: string, imageId: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${articleId}/images/${imageId}`);
+  }
+
   private toPublishedPreview(
     item: PublishedArticlePreview | LegacyArticleWithUserResponse
   ): PublishedArticlePreview {
@@ -81,20 +93,9 @@ export class ArticlesService {
     return {
       articleResponse: {
         ...article.articleResponse,
-        blocks: (article.articleResponse.blocks ?? []).map(block => this.normalizeBlock(block)),
+        markdownContent: article.articleResponse.markdownContent ?? '',
       },
       authorResponse: article.authorResponse,
-    };
-  }
-
-  private normalizeBlock(block: ArticleBlockResponse): ArticleBlockResponse {
-    if (block.type !== 'IMAGE') {
-      return block;
-    }
-
-    return {
-      ...block,
-      imageCaption: block.imageCaption ?? '',
     };
   }
 }
@@ -108,7 +109,7 @@ interface LegacyArticleWithUserResponse {
     imageUrl?: string;
     summary?: string;
     createdAt?: string;
-    blocks?: ArticleBlockResponse[];
+    markdownContent?: string;
     published?: boolean;
   };
   authorResponse: {

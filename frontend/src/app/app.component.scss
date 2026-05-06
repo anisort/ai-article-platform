@@ -7,8 +7,16 @@ ion-app {
 }
 
 .app-shell {
-  min-height: 100vh;
+  height: 100dvh;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
   background: var(--color-surface-base);
+  overflow: hidden;
+}
+
+.app-content {
+  min-height: 0;
+  overflow: auto;
 }
 
 .side-menu {
