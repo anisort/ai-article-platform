@@ -6,8 +6,6 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -30,10 +28,9 @@ public class Article {
 
     private String summary;
 
+    @Column(columnDefinition = "text")
+    private String markdownContent;
+
     @CreationTimestamp
     private ZonedDateTime createdAt;
-
-    @OneToMany(mappedBy = "article", cascade = CascadeType.ALL, orphanRemoval = true)
-    @OrderBy("position ASC")
-    private List<ArticleBlock> blocks = new ArrayList<>();
 }

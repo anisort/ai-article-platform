@@ -10,13 +10,16 @@ public class RestClientConfig {
 
     private final String userServiceUrl;
     private final String llmServiceUrl;
+    private final String filesServiceUrl;
 
     public RestClientConfig(
             @Value("${services.user.url}") String userServiceUrl,
-            @Value("${services.llm.url}") String llmServiceUrl
+            @Value("${services.llm.url}") String llmServiceUrl,
+            @Value("${services.files.url}") String filesServiceUrl
     ) {
         this.userServiceUrl = userServiceUrl;
         this.llmServiceUrl = llmServiceUrl;
+        this.filesServiceUrl = filesServiceUrl;
     }
 
     @Bean("userRestClient")
@@ -27,5 +30,10 @@ public class RestClientConfig {
     @Bean("llmRestClient")
     public RestClient llmRestClient() {
         return RestClient.create(llmServiceUrl);
+    }
+
+    @Bean("filesRestClient")
+    public RestClient filesRestClient() {
+        return RestClient.create(filesServiceUrl);
     }
 }

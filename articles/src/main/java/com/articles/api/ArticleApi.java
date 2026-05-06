@@ -1,12 +1,15 @@
 package com.articles.api;
 
 import com.articles.dto.ArticleWithUserResponse;
+import com.articles.dto.AddArticleImageRequest;
+import com.articles.dto.ArticleImageResponse;
 import com.articles.dto.CreateArticleRequest;
 import com.articles.dto.LikedArticlesResponse;
 import com.articles.dto.PublishedArticlePreviewResponse;
 import com.articles.dto.ToggleArticleLikeResponse;
 import com.articles.services.ArticleFacadeService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
@@ -82,5 +85,35 @@ public class ArticleApi {
     ) {
         UUID userId = UUID.fromString(jwt.getClaimAsString("sub"));
         return articleFacadeService.toggleLike(articleId, userId);
+    }
+
+    @GetMapping("/{articleId}/images")
+    public List<ArticleImageResponse> listArticleImages(
+            @PathVariable UUID articleId,
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        UUID requesterId = UUID.fromString(jwt.getClaimAsString("sub"));
+        return articleFacadeService.listArticleImages(articleId, requesterId);
+    }
+
+    @PostMapping("/{articleId}/images")
+    public ArticleImageResponse addArticleImage(
+            @PathVariable UUID articleId,
+            @AuthenticationPrincipal Jwt jwt,
+            @RequestBody AddArticleImageRequest request
+    ) {
+        UUID requesterId = UUID.fromString(jwt.getClaimAsString("sub"));
+        return articleFacadeService.addArticleImage(articleId, requesterId, request.imageUrl());
+    }
+
+    @DeleteMapping("/{articleId}/images/{imageId}")
+    public void deleteArticleImage(
+            @PathVariable UUID articleId,
+            @PathVariable UUID imageId,
+            @AuthenticationPrincipal Jwt jwt,
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader
+    ) {
+        UUID requesterId = UUID.fromString(jwt.getClaimAsString("sub"));
+        articleFacadeService.deleteArticleImage(articleId, imageId, requesterId, authorizationHeader);
     }
 }

@@ -22,4 +22,9 @@ public class GoogleStorageApi {
     public FileResponse uploadFile(@RequestPart("file") MultipartFile file) throws IOException {
         return FileResponse.from(googleStorageService.uploadFile(file));
     }
+
+    @DeleteMapping
+    public void deleteFile(@RequestParam("url") String url) {
+        googleStorageService.deleteByUrl(url);
+    }
 }

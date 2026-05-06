@@ -1,14 +1,11 @@
 package com.articles.services;
 
-import com.articles.dto.CreateArticleBlockRequest;
 import com.articles.dto.CreateArticleRequest;
 import com.articles.entities.Article;
-import com.articles.entities.ArticleBlock;
 import com.articles.repositories.ArticleRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -83,26 +80,8 @@ public class ArticleService {
         article.setImageUrl(request.imageUrl());
         article.setPublished(request.published());
         article.setSummary(null);
-        article.getBlocks().clear();
-
-        request.blocks().stream()
-                .sorted(Comparator.comparingInt(CreateArticleBlockRequest::position))
-                .forEach(block -> article.getBlocks().add(toEntity(article, block)));
-    }
-
-    private ArticleBlock toEntity(Article article, CreateArticleBlockRequest b) {
-        ArticleBlock block = new ArticleBlock();
-        block.setArticle(article);
-        block.setPosition(b.position());
-        block.setType(b.type());
-
-        block.setContent(b.content());
-        block.setCodeLanguage(b.codeLanguage());
-        block.setCode(b.code());
-        block.setImageUrl(b.imageUrl());
-        block.setImageCaption(b.imageCaption());
-
-        return block;
+        String markdown = request.markdownContent() == null ? "" : request.markdownContent();
+        article.setMarkdownContent(markdown);
     }
 
     public static String extractText(Article article) {

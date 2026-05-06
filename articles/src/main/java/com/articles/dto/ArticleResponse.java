@@ -3,7 +3,6 @@ package com.articles.dto;
 import com.articles.entities.Article;
 
 import java.time.ZonedDateTime;
-import java.util.List;
 import java.util.UUID;
 
 public record ArticleResponse(
@@ -11,8 +10,8 @@ public record ArticleResponse(
         String title,
         String imageUrl,
         String summary,
+        String markdownContent,
         ZonedDateTime createdAt,
-        List<ArticleBlockResponse> blocks,
         boolean published
 ) {
     public static ArticleResponse fromEntity(Article a) {
@@ -21,10 +20,8 @@ public record ArticleResponse(
                 a.getTitle(),
                 a.getImageUrl(),
                 a.getSummary(),
+                a.getMarkdownContent(),
                 a.getCreatedAt(),
-                a.getBlocks().stream()
-                        .map(ArticleBlockResponse::fromEntity)
-                        .toList(),
                 a.isPublished()
         );
     }

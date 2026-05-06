@@ -3,15 +3,16 @@ package com.articles.services;
 import com.articles.dto.ArticleWithUserResponse;
 import com.articles.dto.ArticleEmbeddingDocument;
 import com.articles.dto.ArticleEmbeddingDraft;
+import com.articles.dto.ArticleImageResponse;
 import com.articles.dto.AuthorResponse;
 import com.articles.dto.CreateArticleRequest;
 import com.articles.dto.LikedArticlesResponse;
 import com.articles.dto.PublishedArticlePreviewResponse;
 import com.articles.dto.ToggleArticleLikeResponse;
 import com.articles.entities.Article;
-import com.articles.entities.ArticleBlock;
-import com.articles.entities.BlockType;
+import com.articles.entities.ArticleImage;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -28,19 +29,25 @@ public class ArticleFacadeService {
 
     private final ArticleService articleService;
     private final ArticleLikeService articleLikeService;
+    private final ArticleImageService articleImageService;
     private final UserService userService;
     private final LlmIntegrationService llmIntegrationService;
+    private final FileStorageService fileStorageService;
 
     public ArticleFacadeService(
             ArticleService articleService,
             ArticleLikeService articleLikeService,
+            ArticleImageService articleImageService,
             UserService userService,
-            LlmIntegrationService llmIntegrationService
+            LlmIntegrationService llmIntegrationService,
+            FileStorageService fileStorageService
     ) {
         this.articleService = articleService;
         this.articleLikeService = articleLikeService;
+        this.articleImageService = articleImageService;
         this.userService = userService;
         this.llmIntegrationService = llmIntegrationService;
+        this.fileStorageService = fileStorageService;
     }
 
     public List<ArticleWithUserResponse> getArticles() {
@@ -155,6 +162,31 @@ public class ArticleFacadeService {
         return new ToggleArticleLikeResponse(articleId, liked);
     }
 
+    public List<ArticleImageResponse> listArticleImages(UUID articleId, UUID requesterId) {
+        getOwnedArticle(articleId, requesterId);
+        return articleImageService.listByArticleId(articleId).stream()
+                .map(ArticleImageResponse::fromEntity)
+                .toList();
+    }
+
+    public ArticleImageResponse addArticleImage(UUID articleId, UUID requesterId, String imageUrl) {
+        getOwnedArticle(articleId, requesterId);
+        if (!StringUtils.hasText(imageUrl)) {
+            throw new ResponseStatusException(org.springframework.http.HttpStatus.BAD_REQUEST, "imageUrl is required");
+        }
+        ArticleImage image = articleImageService.add(articleId, imageUrl);
+        return ArticleImageResponse.fromEntity(image);
+    }
+
+    public void deleteArticleImage(UUID articleId, UUID imageId, UUID requesterId, String bearerToken) {
+        getOwnedArticle(articleId, requesterId);
+        ArticleImage image = articleImageService.findByIdAndArticleId(imageId, articleId)
+                .orElseThrow(() -> new ResponseStatusException(NOT_FOUND));
+
+        fileStorageService.deleteByUrl(image.getImageUrl(), bearerToken);
+        articleImageService.delete(image);
+    }
+
     private Article getPublishedArticle(UUID articleId) {
         return articleService.getPublishedArticle(articleId)
                 .orElseThrow(() -> new ResponseStatusException(NOT_FOUND));
@@ -204,26 +236,6 @@ public class ArticleFacadeService {
     }
 
     private String buildArticleText(Article article) {
-        return article.getBlocks().stream()
-                .sorted((a, b) -> Integer.compare(a.getPosition(), b.getPosition()))
-                .map(this::toTextPart)
-                .filter(Objects::nonNull)
-                .filter(part -> !part.isBlank())
-                .collect(Collectors.joining("\n\n"));
-    }
-
-    private String toTextPart(ArticleBlock block) {
-        if (block.getType() == BlockType.TEXT) {
-            return block.getContent();
-        }
-        if (block.getType() == BlockType.CODE) {
-            String code = block.getCode();
-            if (code == null || code.isBlank()) {
-                return null;
-            }
-            String lang = block.getCodeLanguage() == null ? "" : block.getCodeLanguage();
-            return "```" + lang + "\n" + code + "\n```";
-        }
-        return null;
+        return article.getMarkdownContent() == null ? "" : article.getMarkdownContent();
     }
 }
