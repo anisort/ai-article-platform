@@ -7,23 +7,19 @@ import lombok.Setter;
 import java.util.UUID;
 
 @Entity
+@IdClass(ArticleLikeId.class)
 @Table(
-        name = "article_like",
-        uniqueConstraints = {
-                @UniqueConstraint(name = "uk_article_like_user_article", columnNames = {"user_id", "article_id"})
-        }
+        name = "article_like"
 )
 @Getter
 @Setter
 public class ArticleLike {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
-
     @Column(name = "user_id", nullable = false)
     private UUID userId;
 
+    @Id
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "article_id", nullable = false)
     private Article article;

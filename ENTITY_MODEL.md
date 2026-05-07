@@ -17,11 +17,10 @@
 ### `ArticleLike` (`article_like`)
 | Attribute | Type |
 |---|---|
-| `id` | `UUID` |
 | `userId` | `UUID` |
 | `article` | `Article` (`ManyToOne`) |
 
-Unique constraint: `(user_id, article_id)`.
+Composite primary key: `(user_id, article_id)`.
 
 ### `ArticleImage` (`article_image`)
 | Attribute | Type |
@@ -48,11 +47,10 @@ Unique constraint: `(user_id, article_id)`.
 ### `UserFollow` (`user_follow`)
 | Attribute | Type |
 |---|---|
-| `id` | `UUID` |
 | `followerId` | `UUID` |
 | `followingId` | `UUID` |
 
-Unique constraint: `(follower_id, following_id)`.
+Composite primary key: `(follower_id, following_id)`.
 
 ## LLM Service (`llm`)
 
@@ -72,6 +70,26 @@ Unique constraint: `(follower_id, following_id)`.
 | `role` | `AssistantMessageRole` (`USER`, `ASSISTANT`) |
 | `content` | `String` (`TEXT`) |
 | `createdAt` | `ZonedDateTime` |
+
+### `VectorStore` (`vector_store`, a.k.a. `vectore_store` in docs/config notes)
+Auto-created by Spring AI Vector Store integration (not manually defined as a project `@Entity`).
+
+| Attribute | Type |
+|---|---|
+| `id` | `UUID` |
+| `content` | `String` (`TEXT`) |
+| `metadata` | `JSON` |
+| `embedding` | `vector(768)` |
+
+### `SpringAiChatMemory` (`spring_ai_chat_memory`)
+Auto-created by Spring AI Chat Memory integration (not manually defined as a project `@Entity`).
+
+| Attribute | Type |
+|---|---|
+| `conversationId` (`conversation_id`) | `String` (`VARCHAR(36)`) |
+| `content` | `String` (`TEXT`) |
+| `type` | `String` (`VARCHAR(10)`) |
+| `timestamp` | `timestamp` |
 
 ## Files Service (`files`)
 
