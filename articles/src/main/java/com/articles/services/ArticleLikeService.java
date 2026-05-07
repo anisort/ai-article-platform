@@ -25,6 +25,13 @@ public class ArticleLikeService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public List<Article> getLikedArticles(UUID userId) {
+        return articleLikeRepository.findByUserId(userId).stream()
+                .map(ArticleLike::getArticle)
+                .toList();
+    }
+
     @Transactional
     public boolean toggleLike(UUID userId, Article article) {
         return articleLikeRepository.findByUserIdAndArticle_Id(userId, article.getId())

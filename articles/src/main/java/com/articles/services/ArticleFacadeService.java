@@ -16,8 +16,10 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -130,6 +132,51 @@ public class ArticleFacadeService {
         return new LikedArticlesResponse(articleLikeService.getLikedArticleIds(userId));
     }
 
+    public List<PublishedArticlePreviewResponse> getRecommendations(UUID userId, int limit) {
+        int safeLimit = Math.max(1, Math.min(limit, 50));
+
+        List<Article> likedArticles = articleLikeService.getLikedArticles(userId);
+        Set<UUID> excludedIds = likedArticles.stream()
+                .map(Article::getId)
+                .collect(Collectors.toSet());
+
+        LinkedHashSet<UUID> recommendedIds = new LinkedHashSet<>(
+                llmIntegrationService.recommendArticleIds(
+                        likedArticles.stream().map(Article::getId).toList(),
+                        List.copyOf(excludedIds),
+                        safeLimit
+                )
+        );
+
+        List<Article> recommended = articleService.getPublishedArticlesByIds(List.copyOf(recommendedIds));
+        Map<UUID, Article> recommendedById = recommended.stream()
+                .collect(Collectors.toMap(Article::getId, Function.identity()));
+        Map<UUID, AuthorResponse> recommendedAuthors = userService.getAuthors(recommended);
+
+        List<PublishedArticlePreviewResponse> result = recommendedIds.stream()
+                .map(recommendedById::get)
+                .filter(Objects::nonNull)
+                .map(article -> PublishedArticlePreviewResponse.fromEntity(article, recommendedAuthors.get(article.getAuthorId())))
+                .limit(safeLimit)
+                .toList();
+
+        if (result.size() >= safeLimit) {
+            return result;
+        }
+
+        // Cold start / sparse semantic matches fallback.
+        Set<UUID> alreadyIncluded = result.stream().map(PublishedArticlePreviewResponse::id).collect(Collectors.toSet());
+        List<PublishedArticlePreviewResponse> fallback = getPublishedArticles().stream()
+                .filter(article -> !excludedIds.contains(article.id()))
+                .filter(article -> !alreadyIncluded.contains(article.id()))
+                .limit(safeLimit - result.size())
+                .toList();
+
+        return java.util.stream.Stream.concat(result.stream(), fallback.stream())
+                .limit(safeLimit)
+                .toList();
+    }
+
     public ArticleWithUserResponse getArticle(UUID articleId, UUID requesterId) {
         Article article = requesterId == null
                 ? getPublishedArticle(articleId)
@@ -238,4 +285,5 @@ public class ArticleFacadeService {
     private String buildArticleText(Article article) {
         return article.getMarkdownContent() == null ? "" : article.getMarkdownContent();
     }
+
 }

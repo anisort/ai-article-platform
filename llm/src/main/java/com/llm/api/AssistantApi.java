@@ -3,6 +3,8 @@ package com.llm.api;
 import com.llm.dto.ArticleDescriptionResponse;
 import com.llm.dto.ArticleEmbeddingDocument;
 import com.llm.dto.ArticleEmbeddingDraft;
+import com.llm.dto.ArticleRecommendationRequest;
+import com.llm.dto.ArticleRecommendationResponse;
 import com.llm.dto.AdvisorChatRequest;
 import com.llm.dto.AdvisorChatResponse;
 import com.llm.dto.ArticleAssistantChatResponse;
@@ -15,6 +17,7 @@ import com.llm.dto.SendArticleAssistantMessageResponse;
 import com.llm.services.llm.AdvisorService;
 import com.llm.services.llm.ArticleAssistantService;
 import com.llm.services.llm.ArticleVectorService;
+import com.llm.services.llm.ArticleRecommendationService;
 import com.llm.services.llm.AssistantService;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,17 +36,20 @@ public class AssistantApi {
 
     private final AssistantService assistantService;
     private final ArticleVectorService articleVectorService;
+    private final ArticleRecommendationService articleRecommendationService;
     private final AdvisorService advisorService;
     private final ArticleAssistantService articleAssistantService;
 
     public AssistantApi(
             AssistantService assistantService,
             ArticleVectorService articleVectorService,
+            ArticleRecommendationService articleRecommendationService,
             AdvisorService advisorService,
             ArticleAssistantService articleAssistantService
     ) {
         this.assistantService = assistantService;
         this.articleVectorService = articleVectorService;
+        this.articleRecommendationService = articleRecommendationService;
         this.advisorService = advisorService;
         this.articleAssistantService = articleAssistantService;
     }
@@ -74,6 +80,18 @@ public class AssistantApi {
         int topK = request.topK() == null ? 20 : request.topK();
         return new SemanticSearchResponse(
                 articleVectorService.similaritySearchArticleIds(request.query(), threshold, topK)
+        );
+    }
+
+    @PostMapping("/recommend/articles")
+    public ArticleRecommendationResponse recommendArticles(@RequestBody ArticleRecommendationRequest request) {
+        int topK = request.topK() == null ? 20 : request.topK();
+        return new ArticleRecommendationResponse(
+                articleRecommendationService.recommendArticleIds(
+                        request.likedArticleIds(),
+                        request.excludeArticleIds(),
+                        topK
+                )
         );
     }
 

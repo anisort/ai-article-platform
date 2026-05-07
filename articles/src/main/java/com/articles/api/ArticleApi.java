@@ -56,6 +56,15 @@ public class ArticleApi {
         return articleFacadeService.getLikedArticles(userId);
     }
 
+    @GetMapping("/me/recommendations")
+    public List<PublishedArticlePreviewResponse> getMyRecommendations(
+            @AuthenticationPrincipal Jwt jwt,
+            @RequestParam(defaultValue = "20") int limit
+    ) {
+        UUID userId = UUID.fromString(jwt.getSubject());
+        return articleFacadeService.getRecommendations(userId, limit);
+    }
+
     @GetMapping("/{articleId}")
     public ArticleWithUserResponse getArticle(@PathVariable UUID articleId, @AuthenticationPrincipal Jwt jwt) {
         UUID requesterId = jwt == null ? null : UUID.fromString(jwt.getSubject());
