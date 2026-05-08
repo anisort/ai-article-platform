@@ -23,6 +23,10 @@ public class ArticleService {
         return articleRepository.findAll();
     }
 
+    public long count() {
+        return articleRepository.count();
+    }
+
     public List<Article> getPublishedArticles() {
         return articleRepository.findByPublishedTrueOrderByCreatedAtDesc();
     }

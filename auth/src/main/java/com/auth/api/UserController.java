@@ -1,6 +1,7 @@
 package com.auth.api;
 
 import com.auth.dto.CreateUserRequest;
+import com.auth.dto.SeedUserRequest;
 import com.auth.dto.ToggleFollowResponse;
 import com.auth.dto.UserProfileResponse;
 import com.auth.dto.UserResponse;
@@ -26,6 +27,14 @@ public class UserController {
     @PostMapping
     public UserResponse save(@Valid @RequestBody CreateUserRequest request) {
         return UserResponse.fromEntity(userService.save(request));
+    }
+
+    @PostMapping("/seed")
+    public List<UserResponse> seedUsers(
+            @RequestHeader("X-Seed-Token") String seedToken,
+            @RequestBody List<SeedUserRequest> requests
+    ) {
+        return userService.seedUsers(requests, seedToken).stream().map(UserResponse::fromEntity).toList();
     }
 
     @PostMapping("/batch")

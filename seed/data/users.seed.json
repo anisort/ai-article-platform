@@ -1,0 +1,107 @@
+﻿[
+    {
+        "id":  "1412e3a6-f0ee-4230-bb2e-d49b0f1255ec",
+        "username":  "fast_analyst_01",
+        "email":  "fast_analyst_01@example.com",
+        "name":  "Fast Analyst",
+        "password":  "Test100#"
+    },
+    {
+        "id":  "514f84e9-1b90-4272-bb07-6ff8c063778a",
+        "username":  "parallel_builder_02",
+        "email":  "parallel_builder_02@example.com",
+        "name":  "Parallel Builder",
+        "password":  "Test100#"
+    },
+    {
+        "id":  "bc54349d-2f8a-4f0f-affc-4b239b82a420",
+        "username":  "kinetic_coder_03",
+        "email":  "kinetic_coder_03@example.com",
+        "name":  "Kinetic Coder",
+        "password":  "Test100#"
+    },
+    {
+        "id":  "eaa4c312-85db-4a6b-a568-a1b57193ff50",
+        "username":  "unified_builder_04",
+        "email":  "unified_builder_04@example.com",
+        "name":  "Unified Builder",
+        "password":  "Test100#"
+    },
+    {
+        "id":  "d7377864-3628-42d8-900e-6aeaff9e7cdf",
+        "username":  "global_developer_05",
+        "email":  "global_developer_05@example.com",
+        "name":  "Global Developer",
+        "password":  "Test100#"
+    },
+    {
+        "id":  "1f4d4996-742e-42fb-b9a9-e7163d3566cf",
+        "username":  "kinetic_developer_06",
+        "email":  "kinetic_developer_06@example.com",
+        "name":  "Kinetic Developer",
+        "password":  "Test100#"
+    },
+    {
+        "id":  "4ab3fc46-2bb2-4ef3-911c-b85b676189d0",
+        "username":  "modern_analyst_07",
+        "email":  "modern_analyst_07@example.com",
+        "name":  "Modern Analyst",
+        "password":  "Test100#"
+    },
+    {
+        "id":  "3ba44d95-dfad-44a4-90cb-c4333213cd98",
+        "username":  "neural_designer_08",
+        "email":  "neural_designer_08@example.com",
+        "name":  "Neural Designer",
+        "password":  "Test100#"
+    },
+    {
+        "id":  "061651ee-38f1-4901-b25d-a408af816827",
+        "username":  "vector_coder_09",
+        "email":  "vector_coder_09@example.com",
+        "name":  "Vector Coder",
+        "password":  "Test100#"
+    },
+    {
+        "id":  "b8805786-371f-4969-aba3-c9d3a93f445a",
+        "username":  "iterative_reviewer_10",
+        "email":  "iterative_reviewer_10@example.com",
+        "name":  "Iterative Reviewer",
+        "password":  "Test100#"
+    },
+    {
+        "id":  "c91ef597-9c37-434a-94ab-b7cde32b7820",
+        "username":  "modern_mentor_11",
+        "email":  "modern_mentor_11@example.com",
+        "name":  "Modern Mentor",
+        "password":  "Test100#"
+    },
+    {
+        "id":  "43d6fe28-502a-414e-a30e-3ee22501a557",
+        "username":  "neural_coder_12",
+        "email":  "neural_coder_12@example.com",
+        "name":  "Neural Coder",
+        "password":  "Test100#"
+    },
+    {
+        "id":  "8fea9fbd-33f4-4032-8e0f-1fb24d69fbe9",
+        "username":  "eager_analyst_13",
+        "email":  "eager_analyst_13@example.com",
+        "name":  "Eager Analyst",
+        "password":  "Test100#"
+    },
+    {
+        "id":  "fe606a4c-6467-43fe-bf23-003782955150",
+        "username":  "delta_maintainer_14",
+        "email":  "delta_maintainer_14@example.com",
+        "name":  "Delta Maintainer",
+        "password":  "Test100#"
+    },
+    {
+        "id":  "20eac43e-d04e-4d30-850e-5be01a183900",
+        "username":  "atomic_coder_15",
+        "email":  "atomic_coder_15@example.com",
+        "name":  "Atomic Coder",
+        "password":  "Test100#"
+    }
+]

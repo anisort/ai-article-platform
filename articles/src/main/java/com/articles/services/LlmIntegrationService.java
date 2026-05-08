@@ -29,9 +29,15 @@ public class LlmIntegrationService {
     }
 
     public String generateDescription(ArticleEmbeddingDraft draft) {
-        ArticleDescriptionResponse response = llmRestClient.post()
-                .uri("/api/v1/assistant/description")
-                .header(HttpHeaders.AUTHORIZATION, bearerToken())
+        RestClient.RequestBodySpec requestSpec = llmRestClient.post()
+                .uri("/api/v1/assistant/description");
+
+        String bearerToken = bearerTokenOrNull();
+        if (bearerToken != null) {
+            requestSpec.header(HttpHeaders.AUTHORIZATION, bearerToken);
+        }
+
+        ArticleDescriptionResponse response = requestSpec
                 .body(draft)
                 .retrieve()
                 .body(ArticleDescriptionResponse.class);
@@ -39,10 +45,35 @@ public class LlmIntegrationService {
     }
 
     public void addToVectorStore(ArticleEmbeddingDocument document) {
-        llmRestClient.post()
-                .uri("/api/v1/vector/articles")
-                .header(HttpHeaders.AUTHORIZATION, bearerToken())
+        RestClient.RequestBodySpec requestSpec = llmRestClient.post()
+                .uri("/api/v1/vector/articles");
+
+        String bearerToken = bearerTokenOrNull();
+        if (bearerToken != null) {
+            requestSpec.header(HttpHeaders.AUTHORIZATION, bearerToken);
+        }
+
+        requestSpec
                 .body(document)
+                .retrieve()
+                .toBodilessEntity();
+    }
+
+    public void addToVectorStoreBatch(List<ArticleEmbeddingDocument> documents) {
+        if (documents == null || documents.isEmpty()) {
+            return;
+        }
+
+        RestClient.RequestBodySpec requestSpec = llmRestClient.post()
+                .uri("/api/v1/vector/articles/batch");
+
+        String bearerToken = bearerTokenOrNull();
+        if (bearerToken != null) {
+            requestSpec.header(HttpHeaders.AUTHORIZATION, bearerToken);
+        }
+
+        requestSpec
+                .body(documents)
                 .retrieve()
                 .toBodilessEntity();
     }
@@ -52,24 +83,32 @@ public class LlmIntegrationService {
             return List.of();
         }
 
-        RestClient.RequestBodySpec requestSpec = llmRestClient.post()
-                .uri("/api/v1/search/articles");
+        List<SemanticSearchRequest> requests = List.of(
+                new SemanticSearchRequest(query, 0.8, 30),
+                new SemanticSearchRequest(query, 0.65, 40),
+                new SemanticSearchRequest(query, 0.5, 50)
+        );
 
-        String bearerToken = bearerTokenOrNull();
-        if (bearerToken != null) {
-            requestSpec.header(HttpHeaders.AUTHORIZATION, bearerToken);
+        for (SemanticSearchRequest request : requests) {
+            RestClient.RequestBodySpec requestSpec = llmRestClient.post()
+                    .uri("/api/v1/search/articles");
+
+            String bearerToken = bearerTokenOrNull();
+            if (bearerToken != null) {
+                requestSpec.header(HttpHeaders.AUTHORIZATION, bearerToken);
+            }
+
+            SemanticSearchResponse response = requestSpec
+                    .body(request)
+                    .retrieve()
+                    .body(SemanticSearchResponse.class);
+
+            if (response != null && response.articleIds() != null && !response.articleIds().isEmpty()) {
+                return response.articleIds();
+            }
         }
 
-        SemanticSearchResponse response = requestSpec
-                .body(new SemanticSearchRequest(query, 0.8, 20))
-                .retrieve()
-                .body(SemanticSearchResponse.class);
-
-        if (response == null || response.articleIds() == null) {
-            return List.of();
-        }
-
-        return response.articleIds();
+        return List.of();
     }
 
     public List<UUID> recommendArticleIds(List<UUID> likedArticleIds, List<UUID> excludeArticleIds, int topK) {
@@ -95,14 +134,6 @@ public class LlmIntegrationService {
         }
 
         return response.articleIds();
-    }
-
-    private String bearerToken() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !(authentication.getPrincipal() instanceof Jwt jwt)) {
-            throw new IllegalStateException("JWT token is required for LLM service call");
-        }
-        return "Bearer " + jwt.getTokenValue();
     }
 
     private String bearerTokenOrNull() {

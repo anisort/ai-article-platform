@@ -19,7 +19,6 @@ public class CustomUserDetails implements UserDetails, CredentialsContainer {
 
     @Getter
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     private String username;

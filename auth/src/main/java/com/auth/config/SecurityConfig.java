@@ -96,6 +96,7 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests((authorize) -> authorize
                         .requestMatchers("/login", "/.well-known/appspecific/**", "/error").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/users/seed").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/users/me").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/v1/users/*/follow").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/v1/users/**").permitAll()

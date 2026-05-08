@@ -20,21 +20,45 @@ public class ArticleVectorService {
     }
 
     public void addOrUpdate(ArticleEmbeddingDocument article) {
-        vectorStore.delete(List.of(article.id().toString()));
+        addOrUpdateBatch(List.of(article));
+    }
 
-        String content = String.format(
-                "Title: %s\nAuthor: %s\nDescription: %s\nImage: %s",
-                article.title(),
-                article.author(),
-                article.description(),
-                article.image()
-        );
-        Document document = new Document(
-                article.id().toString(),
-                content,
-                Map.of("article_id", article.id().toString())
-        );
-        vectorStore.add(List.of(document));
+    public void addOrUpdateBatch(List<ArticleEmbeddingDocument> articles) {
+        if (articles == null || articles.isEmpty()) {
+            return;
+        }
+
+        List<String> ids = articles.stream()
+                .map(ArticleEmbeddingDocument::id)
+                .filter(id -> id != null)
+                .map(UUID::toString)
+                .toList();
+
+        if (!ids.isEmpty()) {
+            vectorStore.delete(ids);
+        }
+
+        List<Document> documents = articles.stream()
+                .filter(article -> article.id() != null)
+                .map(article -> {
+                    String content = String.format(
+                            "Title: %s\nAuthor: %s\nDescription: %s\nImage: %s",
+                            article.title(),
+                            article.author(),
+                            article.description(),
+                            article.image()
+                    );
+                    return new Document(
+                            article.id().toString(),
+                            content,
+                            Map.of("article_id", article.id().toString())
+                    );
+                })
+                .toList();
+
+        if (!documents.isEmpty()) {
+            vectorStore.add(documents);
+        }
     }
 
     public List<UUID> similaritySearchArticleIds(String query, double similarityThreshold, int topK) {

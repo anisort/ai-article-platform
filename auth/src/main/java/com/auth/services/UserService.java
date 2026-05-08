@@ -1,6 +1,7 @@
 package com.auth.services;
 
 import com.auth.dto.CreateUserRequest;
+import com.auth.dto.SeedUserRequest;
 import com.auth.dto.ToggleFollowResponse;
 import com.auth.dto.UserProfileResponse;
 import com.auth.dto.UserSummaryResponse;
@@ -8,6 +9,7 @@ import com.auth.entities.CustomUserDetails;
 import com.auth.entities.UserFollow;
 import com.auth.repositories.UserFollowRepository;
 import com.auth.repositories.UserRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,17 +28,27 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserFollowRepository userFollowRepository;
     private final PasswordEncoder passwordEncoder;
+    private final String seedToken;
 
-    public UserService(UserRepository userRepository, UserFollowRepository userFollowRepository, PasswordEncoder passwordEncoder) {
+    public UserService(
+            UserRepository userRepository,
+            UserFollowRepository userFollowRepository,
+            PasswordEncoder passwordEncoder,
+            @Value("${app.seed.token:}") String seedToken
+    ) {
         this.userRepository = userRepository;
         this.userFollowRepository = userFollowRepository;
         this.passwordEncoder = passwordEncoder;
+        this.seedToken = seedToken;
     }
 
     @Transactional
     public CustomUserDetails save(CreateUserRequest request) {
         CustomUserDetails user = new CustomUserDetails();
         request.toUser(user);
+        if (user.getId() == null) {
+            user.setId(UUID.randomUUID());
+        }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
@@ -103,6 +115,21 @@ public class UserService {
         return new ToggleFollowResponse(targetUserId, true);
     }
 
+    @Transactional
+    public List<CustomUserDetails> seedUsers(List<SeedUserRequest> requests, String providedToken) {
+        if (seedToken == null || seedToken.isBlank() || !Objects.equals(seedToken, providedToken)) {
+            throw new ResponseStatusException(BAD_REQUEST, "Invalid seed token");
+        }
+        if (userRepository.count() > 0) {
+            throw new ResponseStatusException(BAD_REQUEST, "Users table is not empty");
+        }
+
+        return requests.stream()
+                .map(this::toSeedUser)
+                .map(userRepository::save)
+                .toList();
+    }
+
     private List<UserSummaryResponse> getFollowUsers(List<UserFollow> follows, Function<UserFollow, UUID> idExtractor) {
         List<UUID> ids = follows.stream()
                 .map(idExtractor)
@@ -119,5 +146,16 @@ public class UserService {
                 .sorted(Comparator.comparing(UserSummaryResponse::name, Comparator.nullsLast(String::compareToIgnoreCase))
                         .thenComparing(UserSummaryResponse::username, Comparator.nullsLast(String::compareToIgnoreCase)))
                 .toList();
+    }
+
+    private CustomUserDetails toSeedUser(SeedUserRequest request) {
+        CustomUserDetails user = new CustomUserDetails();
+        user.setId(request.id());
+        user.setUsername(request.username());
+        user.setEmail(request.email());
+        user.setName(request.name());
+        user.setPassword(passwordEncoder.encode(request.password()));
+        user.setRole(com.auth.entities.Role.USER);
+        return user;
     }
 }

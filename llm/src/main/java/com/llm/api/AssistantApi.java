@@ -74,6 +74,11 @@ public class AssistantApi {
         articleVectorService.addOrUpdate(document);
     }
 
+    @PostMapping("/vector/articles/batch")
+    public void addArticlesToVectorStore(@RequestBody List<ArticleEmbeddingDocument> documents) {
+        articleVectorService.addOrUpdateBatch(documents);
+    }
+
     @PostMapping("/search/articles")
     public SemanticSearchResponse searchArticles(@RequestBody SemanticSearchRequest request) {
         double threshold = request.similarityThreshold() == null ? 0.6 : request.similarityThreshold();

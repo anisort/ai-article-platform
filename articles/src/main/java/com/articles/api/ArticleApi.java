@@ -6,6 +6,8 @@ import com.articles.dto.ArticleImageResponse;
 import com.articles.dto.CreateArticleRequest;
 import com.articles.dto.LikedArticlesResponse;
 import com.articles.dto.PublishedArticlePreviewResponse;
+import com.articles.dto.ReindexEmbeddingsResponse;
+import com.articles.dto.SeedArticleRequest;
 import com.articles.dto.ToggleArticleLikeResponse;
 import com.articles.services.ArticleFacadeService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -75,6 +77,24 @@ public class ArticleApi {
     public ArticleWithUserResponse create(@AuthenticationPrincipal Jwt jwt, @RequestBody CreateArticleRequest req) {
         UUID authorId = UUID.fromString(jwt.getClaimAsString("sub"));
         return articleFacadeService.create(req, authorId);
+    }
+
+    @PostMapping("/seed")
+    public List<ArticleWithUserResponse> seedArticles(
+            @RequestHeader("X-Seed-Token") String seedToken,
+            @RequestBody List<SeedArticleRequest> requests
+    ) {
+        return articleFacadeService.seedArticles(requests, seedToken);
+    }
+
+    @PostMapping("/reindex-embeddings")
+    public ReindexEmbeddingsResponse reindexEmbeddings(
+            @RequestHeader("X-Seed-Token") String seedToken,
+            @RequestParam(defaultValue = "30") int batchSize,
+            @RequestParam(defaultValue = "1000") long delayMs
+    ) {
+        int processed = articleFacadeService.reindexEmbeddings(seedToken, batchSize, delayMs);
+        return new ReindexEmbeddingsResponse(processed);
     }
 
     @PutMapping("/{articleId}")
