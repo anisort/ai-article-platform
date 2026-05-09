@@ -8,9 +8,7 @@ import java.util.UUID;
 
 @Entity
 @IdClass(ArticleLikeId.class)
-@Table(
-        name = "article_like"
-)
+@Table(name = "article_like")
 @Getter
 @Setter
 public class ArticleLike {
