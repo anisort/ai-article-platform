@@ -10,9 +10,7 @@ import java.util.UUID;
 @Setter
 @Entity
 @IdClass(UserFollowId.class)
-@Table(
-        name = "user_follow"
-)
+@Table(name = "user_follow")
 public class UserFollow {
 
     @Id
