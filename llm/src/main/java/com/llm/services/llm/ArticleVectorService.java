@@ -20,45 +20,26 @@ public class ArticleVectorService {
     }
 
     public void addOrUpdate(ArticleEmbeddingDocument article) {
-        addOrUpdateBatch(List.of(article));
-    }
-
-    public void addOrUpdateBatch(List<ArticleEmbeddingDocument> articles) {
-        if (articles == null || articles.isEmpty()) {
+        if (article == null || article.id() == null) {
             return;
         }
 
-        List<String> ids = articles.stream()
-                .map(ArticleEmbeddingDocument::id)
-                .filter(id -> id != null)
-                .map(UUID::toString)
-                .toList();
+        String id = article.id().toString();
+        vectorStore.delete(List.of(id));
 
-        if (!ids.isEmpty()) {
-            vectorStore.delete(ids);
-        }
-
-        List<Document> documents = articles.stream()
-                .filter(article -> article.id() != null)
-                .map(article -> {
-                    String content = String.format(
-                            "Title: %s\nAuthor: %s\nDescription: %s\nImage: %s",
-                            article.title(),
-                            article.author(),
-                            article.description(),
-                            article.image()
-                    );
-                    return new Document(
-                            article.id().toString(),
-                            content,
-                            Map.of("article_id", article.id().toString())
-                    );
-                })
-                .toList();
-
-        if (!documents.isEmpty()) {
-            vectorStore.add(documents);
-        }
+        String content = String.format(
+                "Title: %s\nAuthor: %s\nDescription: %s\nImage: %s",
+                article.title(),
+                article.author(),
+                article.description(),
+                article.image()
+        );
+        Document document = new Document(
+                id,
+                content,
+                Map.of("article_id", id)
+        );
+        vectorStore.add(List.of(document));
     }
 
     public List<UUID> similaritySearchArticleIds(String query, double similarityThreshold, int topK) {

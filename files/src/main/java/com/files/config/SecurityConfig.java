@@ -21,7 +21,6 @@ public class SecurityConfig {
         http
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(authorize -> authorize
-                        //.requestMatchers("/api/chats/**", "/api/messages/**").hasAnyRole("ADMIN", "USER")
                         .requestMatchers("/api/v1/files/**").permitAll()
                         .anyRequest().authenticated()
                 )

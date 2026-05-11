@@ -1,4 +1,4 @@
-package com.llm.services.llm;
+package com.llm.services.chat;
 
 import com.llm.dto.ArticleAssistantChatResponse;
 import com.llm.dto.ArticleAssistantMessageResponse;
@@ -10,6 +10,7 @@ import com.llm.entities.ArticleAssistantMessage;
 import com.llm.entities.AssistantMessageRole;
 import com.llm.repositories.ArticleAssistantChatRepository;
 import com.llm.repositories.ArticleAssistantMessageRepository;
+import com.llm.services.llm.AssistantService;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

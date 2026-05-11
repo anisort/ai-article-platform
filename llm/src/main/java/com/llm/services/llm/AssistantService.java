@@ -64,12 +64,23 @@ public class AssistantService {
     }
 
     public ChatResponse getArticleAssistantResponse(String prompt, UUID chatId, AssistantResponseMode mode) {
-        return ChatClient.builder(chatModel)
-                .defaultAdvisors(
-                        MessageChatMemoryAdvisor.builder(chatMemory).build(),
-                        QuestionAnswerAdvisor.builder(vectorStore).build()
-                )
-                .build()
+        return getArticleAssistantResponse(prompt, chatId, mode, false);
+    }
+
+    public ChatResponse getArticleAssistantResponse(String prompt, UUID chatId, AssistantResponseMode mode, boolean useKnowledgeBase) {
+        ChatClient.Builder builder = ChatClient.builder(chatModel);
+        if (useKnowledgeBase) {
+            builder.defaultAdvisors(
+                    MessageChatMemoryAdvisor.builder(chatMemory).build(),
+                    QuestionAnswerAdvisor.builder(vectorStore).build()
+            );
+        } else {
+            builder.defaultAdvisors(
+                    MessageChatMemoryAdvisor.builder(chatMemory).build()
+            );
+        }
+
+        return builder.build()
                 .prompt()
                 .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, chatId))
                 .system(articleAssistantSystemPrompt(mode))
