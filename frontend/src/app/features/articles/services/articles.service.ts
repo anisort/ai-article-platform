@@ -26,7 +26,7 @@ export class ArticlesService {
       return this.list();
     }
 
-    return this.http.get<PublishedArticlePreview[]>(`${this.apiUrl}/search`, {
+    return this.http.get<PublishedArticlePreview[]>(`${environment.apiUrlArticles}/v1/search/articles`, {
       params: {
         query: normalizedQuery,
         mode,
@@ -42,6 +42,14 @@ export class ArticlesService {
 
   listPublishedByAuthor(authorId: string): Observable<PublishedArticlePreview[]> {
     return this.http.get<PublishedArticlePreview[]>(`${this.apiUrl}/author/${authorId}`);
+  }
+
+  getRecommendations(limit = 20): Observable<PublishedArticlePreview[]> {
+    return this.http.get<PublishedArticlePreview[]>(`${this.apiUrl}/recommendations`, {
+      params: {
+        limit,
+      },
+    });
   }
 
   getById(articleId: string): Observable<ArticleWithUserResponse> {

@@ -6,6 +6,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
@@ -21,11 +22,15 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .cors(Customizer.withDefaults())
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers(HttpMethod.POST, "/api/v1/assistant/description").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/vector/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/discovery/articles/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/advisor/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/advisor/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/search/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/v1/search/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/discovery/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/discovery/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2

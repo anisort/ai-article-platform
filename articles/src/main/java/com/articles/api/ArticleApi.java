@@ -1,15 +1,10 @@
 package com.articles.api;
 
-import com.articles.dto.ArticleWithUserResponse;
-import com.articles.dto.AddArticleImageRequest;
-import com.articles.dto.ArticleImageResponse;
-import com.articles.dto.CreateArticleRequest;
-import com.articles.dto.LikedArticlesResponse;
-import com.articles.dto.PublishedArticlePreviewResponse;
-import com.articles.dto.ToggleArticleLikeResponse;
-import com.articles.services.ArticleFacadeService;
+import com.articles.dto.article.ArticleWithUserResponse;
+import com.articles.dto.article.CreateArticleRequest;
+import com.articles.dto.article.PublishedArticlePreviewResponse;
+import com.articles.services.facade.ArticleFacadeService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.http.HttpHeaders;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,29 +26,9 @@ public class ArticleApi {
         return articleFacadeService.getPublishedArticles();
     }
 
-    @GetMapping("/search")
-    public List<PublishedArticlePreviewResponse> searchArticles(
-            @RequestParam String query,
-            @RequestParam(defaultValue = "title") String mode
-    ) {
-        return articleFacadeService.searchPublishedArticles(query, mode);
-    }
-
-    @GetMapping("/me")
-    public List<ArticleWithUserResponse> getMyArticles(@AuthenticationPrincipal Jwt jwt) {
-        UUID authorId = UUID.fromString(jwt.getSubject());
-        return articleFacadeService.getMyArticles(authorId);
-    }
-
     @GetMapping("/author/{authorId}")
     public List<PublishedArticlePreviewResponse> getPublishedArticlesByAuthor(@PathVariable UUID authorId) {
         return articleFacadeService.getPublishedArticlesByAuthor(authorId);
-    }
-
-    @GetMapping("/me/likes")
-    public LikedArticlesResponse getMyLikedArticles(@AuthenticationPrincipal Jwt jwt) {
-        UUID userId = UUID.fromString(jwt.getSubject());
-        return articleFacadeService.getLikedArticles(userId);
     }
 
     @GetMapping("/{articleId}")
@@ -64,7 +39,7 @@ public class ArticleApi {
 
     @PostMapping
     public ArticleWithUserResponse create(@AuthenticationPrincipal Jwt jwt, @RequestBody CreateArticleRequest req) {
-        UUID authorId = UUID.fromString(jwt.getClaimAsString("sub"));
+        UUID authorId = UUID.fromString(jwt.getSubject());
         return articleFacadeService.create(req, authorId);
     }
 
@@ -74,46 +49,7 @@ public class ArticleApi {
             @AuthenticationPrincipal Jwt jwt,
             @RequestBody CreateArticleRequest req
     ) {
-        UUID authorId = UUID.fromString(jwt.getClaimAsString("sub"));
+        UUID authorId = UUID.fromString(jwt.getSubject());
         return articleFacadeService.update(articleId, req, authorId);
-    }
-
-    @PostMapping("/{articleId}/like")
-    public ToggleArticleLikeResponse toggleLike(
-            @PathVariable UUID articleId,
-            @AuthenticationPrincipal Jwt jwt
-    ) {
-        UUID userId = UUID.fromString(jwt.getClaimAsString("sub"));
-        return articleFacadeService.toggleLike(articleId, userId);
-    }
-
-    @GetMapping("/{articleId}/images")
-    public List<ArticleImageResponse> listArticleImages(
-            @PathVariable UUID articleId,
-            @AuthenticationPrincipal Jwt jwt
-    ) {
-        UUID requesterId = UUID.fromString(jwt.getClaimAsString("sub"));
-        return articleFacadeService.listArticleImages(articleId, requesterId);
-    }
-
-    @PostMapping("/{articleId}/images")
-    public ArticleImageResponse addArticleImage(
-            @PathVariable UUID articleId,
-            @AuthenticationPrincipal Jwt jwt,
-            @RequestBody AddArticleImageRequest request
-    ) {
-        UUID requesterId = UUID.fromString(jwt.getClaimAsString("sub"));
-        return articleFacadeService.addArticleImage(articleId, requesterId, request.imageUrl());
-    }
-
-    @DeleteMapping("/{articleId}/images/{imageId}")
-    public void deleteArticleImage(
-            @PathVariable UUID articleId,
-            @PathVariable UUID imageId,
-            @AuthenticationPrincipal Jwt jwt,
-            @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader
-    ) {
-        UUID requesterId = UUID.fromString(jwt.getClaimAsString("sub"));
-        articleFacadeService.deleteArticleImage(articleId, imageId, requesterId, authorizationHeader);
     }
 }

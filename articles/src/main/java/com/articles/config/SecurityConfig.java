@@ -6,6 +6,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
@@ -17,16 +18,21 @@ import java.util.Collection;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http) {
         http
+                .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(authorize -> authorize
-                        //.requestMatchers("/api/chats/**", "/api/messages/**").hasAnyRole("ADMIN", "USER")
-                        .requestMatchers(HttpMethod.POST, "/api/v1/articles/**").authenticated()
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/articles/**").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/articles").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/articles/me/*/like").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/articles/*/images").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/articles/*").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/articles/*/images/*").authenticated()
                         .requestMatchers("/api/v1/articles/me").authenticated()
                         .requestMatchers("/api/v1/articles/me/likes").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/search/**").permitAll()
                         .requestMatchers("/api/v1/articles/**").permitAll()
                         .anyRequest().authenticated()
                 )

@@ -14,7 +14,7 @@ import { Observable } from 'rxjs';
 })
 export class ArticleAssistantService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = `${environment.apiUrlLlm}/v1/advisor/articles`;
+  private readonly apiUrl = `${environment.apiUrlLlm}/v1/assistant/articles`;
 
   createChat(articleId: string, title: string): Observable<ArticleAssistantChat> {
     return this.http.post<ArticleAssistantChat>(`${this.apiUrl}/${articleId}/chats`, { title });

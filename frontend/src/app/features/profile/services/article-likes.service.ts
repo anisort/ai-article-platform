@@ -25,6 +25,6 @@ export class ArticleLikesService {
   }
 
   toggle(articleId: string): Observable<ToggleArticleLikeResponse> {
-    return this.http.post<ToggleArticleLikeResponse>(`${this.apiUrl}/${articleId}/like`, {});
+    return this.http.post<ToggleArticleLikeResponse>(`${this.apiUrl}/me/${articleId}/like`, {});
   }
 }

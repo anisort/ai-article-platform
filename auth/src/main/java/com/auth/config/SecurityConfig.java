@@ -4,9 +4,9 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.time.Duration;
 import java.util.UUID;
 
-import com.auth.entities.Role;
 import com.auth.repositories.UserRepository;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
@@ -31,19 +31,16 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.core.oidc.OidcScopes;
-import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.server.authorization.client.InMemoryRegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
 import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
-import org.springframework.security.oauth2.server.authorization.token.JwtEncodingContext;
-import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer;
+import org.springframework.security.oauth2.server.authorization.settings.TokenSettings;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
-import com.auth.entities.CustomUserDetails;
 import org.springframework.web.filter.ForwardedHeaderFilter;
 
 @Configuration
@@ -62,10 +59,15 @@ public class SecurityConfig {
     @Value("${auth.issuer-uri}")
     private String issuerUri;
 
+    @Value("${auth.token.access-token-ttl-minutes:120}")
+    private long accessTokenTtlMinutes;
+
+    @Value("${auth.token.refresh-token-ttl-days:30}")
+    private long refreshTokenTtlDays;
+
     @Bean
     @Order(1)
-    public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http)
-            throws Exception {
+    public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http) {
 
         http
                 .oauth2AuthorizationServer((authorizationServer) -> {
@@ -91,16 +93,16 @@ public class SecurityConfig {
 
     @Bean
     @Order(2)
-    public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http)
-            throws Exception {
+    public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) {
         http
                 .authorizeHttpRequests((authorize) -> authorize
                         .requestMatchers("/login", "/.well-known/appspecific/**", "/error").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/users/me").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/v1/users/*/follow").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/internal/users/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/internal/users/batch").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/users/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/users").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/v1/users/batch").permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
@@ -117,6 +119,7 @@ public class SecurityConfig {
         RegisteredClient oidcClient = RegisteredClient.withId(UUID.randomUUID().toString())
                 .clientId(clientId)
                 .clientAuthenticationMethods(methods -> {
+                    methods.add(ClientAuthenticationMethod.NONE);
                     methods.add(ClientAuthenticationMethod.CLIENT_SECRET_POST);
                     methods.add(ClientAuthenticationMethod.CLIENT_SECRET_BASIC);
                 })
@@ -131,6 +134,10 @@ public class SecurityConfig {
                         .requireProofKey(true)
                         .requireAuthorizationConsent(true)
                         .build())
+                .tokenSettings(TokenSettings.builder()
+                        .accessTokenTimeToLive(Duration.ofMinutes(accessTokenTtlMinutes))
+                        .refreshTokenTimeToLive(Duration.ofDays(refreshTokenTtlDays))
+                        .build())
                 .build();
 
         return new InMemoryRegisteredClientRepository(oidcClient);
@@ -140,85 +147,6 @@ public class SecurityConfig {
     public UserDetailsService userDetailsService(UserRepository userRepository) {
         return username -> userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
-    }
-
-    @Bean
-    public OAuth2TokenCustomizer<JwtEncodingContext> tokenCustomizer(UserRepository userRepository) {
-        return context -> {
-            Object principal = context.getPrincipal().getPrincipal();
-            if (principal instanceof CustomUserDetails user) {
-                context.getClaims().subject(String.valueOf(user.getId()));
-                context.getClaims().claim("role", user.getRole().name());
-            }
-            else if (principal instanceof DefaultOidcUser user) {
-                CustomUserDetails customUserDetails = userRepository.findByGoogleSub(user.getSubject())
-                        .orElseGet(() -> userRepository.findByEmail(user.getEmail())
-                                .map(existingUser -> {
-                                    existingUser.setGoogleSub(user.getSubject());
-                                    return userRepository.save(existingUser);
-                                })
-                                .orElseGet(() -> {
-                                    CustomUserDetails newUser = new CustomUserDetails();
-                                    newUser.setGoogleSub(user.getSubject());
-                                    newUser.setEmail(user.getEmail());
-                                    newUser.setName(user.getFullName());
-                                    newUser.setAvatar(user.getPicture());
-                                    newUser.setRole(Role.USER);
-                                    return userRepository.save(newUser);
-                                }));
-
-                context.getClaims().subject(String.valueOf(customUserDetails.getId()));
-                context.getClaims().claim("role", customUserDetails.getRole().name());
-            }
-            else if (principal instanceof org.springframework.security.oauth2.core.user.OAuth2User user) {
-
-                Object id = user.getAttribute("id"); // github id
-                if (id == null) return;
-
-                String githubSub = id.toString();
-                String email = user.getAttribute("email");
-                String login = user.getAttribute("login");
-                String name = user.getAttribute("name");
-                String avatar = user.getAttribute("avatar_url");
-
-                CustomUserDetails custom = userRepository.findByGithubSub(githubSub)
-                        .orElseGet(() -> {
-
-                            if (email != null) {
-                                return userRepository.findByEmail(email)
-                                        .map(existing -> {
-                                            existing.setGithubSub(githubSub);
-                                            return userRepository.save(existing);
-                                        })
-                                        .orElseGet(() -> createGithubUser(githubSub, email, login, name, avatar, userRepository));
-                            }
-
-
-                            return createGithubUser(githubSub, null, login, name, avatar, userRepository);
-                        });
-
-                context.getClaims().subject(String.valueOf(custom.getId()));
-                context.getClaims().claim("role", custom.getRole().name());
-            }
-        };
-    }
-
-    private static CustomUserDetails createGithubUser(
-            String githubSub,
-            String email,
-            String login,
-            String name,
-            String avatar,
-            UserRepository userRepository
-    ) {
-        CustomUserDetails nu = new CustomUserDetails();
-        nu.setGithubSub(githubSub);
-        nu.setEmail(email);
-        nu.setUsername(login != null ? login : "github-" + githubSub);
-        nu.setName(name);
-        nu.setAvatar(avatar);
-        nu.setRole(Role.USER);
-        return userRepository.save(nu);
     }
 
     @Bean
