@@ -13,16 +13,16 @@ public interface VectorStoreRepository extends JpaRepository<VectorStoreDocument
     @Query(value = """
             SELECT AVG(embedding)::text
             FROM vector_store
-            WHERE (metadata->>'article_id') IS NOT NULL
-              AND (metadata->>'article_id')::uuid = ANY (string_to_array(:likedIdsCsv, ',')::uuid[])
+            WHERE ((metadata::jsonb)->>'article_id') IS NOT NULL
+              AND ((metadata::jsonb)->>'article_id')::uuid = ANY (string_to_array(:likedIdsCsv, ',')::uuid[])
             """, nativeQuery = true)
     String findCentroidByLikedIds(@Param("likedIdsCsv") String likedIdsCsv);
 
     @Query(value = """
-            SELECT (metadata->>'article_id')::uuid AS article_id
+            SELECT ((metadata::jsonb)->>'article_id')::uuid AS article_id
             FROM vector_store
-            WHERE (metadata->>'article_id') IS NOT NULL
-              AND (metadata->>'article_id')::uuid <> ALL (string_to_array(:excludedIdsCsv, ',')::uuid[])
+            WHERE ((metadata::jsonb)->>'article_id') IS NOT NULL
+              AND ((metadata::jsonb)->>'article_id')::uuid <> ALL (string_to_array(:excludedIdsCsv, ',')::uuid[])
             ORDER BY embedding <=> CAST(:centroid AS vector)
             LIMIT :topK
             """, nativeQuery = true)

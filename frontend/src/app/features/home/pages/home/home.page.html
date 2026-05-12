@@ -1,0 +1,42 @@
+<section class="home-page">
+  <header class="home-hero">
+    <p class="home-kicker">Welcome</p>
+    <h1>Welcome to Commit</h1>
+    <p class="home-subtitle">Personalized article recommendations based on your activity.</p>
+  </header>
+
+  <section class="home-recommendations">
+    <div class="section-header">
+      <h2>Recommended for you</h2>
+      <a routerLink="/articles">View all articles</a>
+    </div>
+
+    @if (loading()) {
+      <div class="empty-state">Loading recommendations...</div>
+    } @else if (recommendations().length) {
+      <div class="recommendation-grid">
+        @for (article of recommendations(); track article.id) {
+          <article class="recommendation-card">
+            <a class="card-media" [routerLink]="['/articles', article.id]">
+              @if (article.imageUrl) {
+                <img [src]="article.imageUrl" [alt]="article.title">
+              } @else {
+                <div class="card-fallback">{{ article.title }}</div>
+              }
+            </a>
+
+            <div class="card-copy">
+              <h3>
+                <a [routerLink]="['/articles', article.id]">{{ article.title }}</a>
+              </h3>
+              <a [routerLink]="['/profile', article.author.id]">{{ authorName(article) }}</a>
+            </div>
+          </article>
+        }
+      </div>
+    } @else {
+      <div class="empty-state">No recommendations yet. Read and like articles to improve recommendations.</div>
+    }
+  </section>
+</section>
+

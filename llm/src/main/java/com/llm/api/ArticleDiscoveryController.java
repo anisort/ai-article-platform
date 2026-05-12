@@ -1,9 +1,9 @@
 package com.llm.api;
 
-import com.llm.dto.ArticleRecommendationRequest;
-import com.llm.dto.ArticleRecommendationResponse;
-import com.llm.dto.SemanticSearchRequest;
-import com.llm.dto.SemanticSearchResponse;
+import com.llm.dto.discovery.ArticleRecommendationRequest;
+import com.llm.dto.discovery.ArticleRecommendationResponse;
+import com.llm.dto.discovery.SemanticSearchRequest;
+import com.llm.dto.discovery.SemanticSearchResponse;
 import com.llm.services.facade.ArticleDiscoveryFacade;
 import org.springframework.web.bind.annotation.*;
 

@@ -33,6 +33,17 @@ public class ArticleLikeService {
     }
 
     @Transactional(readOnly = true)
+    public List<Article> getRecentLikedArticles(UUID userId, int limit) {
+        int safeLimit = Math.max(1, Math.min(limit, 100));
+        return articleLikeRepository.findByUserIdOrderByCreatedAtDesc(
+                        userId,
+                        org.springframework.data.domain.PageRequest.of(0, safeLimit)
+                ).stream()
+                .map(ArticleLike::getArticle)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
     public List<UUID> getPopularPublishedArticleIds(int limit) {
         int safeLimit = Math.max(1, Math.min(limit, 100));
         return articleLikeRepository.findPopularPublishedArticleIds(

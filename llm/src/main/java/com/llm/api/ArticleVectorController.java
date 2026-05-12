@@ -1,6 +1,6 @@
 package com.llm.api;
 
-import com.llm.dto.ArticleEmbeddingDocument;
+import com.llm.dto.article.ArticleEmbeddingDocument;
 import com.llm.services.llm.ArticleVectorService;
 import org.springframework.web.bind.annotation.*;
 

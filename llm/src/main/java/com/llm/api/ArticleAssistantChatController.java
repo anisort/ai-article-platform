@@ -1,10 +1,10 @@
 package com.llm.api;
 
-import com.llm.dto.ArticleAssistantChatResponse;
-import com.llm.dto.ArticleAssistantMessageResponse;
-import com.llm.dto.CreateArticleAssistantChatRequest;
-import com.llm.dto.SendArticleAssistantMessageRequest;
-import com.llm.dto.SendArticleAssistantMessageResponse;
+import com.llm.dto.assistant.ArticleAssistantChatResponse;
+import com.llm.dto.assistant.ArticleAssistantMessageResponse;
+import com.llm.dto.assistant.CreateArticleAssistantChatRequest;
+import com.llm.dto.assistant.SendArticleAssistantMessageRequest;
+import com.llm.dto.assistant.SendArticleAssistantMessageResponse;
 import com.llm.services.chat.ArticleAssistantService;
 import org.springframework.web.bind.annotation.*;
 

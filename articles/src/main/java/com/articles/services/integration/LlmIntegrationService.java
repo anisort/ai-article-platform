@@ -54,7 +54,7 @@ public class LlmIntegrationService {
         );
 
         for (SemanticSearchRequest request : requests) {
-            SemanticSearchResponse response = requestWithAuth("/api/v1/search/articles")
+            SemanticSearchResponse response = requestWithAuth("/api/v1/discovery/articles/search")
                     .body(request)
                     .retrieve()
                     .body(SemanticSearchResponse.class);
@@ -72,7 +72,7 @@ public class LlmIntegrationService {
             return List.of();
         }
 
-        ArticleRecommendationResponse response = requestWithAuth("/api/v1/recommend/articles")
+        ArticleRecommendationResponse response = requestWithAuth("/api/v1/discovery/articles/recommend")
                 .body(new ArticleRecommendationRequest(likedArticleIds, excludeArticleIds, topK))
                 .retrieve()
                 .body(ArticleRecommendationResponse.class);

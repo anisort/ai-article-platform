@@ -1,7 +1,7 @@
 package com.llm.services.facade;
 
-import com.llm.dto.ArticleDescriptionResponse;
-import com.llm.dto.ArticleEmbeddingDraft;
+import com.llm.dto.article.ArticleDescriptionResponse;
+import com.llm.dto.article.ArticleEmbeddingDraft;
 import com.llm.services.llm.AssistantService;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.stereotype.Service;
@@ -28,6 +28,6 @@ public class ArticleDescriptionFacade {
 
         ChatResponse response = assistantService.getResponse(prompt, UUID.randomUUID());
         String description = response == null ? null : response.getResult().getOutput().getText();
-        return new ArticleDescriptionResponse(description);
+        return ArticleDescriptionResponse.of(description);
     }
 }

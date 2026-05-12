@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class ArticleRecommendationFacadeService {
+    private static final int PERSONALIZED_LIKES_WINDOW = 20;
 
     private final ArticleService articleService;
     private final ArticleLikeService articleLikeService;
@@ -45,24 +46,25 @@ public class ArticleRecommendationFacadeService {
             return List.of();
         }
 
-        LinkedHashSet<UUID> orderedIds = new LinkedHashSet<>();
+        List<UUID> orderedIds = new ArrayList<>();
         Set<UUID> excludedIds = new LinkedHashSet<>();
+        List<UUID> personalized = List.of();
 
         if (userId != null) {
-            List<Article> likedArticles = articleLikeService.getLikedArticles(userId);
+            List<Article> likedArticles = articleLikeService.getRecentLikedArticles(userId, PERSONALIZED_LIKES_WINDOW);
             excludedIds.addAll(likedArticles.stream().map(Article::getId).toList());
 
             if (!likedArticles.isEmpty()) {
-                List<UUID> personalized = llmIntegrationService.recommendArticleIds(
+                personalized = llmIntegrationService.recommendArticleIds(
                         likedArticles.stream().map(Article::getId).toList(),
                         List.copyOf(excludedIds),
                         safeLimit
                 );
-                orderedIds.addAll(personalized);
             }
         }
 
-        orderedIds.addAll(buildPopularAndLatestMix(latest, safeLimit, excludedIds, orderedIds));
+        List<UUID> fallback = buildPopularAndLatestMix(latest, safeLimit * 2, excludedIds, Set.copyOf(orderedIds));
+        orderedIds = mergePersonalizedWithFallback(personalized, fallback, safeLimit, excludedIds);
 
         List<Article> selected = articleService.getPublishedArticlesByIds(new ArrayList<>(orderedIds));
         Map<UUID, Article> byId = selected.stream().collect(Collectors.toMap(Article::getId, Function.identity()));
@@ -74,6 +76,47 @@ public class ArticleRecommendationFacadeService {
                 .map(article -> PublishedArticlePreviewResponse.fromEntity(article, authors.get(article.getAuthorId())))
                 .limit(safeLimit)
                 .toList();
+    }
+
+    private List<UUID> mergePersonalizedWithFallback(
+            List<UUID> personalized,
+            List<UUID> fallback,
+            int limit,
+            Set<UUID> excludedIds
+    ) {
+        if (personalized == null || personalized.isEmpty()) {
+            return fallback.stream().limit(limit).toList();
+        }
+
+        List<UUID> result = new ArrayList<>();
+        Set<UUID> seen = new LinkedHashSet<>();
+        int p = 0;
+        int f = 0;
+
+        while (result.size() < limit && (p < personalized.size() || f < fallback.size())) {
+            int personalizedBatch = 0;
+            while (result.size() < limit && personalizedBatch < 3 && p < personalized.size()) {
+                UUID id = personalized.get(p++);
+                if (!excludedIds.contains(id) && seen.add(id)) {
+                    result.add(id);
+                    personalizedBatch++;
+                }
+            }
+
+            if (result.size() >= limit) {
+                break;
+            }
+
+            while (f < fallback.size()) {
+                UUID id = fallback.get(f++);
+                if (!excludedIds.contains(id) && seen.add(id)) {
+                    result.add(id);
+                    break;
+                }
+            }
+        }
+
+        return result;
     }
 
     private List<UUID> buildPopularAndLatestMix(
@@ -108,4 +151,3 @@ public class ArticleRecommendationFacadeService {
         return mixed;
     }
 }
-

@@ -1,7 +1,7 @@
 package com.llm.api;
 
-import com.llm.dto.AdvisorChatRequest;
-import com.llm.dto.AdvisorChatResponse;
+import com.llm.dto.advisor.AdvisorChatRequest;
+import com.llm.dto.advisor.AdvisorChatResponse;
 import com.llm.services.facade.AdvisorChatFacade;
 import org.springframework.web.bind.annotation.*;
 

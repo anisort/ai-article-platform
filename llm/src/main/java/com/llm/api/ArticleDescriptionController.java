@@ -1,7 +1,7 @@
 package com.llm.api;
 
-import com.llm.dto.ArticleDescriptionResponse;
-import com.llm.dto.ArticleEmbeddingDraft;
+import com.llm.dto.article.ArticleDescriptionResponse;
+import com.llm.dto.article.ArticleEmbeddingDraft;
 import com.llm.services.facade.ArticleDescriptionFacade;
 import org.springframework.web.bind.annotation.*;
 

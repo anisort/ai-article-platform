@@ -1,6 +1,6 @@
 package com.llm.services.llm;
 
-import com.llm.dto.ArticleEmbeddingDocument;
+import com.llm.dto.article.ArticleEmbeddingDocument;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.VectorStore;

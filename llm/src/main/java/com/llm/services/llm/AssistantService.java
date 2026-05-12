@@ -1,6 +1,6 @@
 package com.llm.services.llm;
 
-import com.llm.dto.AssistantResponseMode;
+import com.llm.dto.assistant.AssistantResponseMode;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;

@@ -1,4 +1,4 @@
-package com.llm.dto;
+package com.llm.dto.article;
 
 import java.util.UUID;
 

@@ -119,6 +119,7 @@ public class SecurityConfig {
         RegisteredClient oidcClient = RegisteredClient.withId(UUID.randomUUID().toString())
                 .clientId(clientId)
                 .clientAuthenticationMethods(methods -> {
+                    methods.add(ClientAuthenticationMethod.NONE);
                     methods.add(ClientAuthenticationMethod.CLIENT_SECRET_POST);
                     methods.add(ClientAuthenticationMethod.CLIENT_SECRET_BASIC);
                 })

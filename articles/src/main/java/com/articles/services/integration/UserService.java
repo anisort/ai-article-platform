@@ -23,7 +23,7 @@ public class UserService {
 
     public List<AuthorResponse> getUsers(List<UUID> ids) {
         return restClient.post()
-                .uri("/api/v1/users/batch")
+                .uri("/api/v1/internal/users/batch")
                 .body(ids)
                 .retrieve()
                 .body(new ParameterizedTypeReference<>() {});

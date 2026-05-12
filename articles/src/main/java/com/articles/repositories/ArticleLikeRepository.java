@@ -12,6 +12,7 @@ import java.util.UUID;
 
 public interface ArticleLikeRepository extends JpaRepository<ArticleLike, ArticleLikeId> {
     List<ArticleLike> findByUserId(UUID userId);
+    List<ArticleLike> findByUserIdOrderByCreatedAtDesc(UUID userId, org.springframework.data.domain.Pageable pageable);
     Optional<ArticleLike> findByUserIdAndArticle_Id(UUID userId, UUID articleId);
 
     @Query("""
