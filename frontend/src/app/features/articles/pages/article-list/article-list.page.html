@@ -1,46 +1,35 @@
 <section class="article-list-page">
+  <app-page-intro
+    kicker="Articles"
+    title="All Articles"
+    description="Browse all published articles and switch between semantic and title-focused search."
+  ></app-page-intro>
+
   <div class="search-mode-controls" role="radiogroup" aria-label="Search type">
-    <label>
+    <label class="mode-option" [class.mode-option--active]="searchMode() === 'semantic'">
       <input
         type="radio"
         name="searchMode"
         [checked]="searchMode() === 'semantic'"
         (change)="onModeChange('semantic')"
       />
-      Semantic
+      <span>Semantic</span>
     </label>
-    <label>
+    <label class="mode-option" [class.mode-option--active]="searchMode() === 'title'">
       <input
         type="radio"
         name="searchMode"
         [checked]="searchMode() === 'title'"
         (change)="onModeChange('title')"
       />
-      Title + author
+      <span>Title</span>
     </label>
   </div>
 
   @if (articles().length) {
     <div class="article-grid">
-      @for (article of articles(); track article.id; let i = $index) {
-        <article class="article-card" [ngClass]="cardClass(i)">
-          <a class="card-media" [routerLink]="['/articles', article.id]">
-            @if (article.imageUrl) {
-              <img [src]="article.imageUrl" [alt]="article.title">
-            } @else {
-              <div class="card-fallback">{{ article.title }}</div>
-            }
-          </a>
-
-          <div class="card-overlay">
-            <h2 [title]="article.title">
-              <a [routerLink]="['/articles', article.id]">{{ article.title }}</a>
-            </h2>
-            <p>
-              <a [routerLink]="['/profile', article.author.id]" [title]="authorName(article)">{{ authorName(article) }}</a>
-            </p>
-          </div>
-        </article>
+      @for (article of articles(); track article.id) {
+        <app-article-preview-card [article]="article"></app-article-preview-card>
       }
     </div>
   } @else {

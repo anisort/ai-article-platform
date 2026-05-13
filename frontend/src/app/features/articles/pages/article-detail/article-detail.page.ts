@@ -7,7 +7,7 @@ import { MarkdownModule } from 'ngx-markdown';
 import { AuthService } from '../../../../core/services/auth.service';
 import { ArticlesService } from '../../services/articles.service';
 import { ArticleWithUserResponse } from '../../models/article-response.model';
-import { ArticleLikesService } from '../../../profile/services/article-likes.service';
+import { MyArticlesService } from '../../../profile/services/my-articles.service';
 
 @Component({
   selector: 'app-article-detail-page',
@@ -20,7 +20,7 @@ export class ArticleDetailPage implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly articlesService = inject(ArticlesService);
   private readonly authService = inject(AuthService);
-  private readonly articleLikesService = inject(ArticleLikesService);
+  private readonly myArticlesService = inject(MyArticlesService);
 
   article = signal<ArticleWithUserResponse | null>(null);
   loading = signal(true);
@@ -70,7 +70,7 @@ export class ArticleDetailPage implements OnInit {
     }
 
     this.likeLoading.set(true);
-    this.articleLikesService.toggle(articleId).subscribe({
+    this.myArticlesService.toggleLike(articleId).subscribe({
       next: response => {
         this.liked.set(response.liked);
         this.likeLoading.set(false);
@@ -95,7 +95,7 @@ export class ArticleDetailPage implements OnInit {
       return;
     }
 
-    this.articleLikesService.list().subscribe({
+    this.myArticlesService.listLikes().subscribe({
       next: response => {
         this.liked.set(response.articleIds.includes(articleId));
       },

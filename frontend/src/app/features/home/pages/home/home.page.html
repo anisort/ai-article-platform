@@ -1,42 +1,40 @@
 <section class="home-page">
-  <header class="home-hero">
-    <p class="home-kicker">Welcome</p>
-    <h1>Welcome to Commit</h1>
-    <p class="home-subtitle">Personalized article recommendations based on your activity.</p>
-  </header>
+  <app-page-intro
+    kicker="Welcome to Commit"
+    title="Recommended Articles"
+    description="Recommendations with selected articles from across the platform."
+  ></app-page-intro>
 
-  <section class="home-recommendations">
+  <section class="home-carousel-section">
     <div class="section-header">
-      <h2>Recommended for you</h2>
+      <h2>Top picks</h2>
       <a routerLink="/articles">View all articles</a>
     </div>
 
     @if (loading()) {
       <div class="empty-state">Loading recommendations...</div>
-    } @else if (recommendations().length) {
-      <div class="recommendation-grid">
-        @for (article of recommendations(); track article.id) {
-          <article class="recommendation-card">
-            <a class="card-media" [routerLink]="['/articles', article.id]">
-              @if (article.imageUrl) {
-                <img [src]="article.imageUrl" [alt]="article.title">
-              } @else {
-                <div class="card-fallback">{{ article.title }}</div>
-              }
-            </a>
-
-            <div class="card-copy">
-              <h3>
-                <a [routerLink]="['/articles', article.id]">{{ article.title }}</a>
-              </h3>
-              <a [routerLink]="['/profile', article.author.id]">{{ authorName(article) }}</a>
-            </div>
-          </article>
+    } @else if (carouselArticles().length) {
+      <div class="carousel-track">
+        @for (article of carouselArticles(); track article.id) {
+          <app-article-preview-card [article]="article" size="small"></app-article-preview-card>
         }
       </div>
     } @else {
       <div class="empty-state">No recommendations yet. Read and like articles to improve recommendations.</div>
     }
   </section>
-</section>
 
+  @if (!loading() && feedArticles().length) {
+    <section class="home-feed-section">
+      <div class="section-header">
+        <h2>More to read</h2>
+      </div>
+
+      <div class="recommendation-grid">
+        @for (article of feedArticles(); track article.id) {
+          <app-article-preview-card [article]="article" size="large"></app-article-preview-card>
+        }
+      </div>
+    </section>
+  }
+</section>

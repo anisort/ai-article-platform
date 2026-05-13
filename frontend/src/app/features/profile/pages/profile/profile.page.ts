@@ -9,7 +9,7 @@ import { ArticleWithUserResponse } from '../../../articles/models/article-respon
 import { PublishedArticlePreview } from '../../../articles/models/published-article-preview.model';
 import { ArticlesService } from '../../../articles/services/articles.service';
 import { UserProfile, UserSummary } from '../../models/user-profile.model';
-import { ArticleLikesService } from '../../services/article-likes.service';
+import { MyArticlesService } from '../../services/my-articles.service';
 import { ProfileService } from '../../services/profile.service';
 import {
   ProfileArticleCardComponent,
@@ -38,7 +38,7 @@ export class ProfilePage {
   private readonly route = inject(ActivatedRoute);
   private readonly authService = inject(AuthService);
   private readonly articlesService = inject(ArticlesService);
-  private readonly articleLikesService = inject(ArticleLikesService);
+  private readonly myArticlesService = inject(MyArticlesService);
   private readonly profileService = inject(ProfileService);
 
   readonly activeTab = signal<ProfileTab>('published');
@@ -260,7 +260,7 @@ export class ProfilePage {
 
     forkJoin({
       profile: this.profileService.me(),
-      ownArticles: this.articlesService.listMine(),
+      ownArticles: this.myArticlesService.listMine(),
       likedArticles: this.loadLikedArticles(),
     }).subscribe({
       next: ({ profile, ownArticles, likedArticles }) => {
@@ -297,7 +297,7 @@ export class ProfilePage {
   }
 
   private loadLikedArticles() {
-    return this.articleLikesService.list().pipe(
+    return this.myArticlesService.listLikes().pipe(
       map(response => response.articleIds.filter((articleId, index, ids) => ids.indexOf(articleId) === index)),
       switchMap(articleIds => {
         if (!articleIds.length) {

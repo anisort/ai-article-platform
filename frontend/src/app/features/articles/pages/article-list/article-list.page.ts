@@ -1,14 +1,16 @@
 import {CommonModule} from '@angular/common';
 import {Component, inject, OnInit, signal} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
-import {Router, RouterLink} from '@angular/router';
+import {Router} from '@angular/router';
 import {ArticlesService, SearchMode} from '../../services/articles.service';
 import {PublishedArticlePreview} from '../../models/published-article-preview.model';
+import { ArticlePreviewCardComponent } from '../../components/article-preview-card/article-preview-card.component';
+import { PageIntroComponent } from '../../../../shared/components/page-intro/page-intro.component';
 
 @Component({
   selector: 'app-article-list',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, ArticlePreviewCardComponent, PageIntroComponent],
   templateUrl: './article-list.page.html',
   styleUrl: './article-list.page.scss'
 })
@@ -24,7 +26,18 @@ export class ArticleListPage implements OnInit {
   ngOnInit(): void {
     this.route.queryParamMap.subscribe(params => {
       const query = params.get('q') ?? '';
-      const mode = (params.get('mode') === 'title' ? 'title' : 'semantic') as SearchMode;
+      const rawMode = params.get('mode');
+      const mode = (rawMode === 'title' ? 'title' : 'semantic') as SearchMode;
+
+      if (!rawMode) {
+        this.router.navigate([], {
+          relativeTo: this.route,
+          queryParams: { mode: 'semantic' },
+          queryParamsHandling: 'merge',
+          replaceUrl: true,
+        });
+      }
+
       this.query.set(query);
       this.searchMode.set(mode);
       this.loadArticles(query, mode);
@@ -32,7 +45,12 @@ export class ArticleListPage implements OnInit {
   }
 
   loadArticles(query = '', mode: SearchMode = 'semantic') {
-    this.articlesService.search(query, mode).subscribe(articles => this.articles.set(articles));
+    const normalizedQuery = query.trim();
+    const request$ = normalizedQuery
+      ? this.articlesService.search(normalizedQuery, mode)
+      : this.articlesService.list();
+
+    request$.subscribe(articles => this.articles.set(articles));
   }
 
   onModeChange(mode: SearchMode) {
@@ -43,22 +61,5 @@ export class ArticleListPage implements OnInit {
       },
       queryParamsHandling: 'merge',
     });
-  }
-
-  authorName(article: PublishedArticlePreview): string {
-    return article.author?.name || article.author?.username || 'Unknown author';
-  }
-
-  cardClass(index: number): string {
-    const variants = [
-      'article-card--tall',
-      'article-card--square',
-      'article-card--wide',
-      'article-card--wide-soft',
-      'article-card--hero',
-      'article-card--square-tall',
-    ];
-
-    return variants[index % variants.length];
   }
 }

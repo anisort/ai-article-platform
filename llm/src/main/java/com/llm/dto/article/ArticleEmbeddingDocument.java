@@ -7,6 +7,7 @@ public record ArticleEmbeddingDocument(
         String description,
         String title,
         String author,
-        String image
+        String image,
+        boolean published
 ) {
 }

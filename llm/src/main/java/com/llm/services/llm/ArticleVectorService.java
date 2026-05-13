@@ -37,7 +37,10 @@ public class ArticleVectorService {
         Document document = new Document(
                 id,
                 content,
-                Map.of("article_id", id)
+                Map.of(
+                        "article_id", id,
+                        "published", article.published()
+                )
         );
         vectorStore.add(List.of(document));
     }

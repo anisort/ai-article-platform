@@ -1,249 +1,105 @@
 .article-list-page {
-  padding: 1.1rem 1.25rem 2rem;
-  background: var(--color-surface-base);
+  padding: 1rem 1.25rem 2rem;
   margin: 1rem 3rem;
+  background: var(--color-surface-base);
 }
 
 .search-mode-controls {
   display: flex;
-  gap: 1rem;
-  margin-bottom: 1rem;
+  align-items: stretch;
+  gap: 0.35rem;
+  margin: 0.95rem 0 1rem;
+  width: fit-content;
+  padding: 0.3rem;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--surface-elevated);
+  flex-wrap: wrap;
+}
+
+.mode-option {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  min-height: 2rem;
+  min-width: 6.5rem;
+  padding: 0 0.85rem;
   color: var(--color-primary-dark);
-
-  label {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    cursor: pointer;
-  }
+  font-weight: 600;
+  transition: background-color 0.16s ease, color 0.16s ease;
 }
 
-.page-head {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  margin-bottom: 1.1rem;
-
-  h1 {
-    margin: 0;
-    color: var(--color-accent-ink);
-    font-size: clamp(2rem, 3vw, 3.2rem);
-    line-height: 0.95;
-  }
+.mode-option input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  margin: 0;
+  cursor: pointer;
 }
 
-.eyebrow {
-  margin: 0 0 0.45rem;
-  color: var(--color-accent-berry);
-  font-size: 0.82rem;
-  font-weight: 700;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
+.mode-option--active {
+  background: color-mix(in srgb, var(--color-border-strong) 18%, var(--surface-elevated));
+  color: var(--color-accent-ink);
+  border-color: color-mix(in srgb, var(--color-border-strong) 62%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-border-strong) 28%, transparent);
+}
+
+.mode-option:hover {
+  background: color-mix(in srgb, var(--line) 34%, var(--surface-elevated));
+}
+
+.mode-option:focus-within {
+  outline: 2px solid color-mix(in srgb, var(--color-border-strong) 50%, transparent);
+  outline-offset: 1px;
 }
 
 .article-grid {
   display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  grid-auto-rows: 3.9rem;
-  grid-auto-flow: dense;
-  gap: 0.9rem;
-}
-
-.article-card {
-  min-width: 0;
-}
-
-.article-card--tall {
-  grid-column: span 4;
-  grid-row: span 4;
-}
-
-.article-card--square {
-  grid-column: span 2;
-  grid-row: span 2;
-}
-
-.article-card--wide {
-  grid-column: span 6;
-  grid-row: span 2;
-}
-
-.article-card--wide-soft {
-  grid-column: span 6;
-  grid-row: span 2;
-}
-
-.article-card--hero {
-  grid-column: span 9;
-  grid-row: span 3;
-}
-
-.article-card--square-tall {
-  grid-column: span 3;
-  grid-row: span 3;
-}
-
-.card-media {
-  position: relative;
-  display: block;
-  height: 100%;
-  overflow: hidden;
-  border-radius: 1.05rem;
-  background: var(--color-surface-panel);
-  box-shadow: var(--shadow-medium);
-  border: 1px solid var(--color-border-soft);
-  color: inherit;
-  text-decoration: none;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.card-media:hover,
-.card-media:focus-visible {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-strong);
-}
-
-.card-media:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--color-accent-berry) 70%, white);
-  outline-offset: 3px;
-}
-
-.card-media img,
-.card-fallback {
-  width: 100%;
-  height: 100%;
-  display: block;
-}
-
-.card-media img {
-  object-fit: cover;
-}
-
-.card-fallback {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1rem;
-  color: var(--color-accent-ink);
-  font-size: 1rem;
-  font-weight: 600;
-  text-align: center;
-}
-
-.card-overlay {
-  position: absolute;
-  inset: auto 0 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-  padding: 0.8rem 0.85rem 0.9rem;
-  background: var(--color-overlay);
-  color: #ffffff;
-  opacity: 0;
-  transform: translateY(10px);
-  transition: opacity 0.2s ease, transform 0.2s ease;
-}
-
-.card-media:hover .card-overlay,
-.card-media:focus-within .card-overlay {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.card-overlay h2,
-.card-overlay p {
-  margin: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.card-overlay h2 {
-  font-size: 1rem;
-  font-weight: 700;
-}
-
-.card-overlay p {
-  font-size: 0.84rem;
-  color: rgba(255, 255, 255, 0.84);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  align-items: stretch;
 }
 
 .empty-state {
-  padding: 3rem 1rem;
-  border-radius: 1.5rem;
+  padding: 2rem 1rem;
+  border-radius: 8px;
   background: color-mix(in srgb, var(--color-surface-elevated) 74%, var(--color-surface-rose));
   color: var(--color-accent-ink);
   border: 1px solid var(--color-border-strong);
-  box-shadow: var(--shadow-soft);
   text-align: center;
-  font-size: 1.05rem;
 }
 
 @media (max-width: 1100px) {
-  .article-grid {
-    grid-template-columns: repeat(8, minmax(0, 1fr));
-    grid-auto-rows: 3.7rem;
+  .article-list-page {
+    margin: 1rem 1.5rem;
   }
 
-  .article-card--tall,
-  .article-card--wide,
-  .article-card--wide-soft,
-  .article-card--hero {
-    grid-column: span 4;
-  }
-
-  .article-card--square,
-  .article-card--square-tall {
-    grid-column: span 2;
-  }
-}
-
-@media (max-width: 800px) {
   .article-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    grid-auto-rows: 7rem;
-  }
-
-  .article-card--tall,
-  .article-card--wide,
-  .article-card--wide-soft,
-  .article-card--hero,
-  .article-card--square,
-  .article-card--square-tall {
-    grid-column: span 1;
-  }
-
-  .article-card--tall,
-  .article-card--hero,
-  .article-card--square-tall {
-    grid-row: span 2;
-  }
-
-  .article-card--square,
-  .article-card--wide,
-  .article-card--wide-soft {
-    grid-row: span 1;
   }
 }
 
-@media (max-width: 560px) {
+@media (max-width: 680px) {
   .article-list-page {
-    padding-inline: 0.9rem;
+    margin: 0.75rem 0.75rem 1.5rem;
+    padding: 0.9rem;
   }
 
   .article-grid {
     grid-template-columns: 1fr;
-    grid-auto-rows: 10rem;
+    gap: 0.85rem;
   }
 
-  .article-card {
-    grid-column: span 1 !important;
-    grid-row: span 1 !important;
+  .search-mode-controls {
+    width: 100%;
   }
 
-  .article-card--tall,
-  .article-card--hero,
-  .article-card--square-tall {
-    grid-row: span 2 !important;
+  .mode-option {
+    flex: 1 1 0;
+    min-width: 0;
   }
 }

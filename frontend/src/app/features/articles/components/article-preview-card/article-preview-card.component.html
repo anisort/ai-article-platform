@@ -1,0 +1,23 @@
+<article class="article-card" [class.article-card--small]="size() === 'small'" [class.article-card--large]="size() === 'large'">
+  <a class="card-media" [routerLink]="['/articles', article().id]">
+    @if (article().imageUrl) {
+      <img [src]="article().imageUrl" [alt]="article().title">
+    } @else {
+      <div class="card-fallback">{{ article().title }}</div>
+    }
+  </a>
+
+  <div class="card-content">
+    <h2 class="card-title" [title]="article().title">
+      <a [routerLink]="['/articles', article().id]">{{ article().title }}</a>
+    </h2>
+
+    <div class="card-meta">
+      <a [routerLink]="['/profile', article().author.id]" [title]="authorName()">{{ authorName() }}</a>
+      <span class="dot" aria-hidden="true">|</span>
+      <time [attr.datetime]="article().createdAt || null">
+        {{ article().createdAt ? (article().createdAt | date: 'd MMM, y') : 'Unknown date' }}
+      </time>
+    </div>
+  </div>
+</article>

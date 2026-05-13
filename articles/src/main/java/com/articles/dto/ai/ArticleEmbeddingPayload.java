@@ -10,7 +10,8 @@ public record ArticleEmbeddingPayload(
         String content,
         String title,
         String author,
-        String image
+        String image,
+        boolean published
 ) {
     public static ArticleEmbeddingPayload fromArticle(Article article, AuthorResponse author, String contentOverride) {
         String authorName = author == null ? "Unknown" : author.name();
@@ -21,7 +22,8 @@ public record ArticleEmbeddingPayload(
                 content,
                 article.getTitle(),
                 authorName,
-                article.getImageUrl()
+                article.getImageUrl(),
+                article.isPublished()
         );
     }
 }

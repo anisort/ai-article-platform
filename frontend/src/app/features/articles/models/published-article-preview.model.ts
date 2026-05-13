@@ -8,5 +8,6 @@ export interface PublishedArticlePreview {
   id: string;
   title: string;
   imageUrl: string;
+  createdAt?: string;
   author: AuthorPreview;
 }

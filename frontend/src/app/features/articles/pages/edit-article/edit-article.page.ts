@@ -22,6 +22,7 @@ import { marked } from 'marked';
 
 import { EditorStateService } from '../../state/editor-state.service';
 import { ArticlesService } from '../../services/articles.service';
+import { ArticleImagesService } from '../../services/article-images.service';
 import { ArticleWithUserResponse } from '../../models/article-response.model';
 import { CreateArticleRequest } from '../../models/create-article-request.model';
 import { UploadService } from '../../../../shared/services/upload.service';
@@ -75,6 +76,7 @@ export class EditArticlePage implements OnDestroy {
   private route = inject(ActivatedRoute);
   private editorState = inject(EditorStateService);
   private articlesService = inject(ArticlesService);
+  private articleImagesService = inject(ArticleImagesService);
   private uploadService = inject(UploadService);
   private articleAssistantService = inject(ArticleAssistantService);
 
@@ -314,7 +316,7 @@ export class EditArticlePage implements OnDestroy {
       .pipe(finalize(() => this.articleImageUploading.set(false)))
       .subscribe({
         next: response => {
-          this.articlesService.addImage(this.articleId!, response.url).subscribe({
+          this.articleImagesService.add(this.articleId!, response.url).subscribe({
             next: image => this.articleImages.update(images => [image, ...images]),
             error: err => console.error('Failed to save article image', err),
           });
@@ -351,7 +353,7 @@ export class EditArticlePage implements OnDestroy {
 
   removeArticleImage(image: ArticleImage) {
     if (!this.articleId) return;
-    this.articlesService.deleteImage(this.articleId, image.id).subscribe({
+    this.articleImagesService.delete(this.articleId, image.id).subscribe({
       next: () => this.articleImages.update(images => images.filter(i => i.id !== image.id)),
       error: err => console.error('Failed to delete image', err),
     });
@@ -549,7 +551,7 @@ export class EditArticlePage implements OnDestroy {
   }
 
   private loadArticleImages(articleId: string) {
-    this.articlesService.listImages(articleId).subscribe({
+    this.articleImagesService.list(articleId).subscribe({
       next: images => this.articleImages.set(images),
       error: err => console.error('Failed to load article images', err),
     });
