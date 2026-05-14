@@ -151,4 +151,3 @@ public class ArticleRecommendationFacadeService {
         return mixed;
     }
 }
-

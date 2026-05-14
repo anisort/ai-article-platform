@@ -74,9 +74,3 @@ public class ArticleFacadeService {
     }
 
 }
-
-
-
-
-
-
