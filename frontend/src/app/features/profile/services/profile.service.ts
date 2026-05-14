@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { environment } from '../../../../environments/environment';
+import { ProfilePageResponse } from '../models/profile-page-response.model';
 import { ToggleFollowResponse, UserProfile } from '../models/user-profile.model';
 
 @Injectable({
@@ -11,13 +12,12 @@ import { ToggleFollowResponse, UserProfile } from '../models/user-profile.model'
 export class ProfileService {
   private readonly http = inject(HttpClient);
   private readonly apiUrl = `${environment.apiUrlAuth}/v1/users`;
+  private readonly profilePageApiUrl = `${environment.apiUrlArticles}/v1/profile-page`;
 
-  me(): Observable<UserProfile> {
-    return this.http.get<UserProfile>(`${this.apiUrl}/me`);
-  }
-
-  getById(userId: string): Observable<UserProfile> {
-    return this.http.get<UserProfile>(`${this.apiUrl}/${userId}/profile`);
+  getProfilePage(userId?: string): Observable<ProfilePageResponse> {
+    return this.http.get<ProfilePageResponse>(
+      userId ? `${this.profilePageApiUrl}/${userId}` : `${this.profilePageApiUrl}/me`
+    );
   }
 
   toggleFollow(userId: string): Observable<ToggleFollowResponse> {

@@ -60,6 +60,23 @@ ion-item {
     --color: var(--color-accent-ink);
 }
 
+ion-modal.profile-connections-ionic-modal {
+    --width: min(100%, 760px);
+    --height: min(80vh, 900px);
+    --border-radius: 10px;
+    --border-color: var(--line);
+    --border-style: solid;
+    --border-width: 1px;
+    --background: var(--color-surface-elevated);
+}
+
+ion-modal.profile-connections-ionic-modal::part(content) {
+    background: var(--color-surface-elevated);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
 body.theme-dark {
     color-scheme: dark;
     --color-primary: #8df688;

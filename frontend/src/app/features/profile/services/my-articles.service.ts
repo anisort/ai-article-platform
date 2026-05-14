@@ -21,10 +21,6 @@ export class MyArticlesService {
   private readonly http = inject(HttpClient);
   private readonly apiUrl = `${environment.apiUrlArticles}/v1/articles`;
 
-  listMine(): Observable<ArticleWithUserResponse[]> {
-    return this.http.get<ArticleWithUserResponse[]>(`${this.apiUrl}/me`);
-  }
-
   listLikes(): Observable<LikedArticlesResponse> {
     return this.http.get<LikedArticlesResponse>(`${this.apiUrl}/me/likes`);
   }

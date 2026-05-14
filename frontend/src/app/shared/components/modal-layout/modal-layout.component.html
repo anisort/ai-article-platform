@@ -1,0 +1,30 @@
+<section class="modal-layout">
+  <header class="modal-layout__header">
+    <div class="modal-layout__title-block">
+      @if (kicker()) {
+        <p class="modal-layout__kicker">{{ kicker() }}</p>
+      }
+      <h2 class="modal-layout__title">{{ title() }}</h2>
+    </div>
+
+    <ng-content select="[modal-header-actions]" />
+  </header>
+
+  @if (searchPlaceholder(); as placeholder) {
+    <div class="modal-layout__search">
+      <input
+        type="text"
+        [value]="searchValue()"
+        [placeholder]="placeholder"
+        (input)="onSearchInput($event)" />
+    </div>
+  }
+
+  <div class="modal-layout__content">
+    <ng-content />
+  </div>
+
+  <footer class="modal-layout__footer">
+    <ng-content select="[modal-footer]" />
+  </footer>
+</section>

@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { unauthGuard } from './core/guards/unauth.guard';
 
 export const routes: Routes = [
   {
@@ -8,7 +9,7 @@ export const routes: Routes = [
   },
   {
     path: 'home',
-    loadComponent: () => import('./features/home/pages/home/home.page')
+    loadComponent: () => import('./features/articles/pages/home/home.page')
       .then(p => p.HomePage)
   },
   {
@@ -38,6 +39,7 @@ export const routes: Routes = [
   },
   {
     path: 'register',
+    canActivate: [unauthGuard],
     loadComponent: () => import('./features/auth/pages/user-register/user-register.page')
       .then(p => p.UserRegisterPage)
   },

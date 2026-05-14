@@ -32,6 +32,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/articles/*/images/*").authenticated()
                         .requestMatchers("/api/v1/articles/me").authenticated()
                         .requestMatchers("/api/v1/articles/me/likes").authenticated()
+                        .requestMatchers("/api/v1/profile-page/me").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/profile-page/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/search/**").permitAll()
                         .requestMatchers("/api/v1/articles/**").permitAll()
                         .anyRequest().authenticated()

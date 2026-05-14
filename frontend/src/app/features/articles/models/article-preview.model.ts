@@ -4,10 +4,11 @@ export interface AuthorPreview {
   name: string;
 }
 
-export interface PublishedArticlePreview {
+export interface ArticlePreview {
   id: string;
   title: string;
   imageUrl: string;
   createdAt?: string;
+  published: boolean;
   author: AuthorPreview;
 }

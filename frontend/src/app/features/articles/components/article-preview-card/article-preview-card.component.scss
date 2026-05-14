@@ -3,17 +3,17 @@
   flex-direction: column;
   min-width: 0;
   height: 100%;
-  border: 1px solid var(--line);
+  border: 1px solid var(--color-border-strong);
   border-radius: 8px;
   background: var(--surface-elevated);
   overflow: hidden;
   transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-border-soft) 65%, transparent);
 }
 
 .article-card:hover,
 .article-card:focus-within {
   transform: translateY(-2px);
-  border-color: color-mix(in srgb, var(--color-border-strong) 68%, var(--line));
   box-shadow:
     0 10px 24px rgba(16, 24, 40, 0.16),
     0 0 0 1px color-mix(in srgb, var(--color-border-strong) 24%, transparent);
@@ -108,4 +108,31 @@
 
 .dot {
   opacity: 0.7;
+}
+
+.card-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+
+.card-action-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 1.95rem;
+  padding: 0.2rem 0.65rem;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  background: color-mix(in srgb, var(--surface-elevated) 75%, var(--color-surface-base));
+  color: var(--text-primary);
+  font-size: 0.84rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.card-action-button--danger {
+  color: var(--color-accent-berry);
 }

@@ -1,0 +1,55 @@
+.segmented-control {
+  display: flex;
+  align-items: stretch;
+  gap: 0.35rem;
+  width: fit-content;
+  padding: 0.3rem;
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--line) 80%, transparent);
+  background: color-mix(in srgb, var(--surface-elevated) 65%, var(--color-surface-base));
+  flex-wrap: wrap;
+}
+
+.segment-option {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  min-height: 2rem;
+  min-width: 6.5rem;
+  padding: 0 0.85rem;
+  color: var(--color-primary-dark);
+  font-weight: 600;
+  background: transparent;
+  transition: background-color 0.16s ease, color 0.16s ease, border-color 0.16s ease;
+}
+
+.segment-option--active {
+  background: color-mix(in srgb, var(--line) 34%, var(--surface-elevated));
+  color: var(--color-accent-ink);
+  border-width: 1px;
+  border-color: color-mix(in srgb, var(--color-accent-berry) 70%, var(--color-border-strong));
+}
+
+.segment-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--color-accent-berry);
+}
+
+@media (max-width: 680px) {
+  .segmented-control {
+    width: 100%;
+  }
+
+  .segment-option {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+}

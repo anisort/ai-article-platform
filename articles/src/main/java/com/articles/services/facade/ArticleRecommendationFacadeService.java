@@ -1,6 +1,6 @@
 package com.articles.services.facade;
 
-import com.articles.dto.article.PublishedArticlePreviewResponse;
+import com.articles.dto.article.ArticlePreviewResponse;
 import com.articles.dto.user.AuthorResponse;
 import com.articles.entities.Article;
 import com.articles.services.core.ArticleLikeService;
@@ -39,7 +39,7 @@ public class ArticleRecommendationFacadeService {
         this.userService = userService;
     }
 
-    public List<PublishedArticlePreviewResponse> getRecommendations(UUID userId, int limit) {
+    public List<ArticlePreviewResponse> getRecommendations(UUID userId, int limit) {
         int safeLimit = Math.max(1, Math.min(limit, 50));
         List<Article> latest = articleService.getPublishedArticles();
         if (latest.isEmpty()) {
@@ -73,7 +73,7 @@ public class ArticleRecommendationFacadeService {
         return orderedIds.stream()
                 .map(byId::get)
                 .filter(java.util.Objects::nonNull)
-                .map(article -> PublishedArticlePreviewResponse.fromEntity(article, authors.get(article.getAuthorId())))
+                .map(article -> ArticlePreviewResponse.fromEntity(article, authors.get(article.getAuthorId())))
                 .limit(safeLimit)
                 .toList();
     }
@@ -151,3 +151,4 @@ public class ArticleRecommendationFacadeService {
         return mixed;
     }
 }
+

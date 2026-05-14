@@ -5,25 +5,13 @@
     description="Browse all published articles and switch between semantic and title-focused search."
   ></app-page-intro>
 
-  <div class="search-mode-controls" role="radiogroup" aria-label="Search type">
-    <label class="mode-option" [class.mode-option--active]="searchMode() === 'semantic'">
-      <input
-        type="radio"
-        name="searchMode"
-        [checked]="searchMode() === 'semantic'"
-        (change)="onModeChange('semantic')"
-      />
-      <span>Semantic</span>
-    </label>
-    <label class="mode-option" [class.mode-option--active]="searchMode() === 'title'">
-      <input
-        type="radio"
-        name="searchMode"
-        [checked]="searchMode() === 'title'"
-        (change)="onModeChange('title')"
-      />
-      <span>Title</span>
-    </label>
+  <div class="search-mode-controls">
+    <app-segmented-control
+      [options]="modeOptions"
+      [active]="searchMode()"
+      ariaLabel="Search type"
+      (changed)="onModeChange($event)"
+    />
   </div>
 
   @if (articles().length) {

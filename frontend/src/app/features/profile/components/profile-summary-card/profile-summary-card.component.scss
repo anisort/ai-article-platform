@@ -40,19 +40,20 @@
 }
 
 .profile-stat {
-  border: 1px solid transparent;
+  border: 1px solid var(--color-border-soft);
   display: grid;
   gap: 0.15rem;
   min-width: 6rem;
-  padding: 0.8rem 1rem;
+  padding: 0.72rem 0.95rem;
   border-radius: 1rem;
-  background: color-mix(in srgb, var(--color-surface-base) 78%, white);
+  background: color-mix(in srgb, var(--color-surface-elevated) 82%, var(--color-surface-panel));
   text-align: center;
   cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
 
   strong {
     color: var(--color-accent-ink);
-    font-size: 1.15rem;
+    font-size: 1.1rem;
   }
 
   span {
@@ -61,9 +62,16 @@
   }
 }
 
+.profile-stat:hover,
+.profile-stat:focus-visible {
+  border-color: color-mix(in srgb, var(--color-border-strong) 58%, var(--color-border-soft));
+  background: color-mix(in srgb, var(--color-surface-panel) 76%, var(--color-surface-elevated));
+  box-shadow: var(--shadow-soft);
+}
+
 .profile-stat--active {
   border-color: color-mix(in srgb, var(--color-accent-berry) 45%, var(--color-border-soft));
-  background: color-mix(in srgb, var(--color-surface-rose) 34%, var(--color-surface-panel));
+  background: color-mix(in srgb, var(--color-surface-rose) 24%, var(--color-surface-panel));
 }
 
 .profile-follow-button,
@@ -78,6 +86,12 @@
 
 .profile-follow-button {
   background: color-mix(in srgb, var(--color-surface-rose) 42%, var(--color-surface-panel));
+}
+
+.profile-follow-button--inline {
+  justify-self: start;
+  margin-top: 0.45rem;
+  padding: 0.55rem 0.95rem;
 }
 
 .profile-back-button {

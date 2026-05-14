@@ -17,6 +17,16 @@ export class ProfileConnectionCardComponent {
 
   displayName(): string {
     const user = this.user();
-    return user.name || user.username;
+    return user.name || user.username || 'Unknown author';
+  }
+
+  profileHandle(): string | null {
+    const username = this.user().username?.trim();
+    return username ? `@${username}` : null;
+  }
+
+  email(): string | null {
+    const email = this.user().email?.trim();
+    return email ? email : null;
   }
 }

@@ -1,7 +1,7 @@
 import { CommonModule, DatePipe } from '@angular/common';
 import { Component, computed, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { PublishedArticlePreview } from '../../models/published-article-preview.model';
+import { ArticlePreview } from '../../models/article-preview.model';
 
 @Component({
   selector: 'app-article-preview-card',
@@ -11,8 +11,9 @@ import { PublishedArticlePreview } from '../../models/published-article-preview.
   styleUrl: './article-preview-card.component.scss',
 })
 export class ArticlePreviewCardComponent {
-  article = input.required<PublishedArticlePreview>();
+  article = input.required<ArticlePreview>();
   size = input<'small' | 'large'>('large');
+  showOwnerActions = input(false);
 
   authorName = computed(() => {
     const author = this.article().author;

@@ -1,6 +1,6 @@
 package com.articles.services.facade;
 
-import com.articles.dto.article.PublishedArticlePreviewResponse;
+import com.articles.dto.article.ArticlePreviewResponse;
 import com.articles.dto.user.AuthorResponse;
 import com.articles.entities.Article;
 import com.articles.services.core.ArticleService;
@@ -34,7 +34,7 @@ public class ArticleSearchFacadeService {
         this.articleFacadeService = articleFacadeService;
     }
 
-    public List<PublishedArticlePreviewResponse> searchBySemantic(String query) {
+    public List<ArticlePreviewResponse> searchBySemantic(String query) {
         if (query == null || query.isBlank()) {
             return articleFacadeService.getPublishedArticles();
         }
@@ -51,11 +51,11 @@ public class ArticleSearchFacadeService {
         return articleIds.stream()
                 .map(byId::get)
                 .filter(java.util.Objects::nonNull)
-                .map(article -> PublishedArticlePreviewResponse.fromEntity(article, authors.get(article.getAuthorId())))
+                .map(article -> ArticlePreviewResponse.fromEntity(article, authors.get(article.getAuthorId())))
                 .toList();
     }
 
-    public List<PublishedArticlePreviewResponse> searchByTitleOrAuthor(String query) {
+    public List<ArticlePreviewResponse> searchByTitleOrAuthor(String query) {
         if (query == null || query.isBlank()) {
             return articleFacadeService.getPublishedArticles();
         }
@@ -63,7 +63,8 @@ public class ArticleSearchFacadeService {
         List<Article> articles = articleService.searchPublishedArticlesByTitle(query.trim());
         Map<UUID, AuthorResponse> authors = userService.getAuthors(articles);
         return articles.stream()
-                .map(article -> PublishedArticlePreviewResponse.fromEntity(article, authors.get(article.getAuthorId())))
+                .map(article -> ArticlePreviewResponse.fromEntity(article, authors.get(article.getAuthorId())))
                 .toList();
     }
 }
+

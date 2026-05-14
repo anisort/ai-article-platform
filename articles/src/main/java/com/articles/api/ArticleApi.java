@@ -2,7 +2,7 @@ package com.articles.api;
 
 import com.articles.dto.article.ArticleWithUserResponse;
 import com.articles.dto.article.CreateArticleRequest;
-import com.articles.dto.article.PublishedArticlePreviewResponse;
+import com.articles.dto.article.ArticlePreviewResponse;
 import com.articles.services.facade.ArticleFacadeService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -22,12 +22,12 @@ public class ArticleApi {
     }
 
     @GetMapping
-    public List<PublishedArticlePreviewResponse> getArticles() {
+    public List<ArticlePreviewResponse> getArticles() {
         return articleFacadeService.getPublishedArticles();
     }
 
     @GetMapping("/author/{authorId}")
-    public List<PublishedArticlePreviewResponse> getPublishedArticlesByAuthor(@PathVariable UUID authorId) {
+    public List<ArticlePreviewResponse> getPublishedArticlesByAuthor(@PathVariable UUID authorId) {
         return articleFacadeService.getPublishedArticlesByAuthor(authorId);
     }
 

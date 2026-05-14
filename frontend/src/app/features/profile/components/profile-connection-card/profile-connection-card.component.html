@@ -7,6 +7,11 @@
 
   <div class="profile-user-card__meta">
     <strong>{{ displayName() }}</strong>
-    <span>{{ '@' + user().username }}</span>
+    @if (email(); as emailValue) {
+      <span>{{ emailValue }}</span>
+    }
+    @if (profileHandle(); as handle) {
+      <span>{{ handle }}</span>
+    }
   </div>
 </a>

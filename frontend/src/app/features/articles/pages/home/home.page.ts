@@ -2,9 +2,9 @@ import { CommonModule } from '@angular/common';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
-import { PublishedArticlePreview } from '../../../articles/models/published-article-preview.model';
-import { ArticlesService } from '../../../articles/services/articles.service';
-import { ArticlePreviewCardComponent } from '../../../articles/components/article-preview-card/article-preview-card.component';
+import { ArticlePreview } from '../../models/article-preview.model';
+import { ArticlesService } from '../../services/articles.service';
+import { ArticlePreviewCardComponent } from '../../components/article-preview-card/article-preview-card.component';
 import { PageIntroComponent } from '../../../../shared/components/page-intro/page-intro.component';
 
 @Component({
@@ -17,7 +17,7 @@ import { PageIntroComponent } from '../../../../shared/components/page-intro/pag
 export class HomePage implements OnInit {
   private readonly articlesService = inject(ArticlesService);
 
-  readonly recommendations = signal<PublishedArticlePreview[]>([]);
+  readonly recommendations = signal<ArticlePreview[]>([]);
   readonly loading = signal(true);
   readonly carouselArticles = computed(() => this.recommendations().slice(0, 8));
   readonly feedArticles = computed(() => this.recommendations().slice(8, 20));
@@ -36,4 +36,3 @@ export class HomePage implements OnInit {
   }
 
 }
-

@@ -1,6 +1,6 @@
 package com.articles.api;
 
-import com.articles.dto.article.PublishedArticlePreviewResponse;
+import com.articles.dto.article.ArticlePreviewResponse;
 import com.articles.services.facade.ArticleSearchFacadeService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,7 +20,7 @@ public class ArticleSearchApi {
     }
 
     @GetMapping
-    public List<PublishedArticlePreviewResponse> searchArticles(
+    public List<ArticlePreviewResponse> searchArticles(
             @RequestParam String query,
             @RequestParam(defaultValue = "title") String mode
     ) {

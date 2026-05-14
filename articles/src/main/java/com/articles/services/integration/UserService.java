@@ -1,6 +1,7 @@
 package com.articles.services.integration;
 
 import com.articles.dto.user.AuthorResponse;
+import com.articles.dto.profile.UserProfileResponse;
 import com.articles.entities.Article;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
@@ -41,6 +42,25 @@ public class UserService {
                         AuthorResponse::id,
                         author -> author
                 ));
+    }
+
+    public UserProfileResponse getMyProfile(String authorizationHeader) {
+        return restClient.get()
+                .uri("/api/v1/users/me")
+                .header("Authorization", authorizationHeader)
+                .retrieve()
+                .body(UserProfileResponse.class);
+    }
+
+    public UserProfileResponse getProfileById(UUID userId, String authorizationHeader) {
+        RestClient.RequestHeadersSpec<?> request = restClient.get()
+                .uri("/api/v1/users/{userId}/profile", userId);
+
+        if (authorizationHeader != null && !authorizationHeader.isBlank()) {
+            request = request.header("Authorization", authorizationHeader);
+        }
+
+        return request.retrieve().body(UserProfileResponse.class);
     }
 }
 

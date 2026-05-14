@@ -18,6 +18,12 @@
       <time [attr.datetime]="article().createdAt || null">
         {{ article().createdAt ? (article().createdAt | date: 'd MMM, y') : 'Unknown date' }}
       </time>
+      @if (showOwnerActions()) {
+        <div class="card-actions">
+          <a class="card-action-button" [routerLink]="['/edit-article', article().id]">Edit</a>
+          <button type="button" class="card-action-button card-action-button--danger">Delete</button>
+        </div>
+      }
     </div>
   </div>
 </article>

@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { CreateArticleRequest } from '../models/create-article-request.model';
 import { ArticleWithUserResponse } from '../models/article-response.model';
-import { PublishedArticlePreview } from '../models/published-article-preview.model';
+import { ArticlePreview } from '../models/article-preview.model';
 
 export type SearchMode = 'title' | 'semantic';
 
@@ -15,12 +15,12 @@ export class ArticlesService {
   private readonly apiUrl = `${environment.apiUrlArticles}/v1/articles`;
   private readonly http = inject(HttpClient);
 
-  list(): Observable<PublishedArticlePreview[]> {
-    return this.http.get<PublishedArticlePreview[]>(this.apiUrl);
+  list(): Observable<ArticlePreview[]> {
+    return this.http.get<ArticlePreview[]>(this.apiUrl);
   }
 
-  search(query: string, mode: SearchMode): Observable<PublishedArticlePreview[]> {
-    return this.http.get<PublishedArticlePreview[]>(
+  search(query: string, mode: SearchMode): Observable<ArticlePreview[]> {
+    return this.http.get<ArticlePreview[]>(
       `${environment.apiUrlArticles}/v1/search/articles`,
       {
         params: { query, mode },
@@ -28,12 +28,8 @@ export class ArticlesService {
     );
   }
 
-  listPublishedByAuthor(authorId: string): Observable<PublishedArticlePreview[]> {
-    return this.http.get<PublishedArticlePreview[]>(`${this.apiUrl}/author/${authorId}`);
-  }
-
-  getRecommendations(limit = 20): Observable<PublishedArticlePreview[]> {
-    return this.http.get<PublishedArticlePreview[]>(`${this.apiUrl}/recommendations`, {
+  getRecommendations(limit = 20): Observable<ArticlePreview[]> {
+    return this.http.get<ArticlePreview[]>(`${this.apiUrl}/recommendations`, {
       params: { limit },
     });
   }

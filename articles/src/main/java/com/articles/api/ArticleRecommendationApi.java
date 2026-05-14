@@ -1,6 +1,6 @@
 package com.articles.api;
 
-import com.articles.dto.article.PublishedArticlePreviewResponse;
+import com.articles.dto.article.ArticlePreviewResponse;
 import com.articles.services.facade.ArticleRecommendationFacadeService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -23,7 +23,7 @@ public class ArticleRecommendationApi {
     }
 
     @GetMapping
-    public List<PublishedArticlePreviewResponse> getRecommendations(
+    public List<ArticlePreviewResponse> getRecommendations(
             @AuthenticationPrincipal Jwt jwt,
             @RequestParam(defaultValue = "20") int limit
     ) {

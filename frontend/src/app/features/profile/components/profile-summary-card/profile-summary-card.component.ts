@@ -28,8 +28,9 @@ export class ProfileSummaryCardComponent {
     return profile.name || profile.username || 'Unknown author';
   }
 
-  profileHandle(): string {
-    return `@${this.profile().username}`;
+  profileHandle(): string | null {
+    const username = this.profile().username?.trim();
+    return username ? `@${username}` : null;
   }
 
   followersCount(): number {

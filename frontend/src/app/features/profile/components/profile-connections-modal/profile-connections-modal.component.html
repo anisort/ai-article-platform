@@ -1,0 +1,30 @@
+<app-modal-layout
+  [title]="title()"
+  [kicker]="title()"
+  [searchPlaceholder]="'Search by name, email or username'"
+  [searchValue]="searchValue"
+  (searchValueChange)="onSearchValueChange($event)">
+  @if (filteredUsers().length) {
+    <div class="profile-users">
+      @for (user of filteredUsers(); track user.id) {
+        <div (click)="close()">
+          <app-profile-connection-card [user]="user" />
+        </div>
+      }
+    </div>
+  } @else if (hasUsers()) {
+    <section class="profile-state">
+      <p class="profile-state__label">{{ title() }}</p>
+      <h2>No users match your search.</h2>
+    </section>
+  } @else {
+    <section class="profile-state">
+      <p class="profile-state__label">{{ title() }}</p>
+      <h2>{{ emptyMessage() }}</h2>
+    </section>
+  }
+
+  <div modal-footer>
+    <button type="button" class="connections-modal__close" (click)="close()">Close</button>
+  </div>
+</app-modal-layout>

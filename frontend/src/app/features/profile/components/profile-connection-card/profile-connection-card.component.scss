@@ -2,18 +2,23 @@
   display: flex;
   align-items: center;
   gap: 1rem;
+  width: 100%;
+  box-sizing: border-box;
+  height: 5.6rem;
   padding: 1rem 1.1rem;
   border-radius: 1.35rem;
   border: 1px solid var(--color-border-soft);
-  background: var(--color-surface-panel);
+  background: color-mix(in srgb, var(--color-surface-elevated) 82%, var(--color-surface-panel));
   box-shadow: var(--shadow-soft);
   text-decoration: none;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease;
 
   &:hover,
   &:focus-visible {
     transform: translateY(-2px);
-    box-shadow: var(--shadow-medium);
+    border-color: color-mix(in srgb, var(--color-border-strong) 55%, var(--color-border-soft));
+    background: color-mix(in srgb, var(--color-surface-panel) 72%, var(--color-surface-elevated));
+    box-shadow: var(--shadow-soft);
   }
 }
 
@@ -24,12 +29,19 @@
 .profile-user-card__meta {
   display: grid;
   gap: 0.15rem;
+  min-width: 0;
 
   strong {
     color: var(--color-accent-ink);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   span {
     color: var(--color-text-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 }

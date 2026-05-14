@@ -3,7 +3,7 @@ package com.articles.services.facade;
 import com.articles.dto.article.ArticleWithUserResponse;
 import com.articles.dto.user.AuthorResponse;
 import com.articles.dto.article.CreateArticleRequest;
-import com.articles.dto.article.PublishedArticlePreviewResponse;
+import com.articles.dto.article.ArticlePreviewResponse;
 import com.articles.entities.Article;
 import com.articles.services.core.ArticleEmbeddingService;
 import com.articles.services.core.ArticleService;
@@ -31,19 +31,19 @@ public class ArticleFacadeService {
         this.articleEmbeddingService = articleEmbeddingService;
     }
 
-    public List<PublishedArticlePreviewResponse> getPublishedArticles() {
+    public List<ArticlePreviewResponse> getPublishedArticles() {
         List<Article> articles = articleService.getPublishedArticles();
         Map<UUID, AuthorResponse> authors = userService.getAuthors(articles);
         return articles.stream()
-                .map(article -> PublishedArticlePreviewResponse.fromEntity(article, authors.get(article.getAuthorId())))
+                .map(article -> ArticlePreviewResponse.fromEntity(article, authors.get(article.getAuthorId())))
                 .toList();
     }
 
-    public List<PublishedArticlePreviewResponse> getPublishedArticlesByAuthor(UUID authorId) {
+    public List<ArticlePreviewResponse> getPublishedArticlesByAuthor(UUID authorId) {
         List<Article> articles = articleService.getPublishedArticlesByAuthor(authorId);
         Map<UUID, AuthorResponse> authors = userService.getAuthors(articles);
         return articles.stream()
-                .map(article -> PublishedArticlePreviewResponse.fromEntity(article, authors.get(article.getAuthorId())))
+                .map(article -> ArticlePreviewResponse.fromEntity(article, authors.get(article.getAuthorId())))
                 .toList();
     }
 
@@ -74,6 +74,7 @@ public class ArticleFacadeService {
     }
 
 }
+
 
 
 

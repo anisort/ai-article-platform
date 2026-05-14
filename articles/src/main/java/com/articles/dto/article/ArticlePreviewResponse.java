@@ -1,24 +1,26 @@
 package com.articles.dto.article;
 
-import com.articles.entities.Article;
 import com.articles.dto.user.AuthorResponse;
+import com.articles.entities.Article;
 
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
-public record PublishedArticlePreviewResponse(
+public record ArticlePreviewResponse(
         UUID id,
         String title,
         String imageUrl,
         ZonedDateTime createdAt,
+        boolean published,
         AuthorResponse author
 ) {
-    public static PublishedArticlePreviewResponse fromEntity(Article article, AuthorResponse author) {
-        return new PublishedArticlePreviewResponse(
+    public static ArticlePreviewResponse fromEntity(Article article, AuthorResponse author) {
+        return new ArticlePreviewResponse(
                 article.getId(),
                 article.getTitle(),
                 article.getImageUrl(),
                 article.getCreatedAt(),
+                article.isPublished(),
                 author
         );
     }
