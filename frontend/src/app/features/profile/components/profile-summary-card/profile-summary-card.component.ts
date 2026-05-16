@@ -18,6 +18,7 @@ export class ProfileSummaryCardComponent {
   readonly connectionTab = input<ConnectionTab>(null);
   readonly followLoading = input(false);
   readonly canFollow = input(false);
+  readonly showStats = input(true);
 
   readonly connectionSelect = output<'following' | 'followers'>();
   readonly followToggle = output<void>();

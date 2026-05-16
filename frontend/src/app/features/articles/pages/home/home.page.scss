@@ -63,7 +63,7 @@
 .recommendation-grid {
   display: grid;
   gap: 1rem;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .empty-state {
@@ -74,7 +74,7 @@
   background: var(--surface-elevated);
 }
 
-@media (max-width: 1100px) {
+@media (max-width: 900px) {
   .home-page {
     margin: 1rem 1.5rem;
   }
