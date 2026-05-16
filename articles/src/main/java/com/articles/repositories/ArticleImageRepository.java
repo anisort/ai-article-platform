@@ -10,4 +10,5 @@ import java.util.UUID;
 public interface ArticleImageRepository extends JpaRepository<ArticleImage, UUID> {
     List<ArticleImage> findByArticleIdOrderByIdDesc(UUID articleId);
     Optional<ArticleImage> findByIdAndArticleId(UUID id, UUID articleId);
+    void deleteByArticleId(UUID articleId);
 }

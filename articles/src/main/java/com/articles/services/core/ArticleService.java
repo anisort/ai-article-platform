@@ -86,6 +86,11 @@ public class ArticleService {
         return articleRepository.save(article);
     }
 
+    @Transactional
+    public void delete(Article article) {
+        articleRepository.delete(article);
+    }
+
     // Access helper used by guard methods
     private Article requireById(UUID articleId) {
         return getById(articleId).orElseThrow(() -> new ResponseStatusException(NOT_FOUND));

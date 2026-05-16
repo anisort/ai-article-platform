@@ -3,6 +3,7 @@ package com.articles.services.core;
 import com.articles.entities.ArticleImage;
 import com.articles.repositories.ArticleImageRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -34,5 +35,10 @@ public class ArticleImageService {
 
     public void delete(ArticleImage image) {
         articleImageRepository.delete(image);
+    }
+
+    @Transactional
+    public void deleteByArticleId(UUID articleId) {
+        articleImageRepository.deleteByArticleId(articleId);
     }
 }

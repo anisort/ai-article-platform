@@ -2,6 +2,7 @@ export interface AuthorPreview {
   id: string;
   username: string;
   name: string;
+  avatar?: string | null;
 }
 
 export interface ArticlePreview {

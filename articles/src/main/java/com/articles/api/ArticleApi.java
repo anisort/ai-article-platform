@@ -52,4 +52,10 @@ public class ArticleApi {
         UUID authorId = UUID.fromString(jwt.getSubject());
         return articleFacadeService.update(articleId, req, authorId);
     }
+
+    @DeleteMapping("/{articleId}")
+    public void delete(@PathVariable UUID articleId, @AuthenticationPrincipal Jwt jwt) {
+        UUID authorId = UUID.fromString(jwt.getSubject());
+        articleFacadeService.delete(articleId, authorId);
+    }
 }

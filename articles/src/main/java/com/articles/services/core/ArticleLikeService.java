@@ -76,4 +76,9 @@ public class ArticleLikeService {
     public boolean isArticleLikedByUser(UUID articleId, UUID userId) {
         return articleLikeRepository.existsByUserIdAndArticle_Id(userId, articleId);
     }
+
+    @Transactional
+    public void deleteByArticleId(UUID articleId) {
+        articleLikeRepository.deleteByArticle_Id(articleId);
+    }
 }

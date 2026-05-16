@@ -1,5 +1,5 @@
 import { CommonModule, DatePipe } from '@angular/common';
-import { Component, computed, input } from '@angular/core';
+import { Component, computed, input, output } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ArticlePreview } from '../../models/article-preview.model';
 
@@ -14,9 +14,15 @@ export class ArticlePreviewCardComponent {
   article = input.required<ArticlePreview>();
   size = input<'small' | 'large'>('large');
   showOwnerActions = input(false);
+  deleteLoading = input(false);
+  deleteArticle = output<string>();
 
   authorName = computed(() => {
     const author = this.article().author;
     return author?.name || author?.username || 'Unknown author';
   });
+
+  onDeleteClick(): void {
+    this.deleteArticle.emit(this.article().id);
+  }
 }

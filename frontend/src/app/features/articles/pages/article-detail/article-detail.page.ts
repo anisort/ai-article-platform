@@ -1,6 +1,6 @@
 import { CommonModule, DatePipe } from '@angular/common';
 import { AfterViewInit, Component, ElementRef, OnInit, Renderer2, ViewChild, computed, inject, signal } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { MarkdownModule } from 'ngx-markdown';
 import { AuthService } from '../../../../core/services/auth.service';
@@ -20,6 +20,7 @@ import { UserProfile } from '../../../profile/models/user-profile.model';
 })
 export class ArticleDetailPage implements OnInit, AfterViewInit {
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private readonly articlesService = inject(ArticlesService);
   private readonly authService = inject(AuthService);
   private readonly myArticlesService = inject(MyArticlesService);
@@ -31,6 +32,7 @@ export class ArticleDetailPage implements OnInit, AfterViewInit {
   loading = signal(true);
   notFound = signal(false);
   likeLoading = signal(false);
+  deleteLoading = signal(false);
   liked = signal(false);
   likesCount = signal(0);
 
@@ -38,6 +40,11 @@ export class ArticleDetailPage implements OnInit, AfterViewInit {
 
   readonly articleData = computed(() => this.article()?.articleResponse ?? null);
   readonly authorData = computed(() => this.article()?.authorResponse ?? null);
+  readonly isAuthor = computed(() => {
+    const currentUserId = this.authService.userId;
+    const authorId = this.authorData()?.id;
+    return !!currentUserId && !!authorId && currentUserId === authorId;
+  });
 
   readonly authorProfile = computed<UserProfile>(() => {
     const author = this.authorData();
@@ -46,7 +53,7 @@ export class ArticleDetailPage implements OnInit, AfterViewInit {
       username: author?.username ?? '',
       name: author?.name ?? '',
       email: null,
-      avatar: null,
+      avatar: author?.avatar ?? null,
       ownProfile: false,
       following: false,
       followers: [],
@@ -106,6 +113,29 @@ export class ArticleDetailPage implements OnInit, AfterViewInit {
       },
       error: () => {
         this.likeLoading.set(false);
+      },
+    });
+  }
+
+  deleteArticle(): void {
+    const articleId = this.articleData()?.id;
+    if (!articleId || !this.isAuthor() || this.deleteLoading()) {
+      return;
+    }
+
+    const shouldDelete = window.confirm('Delete this article? This action cannot be undone.');
+    if (!shouldDelete) {
+      return;
+    }
+
+    this.deleteLoading.set(true);
+    this.articlesService.delete(articleId).subscribe({
+      next: () => {
+        this.deleteLoading.set(false);
+        this.router.navigate(['/articles']);
+      },
+      error: () => {
+        this.deleteLoading.set(false);
       },
     });
   }

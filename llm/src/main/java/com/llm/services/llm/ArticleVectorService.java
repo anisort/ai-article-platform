@@ -45,6 +45,13 @@ public class ArticleVectorService {
         vectorStore.add(List.of(document));
     }
 
+    public void delete(UUID articleId) {
+        if (articleId == null) {
+            return;
+        }
+        vectorStore.delete(List.of(articleId.toString()));
+    }
+
     public List<UUID> similaritySearchArticleIds(String query, double similarityThreshold, int topK) {
         SearchRequest request = SearchRequest.builder()
                 .query(query)

@@ -25,6 +25,14 @@ public class ArticleEmbeddingService {
         syncVector(ArticleEmbeddingPayload.fromArticle(article, author, description), article.getId());
     }
 
+    public void deleteArticleEmbedding(java.util.UUID articleId) {
+        try {
+            llmIntegrationService.deleteFromVectorStore(articleId);
+        } catch (Exception ex) {
+            log.warn("Vector store delete failed for article {}. Continue with article removal.", articleId);
+        }
+    }
+
     private String loadDescription(ArticleEmbeddingPayload payload, java.util.UUID articleId) {
         String description;
         try {

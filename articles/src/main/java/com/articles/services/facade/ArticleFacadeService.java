@@ -6,6 +6,7 @@ import com.articles.dto.article.CreateArticleRequest;
 import com.articles.dto.article.ArticlePreviewResponse;
 import com.articles.entities.Article;
 import com.articles.services.core.ArticleEmbeddingService;
+import com.articles.services.core.ArticleImageService;
 import com.articles.services.core.ArticleLikeService;
 import com.articles.services.core.ArticleService;
 import com.articles.services.integration.UserService;
@@ -20,17 +21,20 @@ public class ArticleFacadeService {
 
     private final ArticleService articleService;
     private final ArticleLikeService articleLikeService;
+    private final ArticleImageService articleImageService;
     private final UserService userService;
     private final ArticleEmbeddingService articleEmbeddingService;
 
     public ArticleFacadeService(
             ArticleService articleService,
             ArticleLikeService articleLikeService,
+            ArticleImageService articleImageService,
             UserService userService,
             ArticleEmbeddingService articleEmbeddingService
     ) {
         this.articleService = articleService;
         this.articleLikeService = articleLikeService;
+        this.articleImageService = articleImageService;
         this.userService = userService;
         this.articleEmbeddingService = articleEmbeddingService;
     }
@@ -82,6 +86,14 @@ public class ArticleFacadeService {
         AuthorResponse author = authors.get(updatedArticle.getAuthorId());
         articleEmbeddingService.syncArticleEmbedding(updatedArticle, author);
         return ArticleWithUserResponse.mapToResponse(updatedArticle, author, 0, false);
+    }
+
+    public void delete(UUID articleId, UUID requesterId) {
+        Article article = articleService.requireOwned(articleId, requesterId);
+        articleEmbeddingService.deleteArticleEmbedding(articleId);
+        articleLikeService.deleteByArticleId(articleId);
+        articleImageService.deleteByArticleId(articleId);
+        articleService.delete(article);
     }
 
 }

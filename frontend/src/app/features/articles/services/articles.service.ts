@@ -45,4 +45,8 @@ export class ArticlesService {
   update(articleId: string, article: CreateArticleRequest): Observable<ArticleWithUserResponse> {
     return this.http.put<ArticleWithUserResponse>(`${this.apiUrl}/${articleId}`, article);
   }
+
+  delete(articleId: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${articleId}`);
+  }
 }

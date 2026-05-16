@@ -11,6 +11,7 @@ import { ProfileConnectionsModalComponent } from '../../components/profile-conne
 import { ProfileSummaryCardComponent } from '../../components/profile-summary-card/profile-summary-card.component';
 import { UserProfile } from '../../models/user-profile.model';
 import { ProfileService } from '../../services/profile.service';
+import { ArticlesService } from '../../../articles/services/articles.service';
 import {
   SegmentedControlComponent,
   SegmentedControlOption
@@ -36,12 +37,14 @@ export class ProfilePage implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly authService = inject(AuthService);
   private readonly profileService = inject(ProfileService);
+  private readonly articlesService = inject(ArticlesService);
   private readonly modalController = inject(ModalController);
 
   readonly activeTab = signal<ProfileTab>('published');
   readonly loading = signal(false);
   readonly notFound = signal(false);
   readonly followLoading = signal(false);
+  readonly deletingArticleId = signal<string | null>(null);
 
   readonly profile = signal<UserProfile | null>(null);
   readonly articles = signal<ArticlePreview[]>([]);
@@ -168,6 +171,28 @@ export class ProfilePage implements OnInit {
       },
       error: () => {
         this.followLoading.set(false);
+      },
+    });
+  }
+
+  onDeleteArticle(articleId: string): void {
+    if (!articleId || !this.isOwnProfile() || this.deletingArticleId()) {
+      return;
+    }
+
+    const shouldDelete = window.confirm('Delete this article? This action cannot be undone.');
+    if (!shouldDelete) {
+      return;
+    }
+
+    this.deletingArticleId.set(articleId);
+    this.articlesService.delete(articleId).subscribe({
+      next: () => {
+        this.articles.update(items => items.filter(article => article.id !== articleId));
+        this.deletingArticleId.set(null);
+      },
+      error: () => {
+        this.deletingArticleId.set(null);
       },
     });
   }

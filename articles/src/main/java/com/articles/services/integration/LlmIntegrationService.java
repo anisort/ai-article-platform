@@ -42,6 +42,16 @@ public class LlmIntegrationService {
                 .toBodilessEntity();
     }
 
+    public void deleteFromVectorStore(UUID articleId) {
+        RestClient.RequestHeadersSpec<?> requestSpec = llmRestClient.delete()
+                .uri("/api/v1/vector/articles/{articleId}", articleId);
+        String bearerToken = bearerTokenOrNull();
+        if (bearerToken != null) {
+            requestSpec.header(HttpHeaders.AUTHORIZATION, bearerToken);
+        }
+        requestSpec.retrieve().toBodilessEntity();
+    }
+
     public List<UUID> searchArticleIds(String query) {
         if (!StringUtils.hasText(query)) {
             return List.of();

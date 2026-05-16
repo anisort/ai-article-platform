@@ -21,7 +21,13 @@
       @if (showOwnerActions()) {
         <div class="card-actions">
           <a class="card-action-button" [routerLink]="['/edit-article', article().id]">Edit</a>
-          <button type="button" class="card-action-button card-action-button--danger">Delete</button>
+          <button
+            type="button"
+            class="card-action-button card-action-button--danger"
+            [disabled]="deleteLoading()"
+            (click)="onDeleteClick()">
+            Delete
+          </button>
         </div>
       }
     </div>

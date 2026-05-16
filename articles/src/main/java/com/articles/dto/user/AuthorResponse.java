@@ -5,6 +5,7 @@ import java.util.UUID;
 public record AuthorResponse(
         UUID id,
         String username,
-        String name
+        String name,
+        String avatar
 ) {
 }

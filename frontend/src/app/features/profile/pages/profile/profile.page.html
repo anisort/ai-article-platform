@@ -43,7 +43,9 @@
         @for (article of visibleArticlePreviews(); track article.id) {
           <app-article-preview-card
             [article]="article"
-            [showOwnerActions]="isOwnProfile() && activeTab() !== 'liked'" />
+            [showOwnerActions]="isOwnProfile() && activeTab() !== 'liked'"
+            [deleteLoading]="deletingArticleId() === article.id"
+            (deleteArticle)="onDeleteArticle($event)" />
         }
       </div>
     } @else {

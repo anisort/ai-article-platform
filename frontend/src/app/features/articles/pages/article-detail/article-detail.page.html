@@ -29,24 +29,39 @@
                 <app-profile-summary-card [profile]="authorProfile()" [showStats]="false" />
               </div>
 
-              @if (canLike()) {
-                <button
-                  type="button"
-                  class="article-like-button"
-                  [class.article-like-button--active]="liked()"
-                  [attr.aria-label]="liked() ? 'Unlike article' : 'Like article'"
-                  [attr.title]="liked() ? 'Unlike article' : 'Like article'"
-                  [disabled]="likeLoading()"
-                  (click)="toggleLike()">
-                  <i class="bi" [class.bi-heart-fill]="liked()" [class.bi-heart]="!liked()" aria-hidden="true"></i>
-                  <span>{{ liked() ? 'Unlike article' : 'Like article' }} ({{ likesCountLabel() }})</span>
-                </button>
-              } @else {
-                <span class="article-like-count" aria-label="Likes count">
-                  <i class="bi bi-heart" aria-hidden="true"></i>
-                  {{ likesCountLabel() }}
-                </span>
-              }
+              <div class="article-actions">
+                @if (canLike()) {
+                  <button
+                    type="button"
+                    class="article-like-button"
+                    [class.article-like-button--active]="liked()"
+                    [attr.aria-label]="liked() ? 'Unlike article' : 'Like article'"
+                    [attr.title]="liked() ? 'Unlike article' : 'Like article'"
+                    [disabled]="likeLoading()"
+                    (click)="toggleLike()">
+                    <i class="bi" [class.bi-heart-fill]="liked()" [class.bi-heart]="!liked()" aria-hidden="true"></i>
+                    <span>{{ liked() ? 'Unlike article' : 'Like article' }} ({{ likesCountLabel() }})</span>
+                  </button>
+                } @else {
+                  <span class="article-like-count" aria-label="Likes count">
+                    <i class="bi bi-heart" aria-hidden="true"></i>
+                    {{ likesCountLabel() }}
+                  </span>
+                }
+
+                @if (isAuthor()) {
+                  <div class="article-owner-actions">
+                    <a class="article-owner-button" [routerLink]="['/edit-article', articleData()?.id]">Edit</a>
+                    <button
+                      type="button"
+                      class="article-owner-button article-owner-button--danger"
+                      [disabled]="deleteLoading()"
+                      (click)="deleteArticle()">
+                      Delete
+                    </button>
+                  </div>
+                }
+              </div>
             </div>
 
             @if (articleData()?.summary) {
