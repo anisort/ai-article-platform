@@ -57,6 +57,7 @@ public class ArticleVectorService {
                 .query(query)
                 .similarityThreshold(similarityThreshold)
                 .topK(topK)
+                .filterExpression("published == true")
                 .build();
 
         return vectorStore.similaritySearch(request).stream()

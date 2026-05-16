@@ -58,9 +58,9 @@ public class LlmIntegrationService {
         }
 
         List<SemanticSearchRequest> requests = List.of(
-                new SemanticSearchRequest(query, 0.7, 30),
-                new SemanticSearchRequest(query, 0.6, 40),
-                new SemanticSearchRequest(query, 0.5, 50)
+                new SemanticSearchRequest(query, 0.9, 30),
+                new SemanticSearchRequest(query, 0.8, 40),
+                new SemanticSearchRequest(query, 0.7, 50)
         );
 
         for (SemanticSearchRequest request : requests) {
