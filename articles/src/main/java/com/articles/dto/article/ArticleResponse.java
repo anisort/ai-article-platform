@@ -12,9 +12,11 @@ public record ArticleResponse(
         String summary,
         String markdownContent,
         ZonedDateTime createdAt,
-        boolean published
+        boolean published,
+        long likesCount,
+        boolean likedByRequester
 ) {
-    public static ArticleResponse fromEntity(Article a) {
+    public static ArticleResponse fromEntity(Article a, long likesCount, boolean likedByRequester) {
         return new ArticleResponse(
                 a.getId(),
                 a.getTitle(),
@@ -22,7 +24,9 @@ public record ArticleResponse(
                 a.getSummary(),
                 a.getMarkdownContent(),
                 a.getCreatedAt(),
-                a.isPublished()
+                a.isPublished(),
+                likesCount,
+                likedByRequester
         );
     }
 }

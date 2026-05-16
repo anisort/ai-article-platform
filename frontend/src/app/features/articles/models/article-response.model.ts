@@ -6,6 +6,8 @@ export interface ArticleResponse {
   markdownContent?: string;
   createdAt: string;
   published: boolean;
+  likesCount: number;
+  likedByRequester: boolean;
 }
 
 export interface AuthorResponse {

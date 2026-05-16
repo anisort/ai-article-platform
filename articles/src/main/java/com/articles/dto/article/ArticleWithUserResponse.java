@@ -7,9 +7,14 @@ public record ArticleWithUserResponse(
         ArticleResponse articleResponse,
         AuthorResponse authorResponse
 ) {
-    public static ArticleWithUserResponse mapToResponse(Article article, AuthorResponse authorResponse) {
+    public static ArticleWithUserResponse mapToResponse(
+            Article article,
+            AuthorResponse authorResponse,
+            long likesCount,
+            boolean likedByRequester
+    ) {
         return new ArticleWithUserResponse(
-                ArticleResponse.fromEntity(article),
+                ArticleResponse.fromEntity(article, likesCount, likedByRequester),
                 authorResponse
         );
     }

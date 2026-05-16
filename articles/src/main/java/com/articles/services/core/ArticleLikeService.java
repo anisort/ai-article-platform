@@ -66,4 +66,14 @@ public class ArticleLikeService {
                     return true;
                 });
     }
+
+    @Transactional(readOnly = true)
+    public long getLikesCount(UUID articleId) {
+        return articleLikeRepository.countByArticle_Id(articleId);
+    }
+
+    @Transactional(readOnly = true)
+    public boolean isArticleLikedByUser(UUID articleId, UUID userId) {
+        return articleLikeRepository.existsByUserIdAndArticle_Id(userId, articleId);
+    }
 }

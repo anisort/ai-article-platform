@@ -6,6 +6,7 @@ import com.articles.dto.article.CreateArticleRequest;
 import com.articles.dto.article.ArticlePreviewResponse;
 import com.articles.entities.Article;
 import com.articles.services.core.ArticleEmbeddingService;
+import com.articles.services.core.ArticleLikeService;
 import com.articles.services.core.ArticleService;
 import com.articles.services.integration.UserService;
 import org.springframework.stereotype.Service;
@@ -18,15 +19,18 @@ import java.util.UUID;
 public class ArticleFacadeService {
 
     private final ArticleService articleService;
+    private final ArticleLikeService articleLikeService;
     private final UserService userService;
     private final ArticleEmbeddingService articleEmbeddingService;
 
     public ArticleFacadeService(
             ArticleService articleService,
+            ArticleLikeService articleLikeService,
             UserService userService,
             ArticleEmbeddingService articleEmbeddingService
     ) {
         this.articleService = articleService;
+        this.articleLikeService = articleLikeService;
         this.userService = userService;
         this.articleEmbeddingService = articleEmbeddingService;
     }
@@ -53,7 +57,14 @@ public class ArticleFacadeService {
                 : articleService.requireAccessible(articleId, requesterId);
 
         Map<UUID, AuthorResponse> authors = userService.getAuthors(List.of(article));
-        return ArticleWithUserResponse.mapToResponse(article, authors.get(article.getAuthorId()));
+        long likesCount = articleLikeService.getLikesCount(article.getId());
+        boolean likedByRequester = requesterId != null && articleLikeService.isArticleLikedByUser(article.getId(), requesterId);
+        return ArticleWithUserResponse.mapToResponse(
+                article,
+                authors.get(article.getAuthorId()),
+                likesCount,
+                likedByRequester
+        );
     }
 
     public ArticleWithUserResponse create(CreateArticleRequest request, UUID authorId) {
@@ -61,7 +72,7 @@ public class ArticleFacadeService {
         Map<UUID, AuthorResponse> authors = userService.getAuthors(List.of(article));
         AuthorResponse author = authors.get(article.getAuthorId());
         articleEmbeddingService.syncArticleEmbedding(article, author);
-        return ArticleWithUserResponse.mapToResponse(article, author);
+        return ArticleWithUserResponse.mapToResponse(article, author, 0, false);
     }
 
     public ArticleWithUserResponse update(UUID articleId, CreateArticleRequest request, UUID requesterId) {
@@ -70,7 +81,7 @@ public class ArticleFacadeService {
         Map<UUID, AuthorResponse> authors = userService.getAuthors(List.of(updatedArticle));
         AuthorResponse author = authors.get(updatedArticle.getAuthorId());
         articleEmbeddingService.syncArticleEmbedding(updatedArticle, author);
-        return ArticleWithUserResponse.mapToResponse(updatedArticle, author);
+        return ArticleWithUserResponse.mapToResponse(updatedArticle, author, 0, false);
     }
 
 }

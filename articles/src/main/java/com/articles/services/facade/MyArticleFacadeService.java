@@ -35,7 +35,12 @@ public class MyArticleFacadeService {
         List<Article> articles = articleService.getArticlesByAuthor(authorId);
         Map<UUID, AuthorResponse> authors = userService.getAuthors(articles);
         return articles.stream()
-                .map(article -> ArticleWithUserResponse.mapToResponse(article, authors.get(article.getAuthorId())))
+                .map(article -> ArticleWithUserResponse.mapToResponse(
+                        article,
+                        authors.get(article.getAuthorId()),
+                        articleLikeService.getLikesCount(article.getId()),
+                        false
+                ))
                 .toList();
     }
 
@@ -46,7 +51,8 @@ public class MyArticleFacadeService {
     public ToggleArticleLikeResponse toggleLike(UUID articleId, UUID userId) {
         Article article = articleService.requirePublished(articleId);
         boolean liked = articleLikeService.toggleLike(userId, article);
-        return new ToggleArticleLikeResponse(articleId, liked);
+        long likesCount = articleLikeService.getLikesCount(articleId);
+        return new ToggleArticleLikeResponse(articleId, liked, likesCount);
     }
 }
 

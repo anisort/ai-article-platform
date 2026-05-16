@@ -14,6 +14,8 @@ public interface ArticleLikeRepository extends JpaRepository<ArticleLike, Articl
     List<ArticleLike> findByUserId(UUID userId);
     List<ArticleLike> findByUserIdOrderByCreatedAtDesc(UUID userId, org.springframework.data.domain.Pageable pageable);
     Optional<ArticleLike> findByUserIdAndArticle_Id(UUID userId, UUID articleId);
+    long countByArticle_Id(UUID articleId);
+    boolean existsByUserIdAndArticle_Id(UUID userId, UUID articleId);
 
     @Query("""
             SELECT al.article.id

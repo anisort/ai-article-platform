@@ -4,6 +4,7 @@ import java.util.UUID;
 
 public record ToggleArticleLikeResponse(
         UUID articleId,
-        boolean liked
+        boolean liked,
+        long likesCount
 ) {
 }
