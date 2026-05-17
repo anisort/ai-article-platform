@@ -12,6 +12,7 @@ public interface UserRepository extends JpaRepository<CustomUserDetails, UUID> {
     Optional<CustomUserDetails> findByUsername(String username);
     Optional<CustomUserDetails> findByEmail(String email);
     boolean existsByUsername(String username);
+    boolean existsByUsernameAndIdNot(String username, UUID id);
     boolean existsByEmail(String email);
     Optional<CustomUserDetails> findByGoogleSub(String googleSub);
     Optional<CustomUserDetails> findByGithubSub(String githubSub);

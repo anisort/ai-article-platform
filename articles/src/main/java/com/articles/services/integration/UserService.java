@@ -5,8 +5,11 @@ import com.articles.dto.profile.UserProfileResponse;
 import com.articles.entities.Article;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Map;
@@ -60,7 +63,11 @@ public class UserService {
             request = request.header("Authorization", authorizationHeader);
         }
 
-        return request.retrieve().body(UserProfileResponse.class);
+        try {
+            return request.retrieve().body(UserProfileResponse.class);
+        } catch (HttpClientErrorException.NotFound ex) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Profile not found");
+        }
     }
 }
 

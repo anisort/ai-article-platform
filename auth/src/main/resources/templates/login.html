@@ -3,128 +3,292 @@
 <head>
     <meta charset="UTF-8">
     <title>Sign in</title>
+    <script>
+        (function () {
+            const themeCookie = document.cookie
+                .split('; ')
+                .find((row) => row.startsWith('app-theme='))
+                ?.split('=')[1];
+            if (themeCookie === 'dark' || themeCookie === 'light') {
+                document.documentElement.setAttribute('data-theme', themeCookie);
+            }
+        })();
+    </script>
     <style>
+        :root {
+            --color-primary: #74bb91;
+            --color-primary-dark: #2f6e4a;
+            --color-accent-berry: #f650bd;
+            --color-surface-base: #f7faf8;
+            --color-surface-panel: #f3f8f5;
+            --color-surface-elevated: #fcfefd;
+            --color-border-soft: rgba(87, 88, 93, 0.16);
+            --color-border-strong: rgba(246, 80, 189, 0.35);
+            --color-text-main: #1f302a;
+            --color-text-muted: rgba(42, 63, 56, 0.72);
+            --shadow-medium: 0 8px 18px rgba(42, 63, 56, 0.1);
+        }
+
         body {
             margin: 0;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, #eef2ff 0%, #f5f7ff 100%);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: #333;
+            padding: 1rem;
+            background: var(--color-surface-base);
+            font-family: 'Montserrat', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--color-text-main);
         }
 
         .login-container {
-            width: min(90%, 400px);
-            padding: 2rem 2.5rem;
-            background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+            width: min(100%, 520px);
+        }
+
+        .kicker {
+            margin: 0 0 0.35rem;
+            color: var(--color-primary-dark);
+            font-size: 0.82rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
         }
 
         .login-container h2 {
-            margin: 0 0 1.5rem;
-            font-size: 2rem;
+            margin: 0;
+            font-size: clamp(1.65rem, 3.6vw, 2.4rem);
             font-weight: 700;
-            text-align: center;
-            color: #222;
+            line-height: 1.12;
+            color: var(--color-text-main);
+        }
+
+        .lead {
+            margin: 0.55rem 0 0;
+            color: var(--color-primary-dark);
+            font-size: 0.95rem;
+        }
+
+        .form-shell {
+            margin-top: 0.95rem;
+            border-top: 1px solid var(--color-border-soft);
+            padding-top: 0.95rem;
         }
 
         .login-container form {
             display: flex;
             flex-direction: column;
-            gap: 1.2rem;
+            gap: 0.85rem;
         }
 
         .login-container .field {
             display: flex;
             flex-direction: column;
+            gap: 0.45rem;
         }
 
         .login-container label {
-            margin-bottom: 0.35rem;
             font-weight: 600;
-            color: #444;
+            font-size: 0.85rem;
+            color: var(--color-primary-dark);
         }
 
         .login-container input[type="text"],
         .login-container input[type="password"] {
-            padding: 0.55rem 0.75rem;
-            font-size: 1rem;
-            border: 2px solid #ccc;
-            border-radius: 6px;
+            padding: 0.7rem 0.8rem;
+            font-size: 0.95rem;
+            border: 1px solid var(--color-border-soft);
+            border-radius: 8px;
+            background: var(--color-surface-base);
+            color: var(--color-text-main);
             transition: border-color 0.25s ease, box-shadow 0.25s ease;
             font-family: inherit;
         }
 
         .login-container input:focus {
             outline: none;
-            border-color: #4c6bff;
-            box-shadow: 0 0 6px rgba(76, 107, 255, 0.4);
+            border-color: rgba(246, 80, 189, 0.55);
+            box-shadow: 0 0 0 0.2rem rgba(246, 80, 189, 0.16);
         }
 
         .login-container button[type="submit"] {
-            margin-top: 0.4rem;
-            padding: 0.7rem 1.5rem;
-            font-size: 1.1rem;
+            margin-top: 0.2rem;
+            padding: 0.8rem 1rem;
+            font-size: 0.95rem;
             font-weight: 700;
-            background-color: #4c6bff;
+            background: #5a985c;
             border: none;
             border-radius: 8px;
-            color: #fff;
+            color: #ffffff;
             cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.15s ease;
+            box-shadow: var(--shadow-medium);
+            transition: transform 0.15s ease, opacity 0.2s ease;
         }
 
         .login-container button[type="submit"]:hover {
-            background-color: #3a50d7;
+            transform: translateY(-1px);
         }
 
-        .login-container button[type="submit"]:active {
-            transform: translateY(1px);
+        .login-container button[type="submit"]:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
         }
 
         .error-global {
-            margin-top: 0.8rem;
-            background-color: #ffe7e7;
-            border: 1px solid #ffb3b3;
-            color: #d93025;
-            padding: 0.6rem 0.8rem;
-            border-radius: 6px;
-            text-align: center;
+            background: rgba(246, 80, 189, 0.12);
+            border: 1px solid var(--color-border-strong);
+            color: #ff8ccc;
+            padding: 0.7rem 0.85rem;
+            border-radius: 8px;
             font-weight: 600;
             font-size: 0.9rem;
+        }
+
+        .actions {
+            margin-top: 0.1rem;
+            display: grid;
+            gap: 0.85rem;
+        }
+
+        .oauth-links {
+            display: grid;
+            gap: 0.65rem;
+        }
+
+        .oauth-link {
+            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.55rem;
+            text-align: center;
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--color-border-soft);
+            color: var(--color-text-main);
+            text-decoration: none;
+            font-weight: 600;
+            background: var(--color-surface-panel);
+            transition: border-color 0.2s ease, background-color 0.2s ease;
+        }
+
+        .oauth-link:hover {
+            border-color: var(--color-border-strong);
+            background: var(--color-surface-elevated);
+        }
+
+        .oauth-icon {
+            width: 1.15rem;
+            height: 1.15rem;
+            display: inline-block;
+            color: var(--color-primary-dark);
+            flex: 0 0 auto;
+        }
+
+        .register-row {
+            color: var(--color-text-muted);
+            font-size: 0.9rem;
+            margin: 0.85rem 0 0;
+        }
+
+        .register-row a {
+            margin-left: 0.4rem;
+            color: var(--color-accent-berry);
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .register-row a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 680px) {
+            body {
+                padding: 0.75rem;
+            }
+        }
+
+        :root[data-theme='dark'] {
+            --color-primary-dark: #7de177;
+            --color-surface-base: #121316;
+            --color-surface-panel: #21242a;
+            --color-surface-elevated: #292d34;
+            --color-border-soft: rgba(158, 161, 170, 0.28);
+            --color-border-strong: rgba(246, 80, 189, 0.45);
+            --color-text-main: #f4f5f7;
+            --color-text-muted: rgba(244, 245, 247, 0.72);
+            --shadow-medium: 0 10px 24px rgba(0, 0, 0, 0.3);
         }
     </style>
 </head>
 <body>
 <div class="login-container">
-    <h2>Sign in</h2>
-    <form th:action="@{/login}" method="post">
-        <div th:if="${param.error}" class="error-global">
-            Invalid login or password
-        </div>
+    <p class="kicker">Auth</p>
+    <h2>Sign in to your account</h2>
+    <p class="lead">Continue writing and managing your articles.</p>
 
-        <div class="field">
-            <label for="username">Username or email:</label>
-            <input id="username" type="text" name="username" required />
-        </div>
+    <div class="form-shell">
+        <form th:action="@{/login}" method="post">
+            <div th:if="${param.error}" class="error-global">
+                Invalid login or password
+            </div>
 
-        <div class="field">
-            <label for="password">Password:</label>
-            <input id="password" type="password" name="password" required />
-        </div>
+            <div class="field">
+                <label for="username">Username or email</label>
+                <input id="username" type="text" name="username" required />
+            </div>
 
-        <button id="login-btn" type="submit">Sign in</button>
-    </form>
-    <div style="text-align: center; margin-top: 1rem;">
-        <a th:href="@{/oauth2/authorization/google}"
-           style="display: inline-block; padding: 0.7rem 1.5rem; background-color: #4285F4; color: #fff; border-radius: 6px; text-decoration: none; font-weight: 600; transition: background-color 0.3s ease;">
-            Sign in with Google
-        </a>
+            <div class="field">
+                <label for="password">Password</label>
+                <input id="password" type="password" name="password" required />
+            </div>
+
+            <div class="actions">
+                <button id="login-btn" type="submit" disabled>Sign in</button>
+                <div class="oauth-links">
+                    <a class="oauth-link" th:href="@{/oauth2/authorization/github}">
+                        <svg class="oauth-icon" viewBox="0 0 24 24" aria-hidden="true">
+                            <path fill="currentColor" d="M12 2C6.48 2 2 6.59 2 12.25c0 4.53 2.87 8.37 6.84 9.72.5.1.68-.22.68-.49v-1.73c-2.78.62-3.37-1.37-3.37-1.37-.46-1.19-1.11-1.51-1.11-1.51-.9-.63.07-.62.07-.62 1 .07 1.52 1.04 1.52 1.04.88 1.54 2.31 1.1 2.87.85.09-.66.35-1.11.63-1.37-2.22-.26-4.56-1.14-4.56-5.08 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.31.1-2.72 0 0 .84-.28 2.75 1.05A9.36 9.36 0 0 1 12 7.2c.85 0 1.71.12 2.51.36 1.9-1.33 2.74-1.05 2.74-1.05.54 1.41.2 2.46.1 2.72.64.72 1.03 1.63 1.03 2.75 0 3.95-2.34 4.81-4.58 5.07.36.32.68.95.68 1.92v2.85c0 .27.18.59.69.49A10.27 10.27 0 0 0 22 12.25C22 6.59 17.52 2 12 2Z"/>
+                        </svg>
+                        <span>Sign in with GitHub</span>
+                    </a>
+                    <a class="oauth-link" th:href="@{/oauth2/authorization/google}">
+                        <svg class="oauth-icon" viewBox="0 0 24 24" aria-hidden="true">
+                            <path fill="currentColor" d="M21.35 11.1H12v2.98h5.36c-.23 1.47-1.7 4.3-5.36 4.3-3.22 0-5.84-2.67-5.84-5.96s2.62-5.96 5.84-5.96c1.83 0 3.05.79 3.75 1.47l2.56-2.5C16.68 3.9 14.53 3 12 3 7.03 3 3 7.07 3 12.06s4.03 9.06 9 9.06c5.2 0 8.65-3.67 8.65-8.83 0-.59-.06-1.02-.14-1.19Z"/>
+                        </svg>
+                        <span>Sign in with Google</span>
+                    </a>
+                </div>
+            </div>
+        </form>
+
+        <p class="register-row">
+            No account yet?
+            <a href="http://localhost:4200/register">Sign up</a>
+        </p>
     </div>
 </div>
+<script>
+    (function () {
+        const form = document.querySelector('form[method="post"]');
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const loginButton = document.getElementById('login-btn');
+        if (!form || !usernameInput || !passwordInput || !loginButton) return;
+
+        const syncButtonState = () => {
+            const isValid = form.checkValidity()
+                && usernameInput.value.trim().length > 0
+                && passwordInput.value.trim().length > 0;
+            loginButton.disabled = !isValid;
+        };
+
+        usernameInput.addEventListener('input', syncButtonState);
+        passwordInput.addEventListener('input', syncButtonState);
+        syncButtonState();
+    })();
+</script>
 </body>
 
 </html>

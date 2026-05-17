@@ -7,12 +7,16 @@ import com.auth.entities.UserFollow;
 import com.auth.repositories.UserFollowRepository;
 import com.auth.repositories.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @Service
@@ -20,10 +24,14 @@ public class UserProfileService {
 
     private final UserRepository userRepository;
     private final UserFollowRepository userFollowRepository;
+    private final FileStorageService fileStorageService;
 
-    public UserProfileService(UserRepository userRepository, UserFollowRepository userFollowRepository) {
+    public UserProfileService(UserRepository userRepository,
+                              UserFollowRepository userFollowRepository,
+                              FileStorageService fileStorageService) {
         this.userRepository = userRepository;
         this.userFollowRepository = userFollowRepository;
+        this.fileStorageService = fileStorageService;
     }
 
     public UserProfileResponse getMe(UUID userId) {
@@ -54,6 +62,42 @@ public class UserProfileService {
                 following,
                 followers,
                 followingUsers
+        );
+    }
+
+    @Transactional
+    public UserProfileResponse updateMe(UUID userId, String username, String name, MultipartFile avatar) {
+        CustomUserDetails user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(NOT_FOUND));
+
+        if (StringUtils.hasText(username)) {
+            String normalizedUsername = username.trim();
+            if (userRepository.existsByUsernameAndIdNot(normalizedUsername, userId)) {
+                throw new ResponseStatusException(CONFLICT, "Username is already taken");
+            }
+            user.setUsername(normalizedUsername);
+        }
+
+        if (StringUtils.hasText(name)) {
+            user.setName(name.trim());
+        }
+
+        if (avatar != null && !avatar.isEmpty()) {
+            String avatarUrl = fileStorageService.upload(avatar);
+            user.setAvatar(avatarUrl);
+        }
+
+        CustomUserDetails updated = userRepository.save(user);
+        return new UserProfileResponse(
+                updated.getId(),
+                updated.getUsername(),
+                updated.getName(),
+                updated.getEmail(),
+                updated.getAvatar(),
+                true,
+                false,
+                getFollowUsers(userFollowRepository.findByFollowingId(userId), UserFollow::getFollowerId),
+                getFollowUsers(userFollowRepository.findByFollowerId(userId), UserFollow::getFollowingId)
         );
     }
 

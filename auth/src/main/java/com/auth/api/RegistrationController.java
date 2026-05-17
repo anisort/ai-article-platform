@@ -1,5 +1,6 @@
 package com.auth.api;
 
+import com.auth.dto.AvailabilityResponse;
 import com.auth.dto.CreateUserRequest;
 import com.auth.dto.UserResponse;
 import com.auth.services.RegistrationService;
@@ -19,5 +20,15 @@ public class RegistrationController {
     @PostMapping
     public UserResponse save(@Valid @RequestBody CreateUserRequest request) {
         return UserResponse.fromEntity(registrationService.register(request));
+    }
+
+    @GetMapping("/availability/username")
+    public AvailabilityResponse usernameAvailability(@RequestParam String username) {
+        return new AvailabilityResponse(registrationService.isUsernameAvailable(username));
+    }
+
+    @GetMapping("/availability/email")
+    public AvailabilityResponse emailAvailability(@RequestParam String email) {
+        return new AvailabilityResponse(registrationService.isEmailAvailable(email));
     }
 }

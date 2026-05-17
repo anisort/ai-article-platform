@@ -51,6 +51,12 @@ public class ArticleRecommendationFacadeService {
         List<UUID> personalized = List.of();
 
         if (userId != null) {
+            excludedIds.addAll(
+                    articleService.getArticlesByAuthor(userId).stream()
+                            .map(Article::getId)
+                            .toList()
+            );
+
             List<Article> likedArticles = articleLikeService.getRecentLikedArticles(userId, PERSONALIZED_LIKES_WINDOW);
             excludedIds.addAll(likedArticles.stream().map(Article::getId).toList());
 
