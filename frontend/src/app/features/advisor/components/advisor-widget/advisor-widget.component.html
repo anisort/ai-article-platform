@@ -1,12 +1,12 @@
-<button class="advisor-fab" type="button" (click)="toggle()" aria-label="Open advisor">
-  Advisor
+<button class="advisor-fab" type="button" (click)="toggle()" [attr.aria-label]="isOpen() ? 'Close advisor' : 'Open advisor'" [attr.title]="isOpen() ? 'Close advisor' : 'Open advisor'">
+  <i class="bi bi-robot" aria-hidden="true"></i>
 </button>
 
 @if (isOpen()) {
   <section class="advisor-panel">
     <header class="advisor-header">
       <strong>Advisor</strong>
-      <button type="button" (click)="clearSession()">Clear</button>
+      <button class="advisor-clear" type="button" (click)="clearSession()">Clear</button>
     </header>
 
     <div class="advisor-messages">
@@ -27,7 +27,9 @@
         placeholder="Ask about articles"
         (keydown.enter)="send()"
       />
-      <button type="button" (click)="send()" [disabled]="isLoading()">Send</button>
+      <button class="advisor-send" type="button" (click)="send()" [disabled]="isLoading()" aria-label="Send message" title="Send message">
+        <i class="bi bi-send-fill" aria-hidden="true"></i>
+      </button>
     </div>
   </section>
 }
