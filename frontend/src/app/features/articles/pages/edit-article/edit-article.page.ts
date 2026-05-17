@@ -20,7 +20,6 @@ import {
 import { finalize } from 'rxjs';
 import { marked } from 'marked';
 
-import { EditorStateService } from '../../state/editor-state.service';
 import { ArticlesService } from '../../services/articles.service';
 import { ArticleImagesService } from '../../services/article-images.service';
 import { ArticleWithUserResponse } from '../../models/article-response.model';
@@ -75,7 +74,6 @@ export class EditArticlePage implements OnDestroy {
 
   private router = inject(Router);
   private route = inject(ActivatedRoute);
-  private editorState = inject(EditorStateService);
   private articlesService = inject(ArticlesService);
   private articleImagesService = inject(ArticleImagesService);
   private uploadService = inject(UploadService);
@@ -99,8 +97,6 @@ export class EditArticlePage implements OnDestroy {
       this.loadArticleForEditing(this.articleId);
       this.loadArticleImages(this.articleId);
       this.loadAssistantChats(this.articleId);
-    } else {
-      this.restoreDraftState();
     }
   }
 
@@ -109,10 +105,6 @@ export class EditArticlePage implements OnDestroy {
   }
 
   private syncState() {
-    this.editorState.setTitle(this.title);
-    this.editorState.setMarkdownContent(this.markdownContent);
-    this.editorState.setDraft(this.isDraft);
-    this.editorState.setPreviewImage(this.previewImageUrl, this.previewImageName);
   }
 
   onTitleInput(event: Event) {
@@ -491,11 +483,6 @@ export class EditArticlePage implements OnDestroy {
       });
   }
 
-  goToReview() {
-    this.syncState();
-    this.router.navigate(['/review-article']);
-  }
-
   submitArticle() {
     const request: CreateArticleRequest = {
       title: this.title,
@@ -510,7 +497,6 @@ export class EditArticlePage implements OnDestroy {
 
     request$.subscribe({
       next: res => {
-        this.editorState.reset();
         this.router.navigate(['/articles', res.articleResponse.id]);
       },
       error: err => console.error(err),
@@ -523,14 +509,6 @@ export class EditArticlePage implements OnDestroy {
 
   submitLabel(): string {
     return this.articleId ? 'Save' : 'Upload';
-  }
-
-  private restoreDraftState() {
-    this.title = this.editorState.title || '';
-    this.markdownContent = this.editorState.markdownContent || '';
-    this.isDraft = this.editorState.isDraft;
-    this.previewImageUrl = this.editorState.previewImageUrl || '';
-    this.previewImageName = this.editorState.previewImageName || '';
   }
 
   private loadArticleForEditing(articleId: string) {

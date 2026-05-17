@@ -8,7 +8,6 @@
       <div class="title-row">
         <input class="title-input" type="text" placeholder="Title" [value]="title" (input)="onTitleInput($event)">
         <div class="primary-actions">
-          <button type="button" class="action-button" (click)="goToReview()">Preview</button>
           <button type="button" class="action-button" (click)="submitArticle()">{{ submitLabel() }}</button>
         </div>
       </div>

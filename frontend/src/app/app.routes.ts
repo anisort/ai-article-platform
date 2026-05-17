@@ -33,11 +33,6 @@ export const routes: Routes = [
       .then(p => p.EditArticlePage)
   },
   {
-    path: 'review-article',
-    loadComponent: () => import('./features/articles/pages/review-article/review-article.page')
-      .then(p => p.ReviewArticlePage)
-  },
-  {
     path: 'register',
     canActivate: [unauthGuard],
     loadComponent: () => import('./features/auth/pages/user-register/user-register.page')
