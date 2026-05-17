@@ -1,63 +1,86 @@
 <section class="register-page">
-  <div class="register-shell">
-    <div class="register-copy">
-      <p class="eyebrow">Join Commit</p>
-      <h1>Create your author profile</h1>
-      <p class="lead">
-        Publish articles, build your portfolio, and keep everything in one place.
-      </p>
-    </div>
+  <app-page-intro
+    kicker="Auth"
+    title="Create your author profile"
+    description="Publish articles, build your portfolio, and keep everything in one place."
+  />
 
-    <div class="register-card">
-      @if (loading()) {
-        <div class="loading-state">Creating account...</div>
-      } @else {
-        <form class="register-form" [formGroup]="registerForm">
-          <h2>Sign up</h2>
+  <div class="register-card">
+    @if (loading()) {
+      <app-loading-state label="Loading" title="Creating account..." [compact]="true"></app-loading-state>
+    } @else {
+      <form class="register-form" [formGroup]="registerForm">
+        <h2>Sign up</h2>
 
-          @if (message()) {
-            <div class="status-message">
-              {{ message() }}
-            </div>
-          }
-
-          <div class="field-grid">
-            <label class="field">
-              <span>Username</span>
-              <input type="text" id="username" formControlName="username" placeholder="Choose a username" />
-            </label>
-
-            <label class="field">
-              <span>Email</span>
-              <input type="text" id="email" formControlName="email" placeholder="you@example.com" />
-            </label>
-
-            <label class="field">
-              <span>Name</span>
-              <input type="text" id="name" formControlName="name" placeholder="Your public name" />
-            </label>
-
-            <label class="field">
-              <span>Password</span>
-              <input type="password" id="password" formControlName="password" placeholder="At least 8 characters" />
-            </label>
-
-            <label class="field field--full">
-              <span>Repeat password</span>
-              <input type="password" id="repeatPassword" formControlName="repeatPassword" placeholder="Repeat your password" />
-            </label>
+        @if (message()) {
+          <div class="status-message">
+            {{ message() }}
           </div>
+        }
 
-          <button class="submit-button" type="submit" (click)="onRegister()" [disabled]="registerForm.invalid">
-            Sign up
-          </button>
+        <div class="field-grid">
+          <label class="field">
+            <span>Username</span>
+            <input type="text" id="username" formControlName="username" />
+            @if (hasControlError('username', 'required')) {
+              <small class="field-error">Username is required.</small>
+            } @else if (hasControlError('username', 'usernameTaken')) {
+              <small class="field-error">Username is already taken.</small>
+            }
+          </label>
 
-          <div class="login-row">
-            <span>Already have an account?</span>
-            <button class="login-link" type="button" (click)="onLogin()">Sign in</button>
-          </div>
-        </form>
-      }
-    </div>
+          <label class="field">
+            <span>Email</span>
+            <input type="text" id="email" formControlName="email" />
+            @if (hasControlError('email', 'required')) {
+              <small class="field-error">Email is required.</small>
+            } @else if (hasControlError('email', 'email')) {
+              <small class="field-error">Enter a valid email.</small>
+            } @else if (hasControlError('email', 'emailTaken')) {
+              <small class="field-error">Email is already taken.</small>
+            }
+          </label>
+
+          <label class="field">
+            <span>Name</span>
+            <input type="text" id="name" formControlName="name" />
+            @if (hasControlError('name', 'required')) {
+              <small class="field-error">Name is required.</small>
+            }
+          </label>
+
+          <label class="field">
+            <span>Password</span>
+            <input type="password" id="password" formControlName="password" />
+            @if (hasControlError('password', 'required')) {
+              <small class="field-error">Password is required.</small>
+            } @else if (hasControlError('password', 'minlength')) {
+              <small class="field-error">Password must be at least 8 characters.</small>
+            } @else if (hasControlError('password', 'pattern')) {
+              <small class="field-error">Use uppercase, lowercase, digit, and symbol.</small>
+            }
+          </label>
+
+          <label class="field field--full">
+            <span>Repeat password</span>
+            <input type="password" id="repeatPassword" formControlName="repeatPassword" />
+            @if (hasControlError('repeatPassword', 'required')) {
+              <small class="field-error">Repeat password is required.</small>
+            } @else if (showPasswordMismatchError()) {
+              <small class="field-error">Passwords do not match.</small>
+            }
+          </label>
+        </div>
+
+        <button class="submit-button" type="submit" (click)="onRegister()" [disabled]="loading() || registerForm.pending || registerForm.invalid">
+          Sign up
+        </button>
+
+        <div class="login-row">
+          <span>Already have an account?</span>
+          <button class="login-link" type="button" (click)="onLogin()">Sign in</button>
+        </div>
+      </form>
+    }
   </div>
 </section>

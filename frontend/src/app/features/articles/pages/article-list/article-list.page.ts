@@ -6,15 +6,17 @@ import {ArticlesService, SearchMode} from '../../services/articles.service';
 import {ArticlePreview} from '../../models/article-preview.model';
 import { ArticlePreviewCardComponent } from '../../components/article-preview-card/article-preview-card.component';
 import { PageIntroComponent } from '../../../../shared/components/page-intro/page-intro.component';
+import { LoadingStateComponent } from '../../../../shared/components/loading-state/loading-state.component';
 import {
   SegmentedControlComponent,
   SegmentedControlOption
 } from '../../../../shared/components/segmented-control/segmented-control.component';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-article-list',
   standalone: true,
-  imports: [CommonModule, ArticlePreviewCardComponent, PageIntroComponent, SegmentedControlComponent],
+  imports: [CommonModule, ArticlePreviewCardComponent, PageIntroComponent, SegmentedControlComponent, LoadingStateComponent],
   templateUrl: './article-list.page.html',
   styleUrl: './article-list.page.scss'
 })
@@ -24,6 +26,7 @@ export class ArticleListPage implements OnInit {
   router = inject(Router);
 
   articles = signal<ArticlePreview[]>([]);
+  loading = signal(false);
   searchMode = signal<SearchMode>('semantic');
   query = signal('');
   modeOptions: SegmentedControlOption<SearchMode>[] = [
@@ -55,11 +58,17 @@ export class ArticleListPage implements OnInit {
 
   loadArticles(query = '', mode: SearchMode = 'semantic') {
     const normalizedQuery = query.trim();
+    this.loading.set(true);
     const request$ = normalizedQuery
       ? this.articlesService.search(normalizedQuery, mode)
       : this.articlesService.list();
 
-    request$.subscribe(articles => this.articles.set(articles));
+    request$
+      .pipe(finalize(() => this.loading.set(false)))
+      .subscribe({
+        next: articles => this.articles.set(articles),
+        error: () => this.articles.set([]),
+      });
   }
 
   onModeChange(mode: SearchMode) {

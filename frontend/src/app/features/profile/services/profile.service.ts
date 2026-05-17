@@ -23,4 +23,15 @@ export class ProfileService {
   toggleFollow(userId: string): Observable<ToggleFollowResponse> {
     return this.http.post<ToggleFollowResponse>(`${this.apiUrl}/${userId}/follow`, {});
   }
+
+  updateOwnProfile(username: string, name: string, avatar?: File | null): Observable<UserProfile> {
+    const formData = new FormData();
+    formData.append('username', username);
+    formData.append('name', name);
+    if (avatar) {
+      formData.append('avatar', avatar);
+    }
+
+    return this.http.put<UserProfile>(`${this.apiUrl}/me/profile`, formData);
+  }
 }

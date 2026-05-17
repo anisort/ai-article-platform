@@ -2,6 +2,7 @@ import {DOCUMENT} from '@angular/common';
 import {Component, inject, OnInit} from '@angular/core';
 import {RouterLink, RouterOutlet} from '@angular/router';
 import {AuthService} from './core/services/auth.service';
+import { UserStoreService } from './core/services/user-store.service';
 import {HeaderComponent} from './shared/components/header/header.component';
 import {AdvisorWidgetComponent} from './features/advisor/components/advisor-widget/advisor-widget.component';
 import {
@@ -29,11 +30,18 @@ export class AppComponent implements OnInit {
   isDarkTheme = false;
 
   authService = inject(AuthService);
+  userStore = inject(UserStoreService);
 
   async ngOnInit(): Promise<void> {
     this.initializeTheme();
     await this.authService.init();
-    console.log('AuthService initialized and login attempt made.');
+    if (this.authService.isAuthenticated()) {
+      this.userStore.loadProfile().subscribe({
+        error: () => this.userStore.clear(),
+      });
+    } else {
+      this.userStore.clear();
+    }
   }
 
   toggleTheme(): void {
@@ -51,6 +59,7 @@ export class AppComponent implements OnInit {
 
   private applyTheme(isDarkTheme: boolean, persist = true): void {
     this.document.body.classList.toggle('theme-dark', isDarkTheme);
+    this.document.cookie = `app-theme=${isDarkTheme ? 'dark' : 'light'}; Path=/; Max-Age=31536000; SameSite=Lax`;
 
     if (persist) {
       localStorage.setItem(this.themeStorageKey, isDarkTheme ? 'dark' : 'light');

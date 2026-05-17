@@ -2,7 +2,7 @@
   <div class="edit-content">
     <div class="editor-top">
       <p class="page-label">{{ pageTitle() }}</p>
-      @if (loadingArticle()) { <div class="editor-status">Loading article...</div> }
+      @if (loadingArticle()) { <app-loading-state label="Loading" title="Loading article..." [compact]="true"></app-loading-state> }
       @if (loadFailed()) { <div class="editor-status editor-status--error">Article could not be loaded for editing.</div> }
 
       <div class="title-row">
@@ -113,7 +113,7 @@
               }
             </div>
           }
-          @if (assistantLoading()) { <div class="assistant-message">Thinking...</div> }
+          @if (assistantLoading()) { <app-loading-state label="Loading" title="Thinking..." [compact]="true"></app-loading-state> }
         </div>
         <div class="assistant-input">
           <textarea [(ngModel)]="assistantInput" rows="3" placeholder="Ask assistant..."></textarea>
@@ -140,7 +140,7 @@
       @if (!articleId) {
         <p class="image-library__empty">Save article first to manage article image folder.</p>
       } @else if (articleImageUploading()) {
-        <p class="image-library__empty">Uploading image...</p>
+        <app-loading-state label="Loading" title="Uploading image..." [compact]="true"></app-loading-state>
       } @else if (!articleImages().length) {
         <p class="image-library__empty">No images yet.</p>
       } @else {
@@ -178,7 +178,7 @@
         </div>
       }
       @if (previewImageUploading()) {
-        <div class="cover-status">Uploading...</div>
+        <app-loading-state label="Loading" title="Uploading..." [compact]="true"></app-loading-state>
       }
       <button type="button" class="cover-close" (click)="closeCoverDialog()">Close</button>
     </section>

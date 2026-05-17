@@ -1,0 +1,79 @@
+.not-found-page {
+  min-height: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 1rem 1.25rem;
+  background: var(--color-surface-base);
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 1rem;
+}
+
+.not-found-page > * {
+  width: min(100%, 760px);
+  text-align: left;
+}
+
+:host {
+  --page-intro-kicker-color: var(--color-accent-berry);
+  --page-intro-title-color: var(--color-accent-ink);
+  --page-intro-description-color: var(--color-accent-berry);
+}
+
+.not-found-state {
+  width: 100%;
+  padding: 1rem 0 0;
+  border: 0;
+  border-top: 1px solid color-mix(in srgb, var(--color-primary) 34%, var(--color-border-soft));
+  background: transparent;
+}
+
+.not-found-state__label {
+  margin: 0;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-primary-dark);
+}
+
+.not-found-state h2 {
+  margin: 0.45rem 0 0;
+  font-size: 1.15rem;
+  color: var(--color-accent-ink);
+}
+
+.not-found-actions {
+  margin-top: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.not-found-actions a {
+  color: color-mix(in srgb, var(--color-primary-dark) 82%, var(--color-accent-ink));
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.not-found-actions a:hover {
+  color: color-mix(in srgb, var(--color-primary) 70%, var(--color-primary-dark));
+}
+
+@media (max-width: 1100px) {
+  .not-found-page {
+    padding-inline: 1.5rem;
+  }
+}
+
+@media (max-width: 680px) {
+  .not-found-page {
+    padding: 0.9rem;
+  }
+
+  .not-found-state {
+    padding: 1rem;
+  }
+}

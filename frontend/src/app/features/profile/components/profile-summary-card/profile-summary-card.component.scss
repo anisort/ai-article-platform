@@ -21,6 +21,12 @@
   display: grid;
   gap: 0.15rem;
 
+  .profile-identify__title {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+  }
+
   strong {
     color: var(--color-accent-ink);
     font-size: 1.05rem;
@@ -29,6 +35,19 @@
   span {
     color: var(--color-text-muted);
   }
+}
+
+.profile-settings-link {
+  width: 1.6rem;
+  height: 1.6rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  border: 1px solid var(--color-border-soft);
+  background: color-mix(in srgb, var(--color-surface-elevated) 82%, var(--color-surface-panel));
+  color: var(--color-accent-ink);
+  text-decoration: none;
 }
 
 .profile-stats {

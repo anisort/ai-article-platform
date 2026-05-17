@@ -10,11 +10,12 @@ import { MyArticlesService } from '../../../profile/services/my-articles.service
 import { PageIntroComponent } from '../../../../shared/components/page-intro/page-intro.component';
 import { ProfileSummaryCardComponent } from '../../../profile/components/profile-summary-card/profile-summary-card.component';
 import { UserProfile } from '../../../profile/models/user-profile.model';
+import { LoadingStateComponent } from '../../../../shared/components/loading-state/loading-state.component';
 
 @Component({
   selector: 'app-article-detail-page',
   standalone: true,
-  imports: [CommonModule, RouterLink, MarkdownModule, DatePipe, PageIntroComponent, ProfileSummaryCardComponent],
+  imports: [CommonModule, RouterLink, MarkdownModule, DatePipe, PageIntroComponent, ProfileSummaryCardComponent, LoadingStateComponent],
   templateUrl: './article-detail.page.html',
   styleUrl: './article-detail.page.scss',
 })
@@ -30,7 +31,6 @@ export class ArticleDetailPage implements OnInit, AfterViewInit {
 
   article = signal<ArticleWithUserResponse | null>(null);
   loading = signal(true);
-  notFound = signal(false);
   likeLoading = signal(false);
   deleteLoading = signal(false);
   liked = signal(false);
@@ -73,8 +73,7 @@ export class ArticleDetailPage implements OnInit, AfterViewInit {
     const articleId = this.route.snapshot.paramMap.get('id');
 
     if (!articleId) {
-      this.loading.set(false);
-      this.notFound.set(true);
+      this.router.navigate(['/not-found']);
       return;
     }
 
@@ -88,7 +87,9 @@ export class ArticleDetailPage implements OnInit, AfterViewInit {
       },
       error: (error: HttpErrorResponse) => {
         this.loading.set(false);
-        this.notFound.set(error.status === 404);
+        if (error.status === 404) {
+          this.router.navigate(['/not-found']);
+        }
       },
     });
   }

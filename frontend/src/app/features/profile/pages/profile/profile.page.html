@@ -9,6 +9,7 @@
     @if (profile()) {
       <app-profile-summary-card
         [profile]="profile()!"
+        [settingsLink]="isOwnProfile() ? '/profile/edit' : null"
         [connectionTab]="null"
         [followLoading]="followLoading()"
         [canFollow]="canFollow()"
@@ -16,58 +17,47 @@
         (followToggle)="toggleFollow()"/>
     }
   </section>
-  @if (notFound()) {
-    <section class="profile-state">
-      <p class="profile-state__label">Not found</p>
-      <h2>Profile is unavailable.</h2>
-      <a routerLink="/articles">Back to articles</a>
-    </section>
-  } @else {
-    <div class="profile-tabs">
-      <app-segmented-control
-        [options]="tabOptions()"
-        [active]="activeTab()"
-        ariaLabel="Profile tabs"
-        (changed)="setTab($event)"/>
-      @if (isOwnProfile()) {
-        <a routerLink="/edit-article" class="profile-tabs__create-button">+ Create article</a>
+  <div class="profile-tabs">
+    <app-segmented-control
+      [options]="tabOptions()"
+      [active]="activeTab()"
+      ariaLabel="Profile tabs"
+      (changed)="setTab($event)"/>
+    @if (isOwnProfile()) {
+      <a routerLink="/edit-article" class="profile-tabs__create-button">+ Create article</a>
+    }
+  </div>
+  @if (loading()) {
+    <app-loading-state label="Loading" title="Collecting profile data..."></app-loading-state>
+  } @else if (visibleArticlePreviews().length) {
+    <div class="profile-grid">
+      @for (article of visibleArticlePreviews(); track article.id) {
+        <app-article-preview-card
+          [article]="article"
+          [showOwnerActions]="isOwnProfile() && activeTab() !== 'liked'"
+          [deleteLoading]="deletingArticleId() === article.id"
+          (deleteArticle)="onDeleteArticle($event)" />
       }
     </div>
-    @if (loading()) {
-      <section class="profile-state">
-        <p class="profile-state__label">Loading</p>
-        <h2>Collecting profile data...</h2>
-      </section>
-    } @else if (visibleArticlePreviews().length) {
-      <div class="profile-grid">
-        @for (article of visibleArticlePreviews(); track article.id) {
-          <app-article-preview-card
-            [article]="article"
-            [showOwnerActions]="isOwnProfile() && activeTab() !== 'liked'"
-            [deleteLoading]="deletingArticleId() === article.id"
-            (deleteArticle)="onDeleteArticle($event)" />
-        }
-      </div>
-    } @else {
-      <section class="profile-state">
-        <p class="profile-state__label">
-          {{
-            !isOwnProfile()
+  } @else {
+    <section class="profile-state">
+      <p class="profile-state__label">
+        {{
+          !isOwnProfile()
+            ? 'Published'
+            : activeTab() === 'published'
               ? 'Published'
-              : activeTab() === 'published'
-                ? 'Published'
-                : activeTab() === 'drafts'
-                  ? 'Drafts'
-                  : 'Liked'
-          }}
-        </p>
-        <h2>{{ isOwnProfile() ? 'No content in this section yet.' : 'This author has no published articles yet.' }}</h2>
-        <a
-          [routerLink]="!isOwnProfile() || activeTab() === 'liked' ? '/articles' : '/edit-article'"
-          [class.create-article-cta]="isOwnProfile() && activeTab() !== 'liked'">
-          {{ !isOwnProfile() || activeTab() === 'liked' ? 'Explore articles' : '+ Create article' }}
-        </a>
-      </section>
-    }
+              : activeTab() === 'drafts'
+                ? 'Drafts'
+                : 'Liked'
+        }}
+      </p>
+      <h2>{{ isOwnProfile() ? 'No content in this section yet.' : 'This author has no published articles yet.' }}</h2>
+      <a
+        [routerLink]="!isOwnProfile() || activeTab() === 'liked' ? '/articles' : '/edit-article'"
+        [class.create-article-cta]="isOwnProfile() && activeTab() !== 'liked'">
+        {{ !isOwnProfile() || activeTab() === 'liked' ? 'Explore articles' : '+ Create article' }}
+      </a>
+    </section>
   }
 </section>

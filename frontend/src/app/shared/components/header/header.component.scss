@@ -147,6 +147,41 @@
   color: var(--color-primary-dark);
 }
 
+.profile-info {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  max-width: 15rem;
+  color: var(--color-text-body);
+  padding: 0 0.2rem;
+}
+
+.profile-info span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.profile-info--link {
+  text-decoration: none;
+  border-radius: 999px;
+  padding: 0.35rem 0.55rem;
+  cursor: pointer;
+  transition: background-color 0.18s ease, transform 0.18s ease;
+}
+
+.profile-info--link:hover {
+  background: color-mix(in srgb, var(--color-primary) 10%, transparent);
+  transform: translateY(-1px);
+}
+
+.profile-info--link:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--color-primary) 35%, transparent);
+  outline-offset: 2px;
+}
+
 .register {
   background: color-mix(in srgb, var(--color-accent-berry) 16%, var(--color-surface-rose));
   color: var(--color-accent-berry);

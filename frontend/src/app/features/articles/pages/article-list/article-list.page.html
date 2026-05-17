@@ -14,7 +14,9 @@
     />
   </div>
 
-  @if (articles().length) {
+  @if (loading()) {
+    <app-loading-state label="Loading" title="Loading articles..."></app-loading-state>
+  } @else if (articles().length) {
     <div class="article-grid">
       @for (article of articles(); track article.id) {
         <app-article-preview-card [article]="article"></app-article-preview-card>

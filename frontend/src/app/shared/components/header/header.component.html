@@ -35,7 +35,13 @@
         </div>
       } @else {
         <div class="auth-buttons">
-          <button class="login" (click)="onProfile()">Profile</button>
+          <a class="profile-info profile-info--link" routerLink="/profile">
+            <app-avatar
+              [imageUrl]="user()?.avatar"
+              [name]="userDisplay()"
+              size="1.7rem" />
+            <span>{{ userDisplay() }}</span>
+          </a>
           <button class="logout" (click)="onLogout()">Logout</button>
         </div>
       }

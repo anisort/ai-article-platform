@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import {Component, computed, inject, OnInit, signal} from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ModalController } from '@ionic/angular/standalone';
 import { AuthService } from '../../../../core/services/auth.service';
 import { PageIntroComponent } from '../../../../shared/components/page-intro/page-intro.component';
@@ -16,6 +16,7 @@ import {
   SegmentedControlComponent,
   SegmentedControlOption
 } from '../../../../shared/components/segmented-control/segmented-control.component';
+import { LoadingStateComponent } from '../../../../shared/components/loading-state/loading-state.component';
 
 type ProfileTab = 'published' | 'drafts' | 'liked';
 
@@ -28,13 +29,15 @@ type ProfileTab = 'published' | 'drafts' | 'liked';
     PageIntroComponent,
     ArticlePreviewCardComponent,
     ProfileSummaryCardComponent,
-    SegmentedControlComponent
+    SegmentedControlComponent,
+    LoadingStateComponent
   ],
   templateUrl: './profile.page.html',
   styleUrl: './profile.page.scss',
 })
 export class ProfilePage implements OnInit {
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private readonly authService = inject(AuthService);
   private readonly profileService = inject(ProfileService);
   private readonly articlesService = inject(ArticlesService);
@@ -42,7 +45,6 @@ export class ProfilePage implements OnInit {
 
   readonly activeTab = signal<ProfileTab>('published');
   readonly loading = signal(false);
-  readonly notFound = signal(false);
   readonly followLoading = signal(false);
   readonly deletingArticleId = signal<string | null>(null);
 
@@ -198,7 +200,6 @@ export class ProfilePage implements OnInit {
   }
 
   private loadProfile(): void {
-    this.notFound.set(false);
     const userId = this.route.snapshot.paramMap.get('id');
     const currentUserId = this.authService.userId;
 
@@ -227,7 +228,9 @@ export class ProfilePage implements OnInit {
       },
       error: (error: HttpErrorResponse) => {
         this.loading.set(false);
-        this.notFound.set(error.status === 404);
+        if (error.status === 404 || error.status === 400) {
+          this.router.navigate(['/not-found']);
+        }
       },
     });
   }
@@ -243,7 +246,9 @@ export class ProfilePage implements OnInit {
       },
       error: (error: HttpErrorResponse) => {
         this.loading.set(false);
-        this.notFound.set(error.status === 404);
+        if (error.status === 404 || error.status === 400) {
+          this.router.navigate(['/not-found']);
+        }
       },
     });
   }

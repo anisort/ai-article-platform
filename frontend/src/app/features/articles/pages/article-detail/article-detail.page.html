@@ -1,15 +1,6 @@
 <section class="article-detail-page">
   @if (loading()) {
-    <div class="article-state-card">
-      <p class="article-state-label">Loading article</p>
-      <h1>Preparing the page...</h1>
-    </div>
-  } @else if (notFound()) {
-    <div class="article-state-card">
-      <p class="article-state-label">Not found</p>
-      <h1>Article is unavailable.</h1>
-      <a routerLink="/articles">Back to articles</a>
-    </div>
+    <app-loading-state label="Loading article" title="Preparing the page..."></app-loading-state>
   } @else if (articleData()) {
     <article class="article-shell">
       <app-page-intro
@@ -26,7 +17,9 @@
           <div class="article-hero-info">
             <div class="article-author-row">
               <div class="article-author">
-                <app-profile-summary-card [profile]="authorProfile()" [showStats]="false" />
+                <a class="article-author-link" [routerLink]="['/profile', authorProfile().id]" aria-label="Open author profile">
+                  <app-profile-summary-card [profile]="authorProfile()" [showStats]="false" />
+                </a>
               </div>
 
               <div class="article-actions">

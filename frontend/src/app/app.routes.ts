@@ -49,8 +49,22 @@ export const routes: Routes = [
       .then(p => p.ProfilePage)
   },
   {
+    path: 'profile/edit',
+    loadComponent: () => import('./features/profile/pages/edit-profile/edit-profile.page')
+      .then(p => p.EditProfilePage)
+  },
+  {
     path: 'profile/:id',
     loadComponent: () => import('./features/profile/pages/profile/profile.page')
       .then(p => p.ProfilePage)
+  },
+  {
+    path: 'not-found',
+    loadComponent: () => import('./shared/pages/not-found/not-found.page')
+      .then(p => p.NotFoundPage)
+  },
+  {
+    path: '**',
+    redirectTo: 'not-found',
   }
 ];

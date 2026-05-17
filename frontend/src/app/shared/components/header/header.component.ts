@@ -1,15 +1,21 @@
-import {Component, inject} from '@angular/core';
+import {Component, computed, inject} from '@angular/core';
 import {AuthService} from '../../../core/services/auth.service';
 import {Router} from '@angular/router';
+import { RouterLink } from '@angular/router';
 import {addIcons} from 'ionicons';
 import {searchOutline} from 'ionicons/icons';
 import {IonIcon, IonMenuButton} from '@ionic/angular/standalone';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { UserStoreService } from '../../../core/services/user-store.service';
+import { AvatarComponent } from '../avatar/avatar.component';
 
 @Component({
   selector: 'app-header',
   imports: [
     IonIcon,
-    IonMenuButton
+    IonMenuButton,
+    AvatarComponent,
+    RouterLink
   ],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss'
@@ -17,7 +23,13 @@ import {IonIcon, IonMenuButton} from '@ionic/angular/standalone';
 export class HeaderComponent {
   authService = inject(AuthService);
   router = inject(Router);
+  userStore = inject(UserStoreService);
   searchQuery = '';
+  readonly user = toSignal(this.userStore.user$, { initialValue: null });
+  readonly userDisplay = computed(() => {
+    const user = this.user();
+    return user?.name || user?.username || user?.email || 'Profile';
+  });
 
   constructor() {
     addIcons({ searchOutline })
@@ -32,11 +44,8 @@ export class HeaderComponent {
   }
 
   onLogout() {
+    this.userStore.clear();
     this.authService.logout();
-  }
-
-  onProfile() {
-    this.router.navigate(['/profile']);
   }
 
   onSearchSubmit(query: string) {

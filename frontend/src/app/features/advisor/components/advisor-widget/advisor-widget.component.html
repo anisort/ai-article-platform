@@ -16,7 +16,7 @@
         </div>
       }
       @if (isLoading()) {
-        <div class="message">Thinking...</div>
+        <app-loading-state label="Loading" title="Thinking..." [compact]="true"></app-loading-state>
       }
     </div>
 

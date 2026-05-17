@@ -4,11 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { AdvisorService } from '../../services/advisor.service';
 import { AdvisorMessage } from '../../models/advisor-chat.model';
 import { marked } from 'marked';
+import { LoadingStateComponent } from '../../../../shared/components/loading-state/loading-state.component';
 
 @Component({
   selector: 'app-advisor-widget',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, LoadingStateComponent],
   templateUrl: './advisor-widget.component.html',
   styleUrl: './advisor-widget.component.scss'
 })

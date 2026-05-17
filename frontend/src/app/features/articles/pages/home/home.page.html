@@ -12,7 +12,7 @@
     </div>
 
     @if (loading()) {
-      <div class="empty-state">Loading recommendations...</div>
+      <app-loading-state label="Loading" title="Loading recommendations..."></app-loading-state>
     } @else if (carouselArticles().length) {
       <div class="carousel-track">
         @for (article of carouselArticles(); track article.id) {

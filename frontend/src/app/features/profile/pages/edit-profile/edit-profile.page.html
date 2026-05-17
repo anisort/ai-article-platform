@@ -1,0 +1,60 @@
+<section class="edit-profile-page">
+  <app-page-intro
+    kicker="Profile"
+    title="Edit your profile"
+    description="Update public profile fields and avatar."/>
+
+  @if (loading()) {
+    <p class="loading-state">Loading profile...</p>
+  } @else {
+    <form class="edit-profile-form" [formGroup]="form" (ngSubmit)="onSubmit()">
+      <h2>Profile settings</h2>
+
+      @if (message()) {
+        <p class="status-message">{{ message() }}</p>
+      }
+
+      <div class="avatar-picker">
+        <input id="avatarInput" class="avatar-picker__input" type="file" accept="image/*" (change)="onAvatarSelected($event)" />
+        <label class="avatar-picker__control" for="avatarInput">
+          <app-avatar [imageUrl]="avatarPreview()" [name]="form.value.name || form.value.username || 'User'" size="6rem" />
+          <span class="avatar-picker__overlay">
+            <i class="bi bi-upload" aria-hidden="true"></i>
+          </span>
+        </label>
+      </div>
+
+      <div class="field-grid">
+        <label class="field">
+          <span>Username</span>
+          <input type="text" formControlName="username" />
+          @if ((form.controls.username.dirty || submitted()) && form.controls.username.hasError('usernameTaken')) {
+            <small class="field-error">Username is already taken.</small>
+          } @else if ((form.controls.username.dirty || submitted()) && form.controls.username.hasError('required')) {
+            <small class="field-error">Username is required.</small>
+          } @else if ((form.controls.username.dirty || submitted()) && form.controls.username.hasError('minlength')) {
+            <small class="field-error">Username must be at least 3 characters.</small>
+          }
+        </label>
+
+        <label class="field">
+          <span>Name</span>
+          <input type="text" formControlName="name" />
+          @if ((form.controls.name.dirty || submitted()) && form.controls.name.hasError('required')) {
+            <small class="field-error">Name is required.</small>
+          } @else if ((form.controls.name.dirty || submitted()) && form.controls.name.hasError('minlength')) {
+            <small class="field-error">Name must be at least 2 characters.</small>
+          }
+        </label>
+      </div>
+
+      <button class="submit-button" type="submit" [disabled]="saving() || form.pending || form.invalid">
+        {{ saving() ? 'Saving...' : 'Save profile' }}
+      </button>
+
+      <div class="back-row">
+        <a routerLink="/profile">Back to profile</a>
+      </div>
+    </form>
+  }
+</section>

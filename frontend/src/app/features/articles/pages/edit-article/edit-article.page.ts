@@ -33,11 +33,12 @@ import {
   AssistantResponseMode
 } from '../../../advisor/models/article-assistant.model';
 import { ArticleAssistantService } from '../../../advisor/services/article-assistant.service';
+import { LoadingStateComponent } from '../../../../shared/components/loading-state/loading-state.component';
 
 @Component({
   standalone: true,
   selector: 'app-edit-article-page',
-  imports: [CommonModule, FormsModule, IonIcon],
+  imports: [CommonModule, FormsModule, IonIcon, LoadingStateComponent],
   templateUrl: './edit-article.page.html',
   styleUrls: ['./edit-article.page.scss'],
 })

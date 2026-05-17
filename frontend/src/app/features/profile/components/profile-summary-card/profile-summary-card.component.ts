@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, input, output } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
 import { UserProfile } from '../../models/user-profile.model';
 import { AvatarComponent } from '../../../../shared/components/avatar/avatar.component';
@@ -9,7 +10,7 @@ type ConnectionTab = 'following' | 'followers' | null;
 @Component({
   selector: 'app-profile-summary-card',
   standalone: true,
-  imports: [CommonModule, AvatarComponent],
+  imports: [CommonModule, AvatarComponent, RouterLink],
   templateUrl: './profile-summary-card.component.html',
   styleUrl: './profile-summary-card.component.scss',
 })
@@ -19,6 +20,7 @@ export class ProfileSummaryCardComponent {
   readonly followLoading = input(false);
   readonly canFollow = input(false);
   readonly showStats = input(true);
+  readonly settingsLink = input<string | null>(null);
 
   readonly connectionSelect = output<'following' | 'followers'>();
   readonly followToggle = output<void>();

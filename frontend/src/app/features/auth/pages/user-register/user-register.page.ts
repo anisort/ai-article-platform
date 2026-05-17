@@ -1,17 +1,27 @@
 import {CommonModule} from '@angular/common';
 import {Component, DestroyRef, inject, OnInit, signal} from '@angular/core';
-import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators
+} from '@angular/forms';
 import {UserRegisterService} from '../../services/user-register.service';
 import {AuthService} from '../../../../core/services/auth.service';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {finalize, tap} from 'rxjs';
+import { LoadingStateComponent } from '../../../../shared/components/loading-state/loading-state.component';
+import { PageIntroComponent } from '../../../../shared/components/page-intro/page-intro.component';
+import { AuthValidationService } from '../../services/auth-validation.service';
 
 @Component({
   selector: 'app-user-register',
   standalone: true,
   imports: [
     CommonModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    LoadingStateComponent,
+    PageIntroComponent
   ],
   templateUrl: './user-register.page.html',
   styleUrl: './user-register.page.scss'
@@ -20,9 +30,11 @@ export class UserRegisterPage implements OnInit {
   registerForm!: FormGroup;
   loading = signal<boolean>(false);
   message = signal<string | undefined>(undefined);
+  submitted = signal<boolean>(false);
 
   private userRegisterService = inject(UserRegisterService);
   private authService = inject(AuthService);
+  private authValidationService = inject(AuthValidationService);
   private destroyRef = inject(DestroyRef);
 
   ngOnInit() {
@@ -31,17 +43,32 @@ export class UserRegisterPage implements OnInit {
 
   initForm() {
     this.registerForm = new FormGroup({
-        username: new FormControl('', [Validators.required, Validators.minLength(3)]),
-        email: new FormControl('', [Validators.required, Validators.email]),
+        username: new FormControl('', {
+          validators: [Validators.required, Validators.minLength(3)],
+          asyncValidators: [this.authValidationService.usernameAvailabilityValidator()]
+        }),
+        email: new FormControl('', {
+          validators: [Validators.required, Validators.email],
+          asyncValidators: [this.authValidationService.emailAvailabilityValidator()]
+        }),
         name: new FormControl('', [Validators.required, Validators.minLength(3)]),
-        password: new FormControl('', [Validators.required, Validators.minLength(8)]),
+        password: new FormControl('', [
+          Validators.required,
+          Validators.minLength(8),
+          Validators.pattern(this.authValidationService.strongPasswordPattern())
+        ]),
         repeatPassword: new FormControl('', [Validators.required])
       },
+      { validators: this.authValidationService.passwordsMatchValidator('password', 'repeatPassword') }
     )
   }
 
   onRegister() {
-    if (!this.registerForm.valid) return;
+    this.submitted.set(true);
+    if (!this.registerForm.valid) {
+      this.registerForm.markAllAsTouched();
+      return;
+    }
 
     this.loading.set(true);
 
@@ -51,6 +78,7 @@ export class UserRegisterPage implements OnInit {
         tap(() => {
           this.message.set("Successfully registered");
           this.registerForm.reset();
+          this.submitted.set(false);
         }),
         finalize(() => this.loading.set(false))
       )
@@ -61,5 +89,17 @@ export class UserRegisterPage implements OnInit {
 
   onLogin() {
     this.authService.login();
+  }
+
+  hasControlError(controlName: string, errorKey: string): boolean {
+    const control = this.registerForm.get(controlName);
+    return !!control && control.hasError(errorKey) && (control.dirty || this.submitted());
+  }
+
+  showPasswordMismatchError(): boolean {
+    const repeatPasswordControl = this.registerForm.get('repeatPassword');
+    return !!repeatPasswordControl
+      && (repeatPasswordControl.dirty || this.submitted())
+      && this.registerForm.hasError('passwordMismatch');
   }
 }

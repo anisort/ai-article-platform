@@ -72,6 +72,13 @@
   min-width: 260px;
 }
 
+.article-author-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}
+
 .article-hero-main {
   display: grid;
   gap: 0.75rem;

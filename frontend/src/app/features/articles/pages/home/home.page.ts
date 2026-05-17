@@ -6,11 +6,12 @@ import { ArticlePreview } from '../../models/article-preview.model';
 import { ArticlesService } from '../../services/articles.service';
 import { ArticlePreviewCardComponent } from '../../components/article-preview-card/article-preview-card.component';
 import { PageIntroComponent } from '../../../../shared/components/page-intro/page-intro.component';
+import { LoadingStateComponent } from '../../../../shared/components/loading-state/loading-state.component';
 
 @Component({
   selector: 'app-home-page',
   standalone: true,
-  imports: [CommonModule, RouterLink, ArticlePreviewCardComponent, PageIntroComponent],
+  imports: [CommonModule, RouterLink, ArticlePreviewCardComponent, PageIntroComponent, LoadingStateComponent],
   templateUrl: './home.page.html',
   styleUrl: './home.page.scss'
 })
