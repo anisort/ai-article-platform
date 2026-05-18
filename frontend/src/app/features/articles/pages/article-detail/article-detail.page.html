@@ -71,8 +71,7 @@
       }
 
       <section class="article-content">
-        <div #markdownHost class="article-block article-block--text">
-          <markdown [data]="contentMarkdown()" (ready)="onMarkdownReady()"></markdown>
+        <div class="article-block article-block--text" (click)="onArticleContentClick($event)" [innerHTML]="contentMarkdown()">
         </div>
       </section>
     </article>

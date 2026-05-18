@@ -1,0 +1,31 @@
+<app-modal-layout title="Images folder" kicker="Article">
+  @if (!articleId) {
+    <p class="images-empty">Save article first to manage images.</p>
+  } @else if (uploading) {
+    <app-loading-state label="Loading" title="Uploading image..." [compact]="true" />
+  } @else if (!images.length) {
+    <p class="images-empty">No images yet.</p>
+  } @else {
+    <div class="images-grid">
+      @for (image of images; track image.id) {
+        <figure class="image-item">
+          <img [src]="image.imageUrl" alt="Article image" />
+          <div class="image-item__overlay">
+            <button type="button" class="image-button image-button--overlay" (click)="insert(image)">Insert</button>
+            <button type="button" class="image-button image-button--overlay image-button--danger" (click)="remove(image)">Delete</button>
+          </div>
+        </figure>
+      }
+    </div>
+  }
+
+  <div modal-footer class="images-actions">
+    @if (articleId) {
+      <label class="image-button">
+        <input type="file" accept="image/*" (change)="onFileSelected($event)" />
+        Add image
+      </label>
+    }
+    <button type="button" class="image-button" (click)="close()">Close</button>
+  </div>
+</app-modal-layout>

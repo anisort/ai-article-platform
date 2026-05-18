@@ -1,0 +1,54 @@
+.cover-body {
+  height: 100%;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.cover-preview {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  margin: 0 auto;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid var(--color-border-soft);
+}
+
+.cover-empty {
+  margin: 0;
+  color: var(--color-accent-berry);
+  font-weight: 600;
+}
+
+.cover-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.cover-button {
+  border: 1px solid var(--color-border-soft);
+  border-radius: 8px;
+  background: var(--color-surface-elevated);
+  color: var(--color-accent-ink);
+  cursor: pointer;
+  min-height: 2.25rem;
+  padding: 0.5rem 0.85rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  line-height: 1;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cover-button input { display: none; }
+
+.cover-button--danger {
+  color: var(--color-accent-berry);
+  border-color: color-mix(in srgb, var(--color-accent-berry) 40%, var(--color-border-soft));
+}

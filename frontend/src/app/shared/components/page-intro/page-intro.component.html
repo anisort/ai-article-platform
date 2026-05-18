@@ -2,7 +2,9 @@
   @if (kicker()) {
     <p class="page-intro-kicker">{{ kicker() }}</p>
   }
-  <h1>{{ title() }}</h1>
+  @if (title()) {
+    <h1>{{ title() }}</h1>
+  }
   @if (description()) {
     <p class="page-intro-description">{{ description() }}</p>
   }

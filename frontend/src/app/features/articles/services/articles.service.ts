@@ -5,6 +5,7 @@ import { environment } from '../../../../environments/environment';
 import { CreateArticleRequest } from '../models/create-article-request.model';
 import { ArticleWithUserResponse } from '../models/article-response.model';
 import { ArticlePreview } from '../models/article-preview.model';
+import { EditArticlePageResponse } from '../models/edit-article-payload.model';
 
 export type SearchMode = 'title' | 'semantic';
 
@@ -36,6 +37,10 @@ export class ArticlesService {
 
   getById(articleId: string): Observable<ArticleWithUserResponse> {
     return this.http.get<ArticleWithUserResponse>(`${this.apiUrl}/${articleId}`);
+  }
+
+  getEditPage(articleId: string): Observable<EditArticlePageResponse> {
+    return this.http.get<EditArticlePageResponse>(`${this.apiUrl}/${articleId}/edit-page`);
   }
 
   create(article: CreateArticleRequest): Observable<ArticleWithUserResponse> {

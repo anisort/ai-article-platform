@@ -6,7 +6,10 @@ import com.articles.dto.ai.ArticleRecommendationRequest;
 import com.articles.dto.ai.ArticleRecommendationResponse;
 import com.articles.dto.ai.SemanticSearchRequest;
 import com.articles.dto.ai.SemanticSearchResponse;
+import com.articles.dto.assistant.ArticleAssistantChatSummary;
+import com.articles.dto.assistant.ArticleAssistantMessageSummary;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -92,6 +95,26 @@ public class LlmIntegrationService {
         }
 
         return response.articleIds();
+    }
+
+    public List<ArticleAssistantChatSummary> listArticleChats(UUID articleId) {
+        RestClient.RequestHeadersSpec<?> requestSpec = llmRestClient.get()
+                .uri("/api/v1/assistant/articles/{articleId}/chats", articleId);
+        String bearerToken = bearerTokenOrNull();
+        if (bearerToken != null) {
+            requestSpec = requestSpec.header(HttpHeaders.AUTHORIZATION, bearerToken);
+        }
+        return requestSpec.retrieve().body(new ParameterizedTypeReference<>() {});
+    }
+
+    public List<ArticleAssistantMessageSummary> listArticleChatMessages(UUID articleId, UUID chatId) {
+        RestClient.RequestHeadersSpec<?> requestSpec = llmRestClient.get()
+                .uri("/api/v1/assistant/articles/{articleId}/chats/{chatId}/messages", articleId, chatId);
+        String bearerToken = bearerTokenOrNull();
+        if (bearerToken != null) {
+            requestSpec = requestSpec.header(HttpHeaders.AUTHORIZATION, bearerToken);
+        }
+        return requestSpec.retrieve().body(new ParameterizedTypeReference<>() {});
     }
 
     private RestClient.RequestBodySpec requestWithAuth(String uri) {

@@ -11,9 +11,10 @@
 
     <div class="advisor-messages">
       @for (message of messages(); track $index) {
-        <div class="message" [class.message--user]="message.role === 'user'">
-          <div [innerHTML]="renderMarkdown(message.text)"></div>
-        </div>
+        <app-message-bubble
+          [html]="renderMarkdown(message.text)"
+          [isUser]="message.role === 'user'"
+        />
       }
       @if (isLoading()) {
         <app-loading-state label="Loading" title="Thinking..." [compact]="true"></app-loading-state>

@@ -26,6 +26,7 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.POST, "/api/v1/articles").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/articles/*/edit-page").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/v1/articles/me/*/like").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/v1/articles/*/images").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/v1/articles/*").authenticated()

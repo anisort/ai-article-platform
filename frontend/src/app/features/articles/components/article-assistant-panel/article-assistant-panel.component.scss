@@ -1,0 +1,66 @@
+:host {
+  box-sizing: border-box;
+  border: 1px solid var(--color-border-soft);
+  border-radius: 8px;
+  background: var(--color-surface-elevated);
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.assistant-panel__header { display: flex; align-items: center; justify-content: space-between; padding: 0.65rem; border-bottom: 1px solid var(--color-border-soft); }
+.assistant-panel__header-actions { display: inline-flex; gap: 0.35rem; }
+.assistant-button {
+  border: 1px solid var(--color-border-soft);
+  border-radius: 6px;
+  padding: 0.4rem 0.65rem;
+  background: color-mix(in srgb, var(--color-primary) 14%, var(--color-surface-elevated));
+  color: var(--color-accent-ink);
+  cursor: pointer;
+}
+.assistant-button:hover {
+  background: color-mix(in srgb, var(--color-primary) 22%, var(--color-surface-elevated));
+  border-color: color-mix(in srgb, var(--color-primary) 36%, var(--color-border-soft));
+}
+
+.assistant-button--close {
+  background: color-mix(in srgb, var(--color-surface-elevated) 78%, var(--color-surface-rose));
+  color: var(--color-accent-ink);
+  border-color: var(--color-border-soft);
+}
+
+.assistant-button--close:hover {
+  background: color-mix(in srgb, var(--color-surface-rose) 42%, var(--color-surface-elevated));
+  border-color: var(--color-border-soft);
+}
+
+.assistant-button--send {
+  background: var(--color-button-primary-bg);
+  color: #ffffff;
+  border-color: var(--color-border-soft);
+  font-weight: 700;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.18);
+}
+
+.assistant-button--send:hover {
+  background: var(--color-button-primary-bg);
+  border-color: var(--color-border-soft);
+  filter: brightness(1.03);
+}
+.assistant-selectors {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 0.4rem;
+  padding: 0.45rem 0.65rem;
+  border-bottom: 1px solid var(--color-border-soft);
+}
+.assistant-messages { min-height: 0; overflow: auto; padding: 0.65rem; display: flex; flex-direction: column; gap: 0.5rem; }
+.assistant-input { border-top: 1px solid var(--color-border-soft); padding: 0.65rem; display: grid; gap: 0.5rem; }
+.assistant-input textarea { width: 100%; resize: none; border: 1px solid var(--color-border-soft); border-radius: 8px; padding: 0.6rem; box-sizing: border-box; }
+.assistant-input textarea:focus {
+  outline: none;
+  border-color: color-mix(in srgb, var(--color-primary) 55%, var(--color-border-soft));
+  box-shadow: 0 0 0 0.2rem color-mix(in srgb, var(--color-primary) 18%, transparent);
+}
+.assistant-empty { padding: 0.65rem; color: var(--color-text-muted); }

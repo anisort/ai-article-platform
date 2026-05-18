@@ -1,14 +1,19 @@
 package com.articles.services.facade;
 
 import com.articles.dto.article.ArticleWithUserResponse;
+import com.articles.dto.article.EditArticlePageResponse;
+import com.articles.dto.assistant.ArticleAssistantChatSummary;
+import com.articles.dto.assistant.ArticleAssistantMessageSummary;
 import com.articles.dto.user.AuthorResponse;
 import com.articles.dto.article.CreateArticleRequest;
 import com.articles.dto.article.ArticlePreviewResponse;
+import com.articles.dto.image.ArticleImageResponse;
 import com.articles.entities.Article;
 import com.articles.services.core.ArticleEmbeddingService;
 import com.articles.services.core.ArticleImageService;
 import com.articles.services.core.ArticleLikeService;
 import com.articles.services.core.ArticleService;
+import com.articles.services.integration.LlmIntegrationService;
 import com.articles.services.integration.UserService;
 import org.springframework.stereotype.Service;
 
@@ -24,19 +29,22 @@ public class ArticleFacadeService {
     private final ArticleImageService articleImageService;
     private final UserService userService;
     private final ArticleEmbeddingService articleEmbeddingService;
+    private final LlmIntegrationService llmIntegrationService;
 
     public ArticleFacadeService(
             ArticleService articleService,
             ArticleLikeService articleLikeService,
             ArticleImageService articleImageService,
             UserService userService,
-            ArticleEmbeddingService articleEmbeddingService
+            ArticleEmbeddingService articleEmbeddingService,
+            LlmIntegrationService llmIntegrationService
     ) {
         this.articleService = articleService;
         this.articleLikeService = articleLikeService;
         this.articleImageService = articleImageService;
         this.userService = userService;
         this.articleEmbeddingService = articleEmbeddingService;
+        this.llmIntegrationService = llmIntegrationService;
     }
 
     public List<ArticlePreviewResponse> getPublishedArticles() {
@@ -94,6 +102,37 @@ public class ArticleFacadeService {
         articleLikeService.deleteByArticleId(articleId);
         articleImageService.deleteByArticleId(articleId);
         articleService.delete(article);
+    }
+
+    public EditArticlePageResponse getEditPage(UUID articleId, UUID requesterId) {
+        Article article = articleService.requireOwned(articleId, requesterId);
+        Map<UUID, AuthorResponse> authors = userService.getAuthors(List.of(article));
+        long likesCount = articleLikeService.getLikesCount(article.getId());
+        boolean likedByRequester = articleLikeService.isArticleLikedByUser(article.getId(), requesterId);
+        ArticleWithUserResponse articleResponse = ArticleWithUserResponse.mapToResponse(
+                article,
+                authors.get(article.getAuthorId()),
+                likesCount,
+                likedByRequester
+        );
+
+        List<ArticleImageResponse> images = articleImageService.listByArticleId(articleId).stream()
+                .map(ArticleImageResponse::fromEntity)
+                .toList();
+
+        List<ArticleAssistantChatSummary> chats = llmIntegrationService.listArticleChats(articleId);
+        UUID selectedChatId = chats.isEmpty() ? null : chats.getFirst().id();
+        List<ArticleAssistantMessageSummary> messages = selectedChatId == null
+                ? List.of()
+                : llmIntegrationService.listArticleChatMessages(articleId, selectedChatId);
+
+        return new EditArticlePageResponse(
+                articleResponse,
+                images,
+                chats,
+                selectedChatId,
+                messages
+        );
     }
 
 }

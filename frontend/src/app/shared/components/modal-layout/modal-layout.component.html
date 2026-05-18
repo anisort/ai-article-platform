@@ -20,7 +20,7 @@
     </div>
   }
 
-  <div class="modal-layout__content">
+  <div class="modal-layout__content" [class.modal-layout__content--no-scroll]="!contentScrollable()">
     <ng-content />
   </div>
 

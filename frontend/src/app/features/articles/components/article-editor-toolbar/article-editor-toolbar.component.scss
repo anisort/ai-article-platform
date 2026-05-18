@@ -1,0 +1,46 @@
+.toolbar {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  max-width: 34rem;
+}
+.toolbar-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.1rem 0.35rem;
+  border-radius: 0;
+  background: transparent;
+  border: 0;
+  border-left: 1px solid var(--color-border-soft);
+}
+.toolbar-group:first-child { border-left: 0; padding-left: 0; }
+
+.toolbar-group app-select-field {
+  width: 3.4rem;
+}
+
+.toolbar-chip,.toolbar-icon {
+  border: 1px solid var(--color-border-soft);
+  border-radius: 8px;
+  background: var(--color-surface-base);
+  color: var(--color-accent-ink);
+  cursor: pointer;
+  min-width: 2.1rem;
+  height: 2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.toolbar-chip { padding: 0 0.55rem; min-width: 3.3rem; font-size: 0.95rem; }
+.toolbar-chip--select { justify-content: space-between; }
+.toolbar-icon--accent {
+  background: var(--color-accent-berry);
+  color: #fff;
+  border-color: color-mix(in srgb, var(--color-accent-berry) 75%, var(--color-border-soft));
+}
+.toolbar-icon--text { font-weight: 700; }
+.toolbar-icon--italic { font-style: italic; font-weight: 500; }
+.toolbar-icon--underline { text-decoration: underline; }
+.toolbar-icon--strike { text-decoration: line-through; }

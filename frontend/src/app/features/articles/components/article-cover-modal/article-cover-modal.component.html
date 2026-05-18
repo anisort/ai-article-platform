@@ -1,0 +1,24 @@
+<app-modal-layout title="Cover image" kicker="Article" [contentScrollable]="true">
+  <div class="cover-body">
+    @if (imageUrl) {
+      <img class="cover-preview" [src]="imageUrl" alt="Article cover" />
+    } @else {
+      <p class="cover-empty">Cover image is required.</p>
+    }
+
+    @if (uploading) {
+      <app-loading-state label="Loading" title="Uploading..." [compact]="true" />
+    }
+  </div>
+
+  <div modal-footer class="cover-actions">
+    <label class="cover-button">
+      <input type="file" accept="image/*" (change)="onFileSelected($event)" />
+      {{ imageUrl ? 'Replace' : 'Choose image' }}
+    </label>
+    @if (imageUrl) {
+      <button type="button" class="cover-button cover-button--danger" (click)="remove()">Remove</button>
+    }
+    <button type="button" class="cover-button" (click)="close()">Close</button>
+  </div>
+</app-modal-layout>

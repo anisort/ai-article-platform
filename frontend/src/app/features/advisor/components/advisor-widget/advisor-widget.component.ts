@@ -5,11 +5,12 @@ import { AdvisorService } from '../../services/advisor.service';
 import { AdvisorMessage } from '../../models/advisor-chat.model';
 import { marked } from 'marked';
 import { LoadingStateComponent } from '../../../../shared/components/loading-state/loading-state.component';
+import { MessageBubbleComponent } from '../../../../shared/components/message-bubble/message-bubble.component';
 
 @Component({
   selector: 'app-advisor-widget',
   standalone: true,
-  imports: [CommonModule, FormsModule, LoadingStateComponent],
+  imports: [CommonModule, FormsModule, LoadingStateComponent, MessageBubbleComponent],
   templateUrl: './advisor-widget.component.html',
   styleUrl: './advisor-widget.component.scss'
 })

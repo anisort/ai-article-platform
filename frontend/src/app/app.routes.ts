@@ -1,5 +1,7 @@
 import { Routes } from '@angular/router';
 import { unauthGuard } from './core/guards/unauth.guard';
+import { pendingChangesGuard } from './core/guards/pending-changes.guard';
+import { authGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
   {
@@ -24,11 +26,15 @@ export const routes: Routes = [
   },
   {
     path: 'edit-article',
+    canActivate: [authGuard],
+    canDeactivate: [pendingChangesGuard],
     loadComponent: () => import('./features/articles/pages/edit-article/edit-article.page')
       .then(p => p.EditArticlePage)
   },
   {
     path: 'edit-article/:id',
+    canActivate: [authGuard],
+    canDeactivate: [pendingChangesGuard],
     loadComponent: () => import('./features/articles/pages/edit-article/edit-article.page')
       .then(p => p.EditArticlePage)
   },

@@ -3,23 +3,15 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
-import { IonIcon } from '@ionic/angular/standalone';
-import { addIcons } from 'ionicons';
-import {
-  chevronDownOutline,
-  cloudUploadOutline,
-  checkmarkOutline,
-  codeSlashOutline,
-  folderOpenOutline,
-  imageOutline,
-  linkOutline,
-  listOutline,
-  reorderThreeOutline,
-  textOutline
-} from 'ionicons/icons';
+import { ModalController } from '@ionic/angular/standalone';
 import { finalize } from 'rxjs';
-import { marked } from 'marked';
-
+import { PageIntroComponent } from '../../../../shared/components/page-intro/page-intro.component';
+import { SegmentedControlComponent } from '../../../../shared/components/segmented-control/segmented-control.component';
+import { LoadingStateComponent } from '../../../../shared/components/loading-state/loading-state.component';
+import { ArticleEditorToolbarComponent } from '../../components/article-editor-toolbar/article-editor-toolbar.component';
+import { ArticleAssistantPanelComponent } from '../../components/article-assistant-panel/article-assistant-panel.component';
+import { ArticleCoverModalComponent } from '../../components/article-cover-modal/article-cover-modal.component';
+import { ArticleImagesModalComponent } from '../../components/article-images-modal/article-images-modal.component';
 import { ArticlesService } from '../../services/articles.service';
 import { ArticleImagesService } from '../../services/article-images.service';
 import { ArticleWithUserResponse } from '../../models/article-response.model';
@@ -32,16 +24,25 @@ import {
   AssistantResponseMode
 } from '../../../advisor/models/article-assistant.model';
 import { ArticleAssistantService } from '../../../advisor/services/article-assistant.service';
-import { LoadingStateComponent } from '../../../../shared/components/loading-state/loading-state.component';
+import { PendingChangesComponent } from '../../../../core/guards/pending-changes.guard';
+import { MarkdownRenderService } from '../../../../shared/services/markdown-render.service';
 
 @Component({
   standalone: true,
   selector: 'app-edit-article-page',
-  imports: [CommonModule, FormsModule, IonIcon, LoadingStateComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    PageIntroComponent,
+    SegmentedControlComponent,
+    LoadingStateComponent,
+    ArticleEditorToolbarComponent,
+    ArticleAssistantPanelComponent
+  ],
   templateUrl: './edit-article.page.html',
   styleUrls: ['./edit-article.page.scss'],
 })
-export class EditArticlePage implements OnDestroy {
+export class EditArticlePage implements OnDestroy, PendingChangesComponent {
   @ViewChild('markdownInput') markdownInput?: ElementRef<HTMLTextAreaElement>;
 
   title = '';
@@ -53,24 +54,23 @@ export class EditArticlePage implements OnDestroy {
   previewImageUrl = '';
   previewImageUploading = signal(false);
   articleImageUploading = signal(false);
-  coverDialogOpen = signal(false);
   loadingArticle = signal(false);
   loadFailed = signal(false);
   articleImages = signal<ArticleImage[]>([]);
-  imageLibraryOpen = signal(false);
   editorTab: 'write' | 'preview' = 'write';
   assistantChats = signal<ArticleAssistantChat[]>([]);
   selectedChatId = signal<string | null>(null);
   assistantMessages = signal<ArticleAssistantMessage[]>([]);
-  assistantInput = '';
   assistantMode: AssistantResponseMode = 'THINKING';
-  assistantLoading = signal(false);
   assistantOpen = signal(false);
-  assistantWidthPx = signal(448);
+  assistantPanelWidth = signal(448);
+  draftCreationLoading = signal(false);
   articleId: string | null = null;
-  private isResizingAssistant = false;
-  private onAssistantResizeMove?: (event: MouseEvent) => void;
-  private onAssistantResizeUp?: () => void;
+  submitted = false;
+  titleError = signal(false);
+  contentError = signal(false);
+  coverError = signal(false);
+  private initialSnapshot = '';
 
   private router = inject(Router);
   private route = inject(ActivatedRoute);
@@ -78,77 +78,60 @@ export class EditArticlePage implements OnDestroy {
   private articleImagesService = inject(ArticleImagesService);
   private uploadService = inject(UploadService);
   private articleAssistantService = inject(ArticleAssistantService);
+  private modalController = inject(ModalController);
+  private markdownRenderService = inject(MarkdownRenderService);
+  private resizePointerId: number | null = null;
+  private readonly pendingActionStorageKey = 'edit_article_pending_action';
+  private readonly onResizePointerMove = (event: PointerEvent) => this.handleAssistantResize(event);
+  private readonly onResizePointerUp = (event: PointerEvent) => this.stopAssistantResize(event);
+
+  readonly editorTabs: { value: 'write' | 'preview'; label: string }[] = [
+    { value: 'write', label: 'Write' },
+    { value: 'preview', label: 'Preview' },
+  ];
 
   constructor() {
-    addIcons({
-      checkmarkOutline,
-      chevronDownOutline,
-      cloudUploadOutline,
-      codeSlashOutline,
-      folderOpenOutline,
-      imageOutline,
-      linkOutline,
-      listOutline,
-      reorderThreeOutline,
-      textOutline
-    });
     this.articleId = this.route.snapshot.paramMap.get('id');
     if (this.articleId) {
-      this.loadArticleForEditing(this.articleId);
-      this.loadArticleImages(this.articleId);
-      this.loadAssistantChats(this.articleId);
+      this.loadEditorData(this.articleId);
+      return;
     }
+    this.captureSnapshot();
   }
 
   ngOnDestroy() {
-    this.stopAssistantResize();
+    this.teardownAssistantResize();
   }
 
-  private syncState() {
+  hasPendingChanges(): boolean {
+    return this.initialSnapshot !== this.snapshotState();
   }
 
   onTitleInput(event: Event) {
     this.title = (event.target as HTMLInputElement).value;
-    this.syncState();
+    this.validateRequiredFields();
   }
 
   onContentInput(event: Event) {
     this.markdownContent = (event.target as HTMLTextAreaElement).value;
-    this.syncState();
+    this.validateRequiredFields();
   }
 
   onDraftToggle(event: Event) {
     this.isDraft = (event.target as HTMLInputElement).checked;
-    this.syncState();
   }
 
   renderMarkdown(text: string): string {
-    return marked.parse(text, { breaks: true }) as string;
+    return this.markdownRenderService.render(text);
   }
 
   renderAssistantMarkdown(text: string): string {
-    const html = marked.parse(text, { breaks: true }) as string;
-    return html.replace(/(<pre><code[^>]*>)([\s\S]*?)(<\/code><\/pre>)/g, (full, openTag: string, codeHtml: string, closeTag: string) => {
-      const langMatch = openTag.match(/language-([a-zA-Z0-9_-]+)/);
-      const language = langMatch?.[1] ?? '';
-      const decoded = this.decodeHtml(codeHtml);
-      const payload = encodeURIComponent(decoded);
-      return `<div class="assistant-code-block"><div class="assistant-code-block__actions"><button type="button" class="assistant-code-block__edit" data-code="${payload}" data-language="${language}">Edit code</button></div>${openTag}${codeHtml}${closeTag}</div>`;
-    });
+    return this.markdownRenderService.renderAssistant(text);
   }
 
-  headingLabel(): string {
-    return `h${this.headingLevel}`;
-  }
-
-  toggleHeadingDropdown() {
-    this.headingDropdownOpen = !this.headingDropdownOpen;
-  }
-
-  selectHeading(level: 1 | 2 | 3 | 4) {
-    this.headingLevel = level;
-    this.headingDropdownOpen = false;
-  }
+  toggleHeadingDropdown() { this.headingDropdownOpen = !this.headingDropdownOpen; }
+  selectHeading(level: 1 | 2 | 3 | 4) { this.headingLevel = level; this.headingDropdownOpen = false; }
+  setEditorTab(tab: 'write' | 'preview') { this.editorTab = tab; }
 
   applyHeadingLevel() {
     const textarea = this.markdownInput?.nativeElement;
@@ -156,7 +139,6 @@ export class EditArticlePage implements OnDestroy {
       this.appendBlock(`${'#'.repeat(this.headingLevel)} Heading`);
       return;
     }
-
     const value = this.markdownContent;
     const start = textarea.selectionStart ?? 0;
     const end = textarea.selectionEnd ?? start;
@@ -168,21 +150,13 @@ export class EditArticlePage implements OnDestroy {
     const updatedLine = selected.replace(/^\s{0,3}#{1,6}\s+/, '').trim().length
       ? `${prefix}${selected.replace(/^\s{0,3}#{1,6}\s+/, '')}`
       : `${prefix}`;
-
     this.markdownContent = value.slice(0, lineStart) + updatedLine + value.slice(lineEnd);
-    this.syncState();
-    queueMicrotask(() => {
-      const caret = lineStart + updatedLine.length;
-      textarea.focus();
-      textarea.setSelectionRange(caret, caret);
-    });
+    this.validateRequiredFields();
   }
 
   appendWrap(prefix: string, suffix: string, placeholder: string) {
     const textarea = this.markdownInput?.nativeElement;
-    if (!textarea) {
-      return;
-    }
+    if (!textarea) return;
     const value = this.markdownContent;
     const start = textarea.selectionStart ?? 0;
     const end = textarea.selectionEnd ?? start;
@@ -190,39 +164,24 @@ export class EditArticlePage implements OnDestroy {
     const content = selected || placeholder;
     const replacement = `${prefix}${content}${suffix}`;
     this.markdownContent = value.slice(0, start) + replacement + value.slice(end);
-    this.syncState();
-    queueMicrotask(() => {
-      textarea.focus();
-      if (selected) {
-        textarea.setSelectionRange(start, start + replacement.length);
-      } else {
-        const caret = start + prefix.length + content.length;
-        textarea.setSelectionRange(caret, caret);
-      }
-    });
+    this.validateRequiredFields();
   }
 
   appendBlock(text: string, placeholder = '') {
     const textarea = this.markdownInput?.nativeElement;
-    if (!textarea) {
-      return;
-    }
+    if (!textarea) return;
     const value = this.markdownContent;
     const start = textarea.selectionStart ?? 0;
     const end = textarea.selectionEnd ?? start;
     const selected = value.slice(start, end);
     const replacement = selected ? text.replace(placeholder, selected) : text;
     this.markdownContent = value.slice(0, start) + replacement + value.slice(end);
-    this.syncState();
-    queueMicrotask(() => {
-      textarea.focus();
-      const caret = start + replacement.length;
-      textarea.setSelectionRange(caret, caret);
-    });
+    this.validateRequiredFields();
   }
 
   addBold() { this.appendWrap('**', '**', 'bold text'); }
   addItalic() { this.appendWrap('*', '*', 'italic text'); }
+  addStrike() { this.appendWrap('~~', '~~', 'strikethrough text'); }
   addLink() { this.appendWrap('[', '](https://example.com)', 'link text'); }
   addList() { this.applyLinePrefix('- '); }
   addNumberedList() { this.applyNumberedList(); }
@@ -230,80 +189,166 @@ export class EditArticlePage implements OnDestroy {
   addCode() { this.appendBlock('```ts\n{{selection}}\n```', '{{selection}}'); }
   addImageMarkdown() { this.appendBlock('![caption]({{selection}})', '{{selection}}'); }
 
-  private applyLinePrefix(prefix: string) {
-    const textarea = this.markdownInput?.nativeElement;
-    if (!textarea) {
+  async openCoverDialog() {
+    const modal = await this.modalController.create({
+      component: ArticleCoverModalComponent,
+      componentProps: { imageUrl: this.previewImageUrl, uploading: this.previewImageUploading() },
+      cssClass: 'profile-connections-ionic-modal',
+    });
+    await modal.present();
+    const { data } = await modal.onDidDismiss<{ action?: 'upload' | 'remove'; file?: File }>();
+    if (data?.action === 'remove') {
+      this.removeCoverImage();
+    } else if (data?.action === 'upload' && data.file) {
+      this.uploadPreviewFile(data.file);
+    }
+  }
+
+  async openImageLibrary() {
+    if (!this.articleId) {
+      await this.ensureDraftArticle('images');
       return;
     }
-    const value = this.markdownContent;
-    const start = textarea.selectionStart ?? 0;
-    const end = textarea.selectionEnd ?? start;
-    const blockStart = value.lastIndexOf('\n', Math.max(0, start - 1)) + 1;
-    const blockEndRaw = value.indexOf('\n', end);
-    const blockEnd = blockEndRaw === -1 ? value.length : blockEndRaw;
-    const blockText = value.slice(blockStart, blockEnd);
-    const transformed = blockText
-      .split('\n')
-      .map(line => `${prefix}${line}`)
-      .join('\n');
+    const modal = await this.modalController.create({
+      component: ArticleImagesModalComponent,
+      componentProps: { articleId: this.articleId, uploading: this.articleImageUploading(), images: this.articleImages() },
+      cssClass: 'article-images-ionic-modal',
+    });
+    await modal.present();
+    const { data } = await modal.onDidDismiss<{ action?: 'upload' | 'insert' | 'remove'; file?: File; image?: ArticleImage }>();
+    if (data?.action === 'upload' && data.file) {
+      this.uploadArticleImage(data.file);
+    } else if (data?.action === 'insert' && data.image) {
+      this.insertArticleImage(data.image);
+    } else if (data?.action === 'remove' && data.image) {
+      this.removeArticleImage(data.image);
+    }
+  }
 
-    this.markdownContent = value.slice(0, blockStart) + transformed + value.slice(blockEnd);
-    this.syncState();
-    queueMicrotask(() => {
-      textarea.focus();
-      textarea.setSelectionRange(blockStart, blockStart + transformed.length);
+  removeCoverImage() {
+    this.previewImageUrl = '';
+    this.previewImageName = '';
+    this.validateRequiredFields();
+  }
+
+  insertArticleImage(image: ArticleImage) {
+    this.appendBlock(`![image](${image.imageUrl})`);
+  }
+
+  removeArticleImage(image: ArticleImage) {
+    if (!this.articleId) return;
+    this.articleImagesService.delete(this.articleId, image.id).subscribe({
+      next: () => this.articleImages.update(images => images.filter(i => i.id !== image.id)),
     });
   }
 
-  private applyNumberedList() {
-    const textarea = this.markdownInput?.nativeElement;
-    if (!textarea) {
+  async toggleAssistant() {
+    if (this.draftCreationLoading()) {
       return;
     }
-    const value = this.markdownContent;
-    const start = textarea.selectionStart ?? 0;
-    const end = textarea.selectionEnd ?? start;
-    const blockStart = value.lastIndexOf('\n', Math.max(0, start - 1)) + 1;
-    const blockEndRaw = value.indexOf('\n', end);
-    const blockEnd = blockEndRaw === -1 ? value.length : blockEndRaw;
-    const blockText = value.slice(blockStart, blockEnd);
-    const transformed = blockText
-      .split('\n')
-      .map((line, idx) => `${idx + 1}. ${line}`)
-      .join('\n');
+    if (!this.assistantOpen()) {
+      if (!this.articleId) {
+        await this.ensureDraftArticle('assistant');
+        return;
+      }
+    }
+    this.assistantOpen.update(value => !value);
+  }
 
-    this.markdownContent = value.slice(0, blockStart) + transformed + value.slice(blockEnd);
-    this.syncState();
-    queueMicrotask(() => {
-      textarea.focus();
-      textarea.setSelectionRange(blockStart, blockStart + transformed.length);
+  startAssistantResize(event: PointerEvent): void {
+    event.preventDefault();
+    this.resizePointerId = event.pointerId;
+    document.addEventListener('pointermove', this.onResizePointerMove);
+    document.addEventListener('pointerup', this.onResizePointerUp);
+  }
+
+  onAssistantMessagesClick(event: MouseEvent) {
+    const target = event.target instanceof Element ? event.target : null;
+    const copyButton = target?.closest('.article-code-copy') as HTMLElement | null;
+    if (copyButton) {
+      const pre = copyButton.closest('pre');
+      const code = pre?.querySelector('code')?.textContent ?? '';
+      this.copyText(code, copyButton);
+    }
+  }
+
+  onPreviewClick(event: MouseEvent): void {
+    const target = event.target instanceof Element ? event.target : null;
+    const copyButton = target?.closest('.article-code-copy') as HTMLElement | null;
+    if (!copyButton) return;
+    const pre = copyButton.closest('pre');
+    const code = pre?.querySelector('code')?.textContent ?? '';
+    this.copyText(code, copyButton);
+  }
+
+  onAssistantChatSelected(chatId: string): void {
+    const articleId = this.articleId;
+    if (!articleId) return;
+    this.selectedChatId.set(chatId);
+    this.loadAssistantMessages(articleId, chatId);
+  }
+
+  insertAssistantMessage(content: string) {
+    const textarea = this.markdownInput?.nativeElement;
+    if (!textarea) return;
+    const value = this.markdownContent;
+    const start = textarea.selectionStart ?? value.length;
+    const end = textarea.selectionEnd ?? start;
+    const replacement = `${content}\n`;
+    this.markdownContent = value.slice(0, start) + replacement + value.slice(end);
+    this.editorTab = 'write';
+    this.validateRequiredFields();
+  }
+
+  submitArticle() {
+    this.submitted = true;
+    this.validateRequiredFields();
+    if (!this.canSubmit()) {
+      return;
+    }
+
+    const request: CreateArticleRequest = {
+      title: this.title.trim(),
+      imageUrl: this.previewImageUrl,
+      published: !this.isDraft,
+      markdownContent: this.markdownContent.trim(),
+    };
+
+    const request$ = this.articleId ? this.articlesService.update(this.articleId, request) : this.articlesService.create(request);
+    request$.subscribe({
+      next: res => {
+        this.captureSnapshot();
+        this.router.navigate(['/articles', res.articleResponse.id]);
+      },
     });
   }
 
-  onPreviewSelected(event: Event) {
-    const file = (event.target as HTMLInputElement).files?.[0];
-    if (!file) return;
+  pageTitle(): string { return this.articleId ? 'Edit article' : 'Create article'; }
+  submitLabel(): string { return this.articleId ? 'Save article' : 'Publish article'; }
+  canSubmit(): boolean { return this.title.trim().length > 0 && this.markdownContent.trim().length > 0 && this.previewImageUrl.trim().length > 0; }
+  validationMissingItems(): string[] {
+    const missing: string[] = [];
+    if (!this.title.trim()) missing.push('Title');
+    if (!this.markdownContent.trim()) missing.push('Content');
+    if (!this.previewImageUrl.trim()) missing.push('Cover image');
+    return missing;
+  }
 
+  private uploadPreviewFile(file: File): void {
     this.previewImageName = file.name;
     this.previewImageUploading.set(true);
-
     this.uploadService.uploadFile(file)
       .pipe(finalize(() => this.previewImageUploading.set(false)))
       .subscribe({
         next: response => {
           this.previewImageUrl = response.url;
-          this.previewImageName = file.name;
-          this.syncState();
-          this.coverDialogOpen.set(false);
+          this.validateRequiredFields();
         },
-        error: err => console.error('Preview upload failed', err),
       });
   }
 
-  onArticleImageSelected(event: Event) {
-    const file = (event.target as HTMLInputElement).files?.[0];
-    if (!file || !this.articleId) return;
-
+  private uploadArticleImage(file: File): void {
+    if (!this.articleId) return;
     this.articleImageUploading.set(true);
     this.uploadService.uploadFile(file)
       .pipe(finalize(() => this.articleImageUploading.set(false)))
@@ -311,239 +356,40 @@ export class EditArticlePage implements OnDestroy {
         next: response => {
           this.articleImagesService.add(this.articleId!, response.url).subscribe({
             next: image => this.articleImages.update(images => [image, ...images]),
-            error: err => console.error('Failed to save article image', err),
           });
         },
-        error: err => console.error('Article image upload failed', err),
       });
   }
 
-  openImageLibrary() {
-    this.imageLibraryOpen.set(true);
-  }
-
-  closeImageLibrary() {
-    this.imageLibraryOpen.set(false);
-  }
-
-  toggleCoverDialog() {
-    this.coverDialogOpen.update(value => !value);
-  }
-
-  closeCoverDialog() {
-    this.coverDialogOpen.set(false);
-  }
-
-  removeCoverImage() {
-    this.previewImageUrl = '';
-    this.previewImageName = '';
-    this.syncState();
-  }
-
-  setEditorTab(tab: 'write' | 'preview') {
-    this.editorTab = tab;
-  }
-
-  removeArticleImage(image: ArticleImage) {
-    if (!this.articleId) return;
-    this.articleImagesService.delete(this.articleId, image.id).subscribe({
-      next: () => this.articleImages.update(images => images.filter(i => i.id !== image.id)),
-      error: err => console.error('Failed to delete image', err),
-    });
-  }
-
-  insertArticleImage(image: ArticleImage) {
-    this.appendBlock(`![image](${image.imageUrl})`);
-  }
-
-  insertAssistantMessage(content: string) {
-    const insert = () => {
-      const textarea = this.markdownInput?.nativeElement;
-      if (!textarea) {
-        this.markdownContent = `${this.markdownContent}${this.markdownContent ? '\n\n' : ''}${content}`;
-        this.syncState();
-        return;
-      }
-
-      const value = this.markdownContent;
-      const start = textarea.selectionStart ?? value.length;
-      const end = textarea.selectionEnd ?? start;
-      const replacement = `${content}\n`;
-      this.markdownContent = value.slice(0, start) + replacement + value.slice(end);
-      this.syncState();
-
-      queueMicrotask(() => {
-        const caret = start + replacement.length;
-        textarea.focus();
-        textarea.setSelectionRange(caret, caret);
-      });
-    };
-
-    if (this.editorTab !== 'write') {
-      this.editorTab = 'write';
-      setTimeout(insert, 0);
-      return;
-    }
-
-    insert();
-  }
-
-  onAssistantMessagesClick(event: MouseEvent) {
-    const target = event.target as HTMLElement | null;
-    const editButton = target?.closest('.assistant-code-block__edit') as HTMLElement | null;
-    if (!editButton) {
-      return;
-    }
-
-    event.preventDefault();
-    event.stopPropagation();
-
-    const payload = editButton.getAttribute('data-code');
-    const language = editButton.getAttribute('data-language') ?? '';
-    if (!payload) {
-      return;
-    }
-
-    const code = decodeURIComponent(payload);
-    const fenced = `\`\`\`${language}\n${code}\n\`\`\`\n`;
-    this.insertAssistantMessage(fenced);
-  }
-
-  onAssistantResizeStart(event: MouseEvent) {
-    if (window.innerWidth <= 1200) {
-      return;
-    }
-    event.preventDefault();
-    this.isResizingAssistant = true;
-    document.body.style.cursor = 'col-resize';
-    document.body.style.userSelect = 'none';
-
-    this.onAssistantResizeMove = (moveEvent: MouseEvent) => {
-      if (!this.isResizingAssistant) {
-        return;
-      }
-      const minWidth = 320;
-      const maxWidth = Math.max(minWidth, Math.floor(window.innerWidth * 0.55));
-      const next = Math.round(window.innerWidth - moveEvent.clientX);
-      const width = Math.min(maxWidth, Math.max(minWidth, next));
-      this.assistantWidthPx.set(width);
-    };
-
-    this.onAssistantResizeUp = () => {
-      this.stopAssistantResize();
-    };
-
-    document.addEventListener('mousemove', this.onAssistantResizeMove);
-    document.addEventListener('mouseup', this.onAssistantResizeUp);
-  }
-
-  toggleAssistant() {
-    this.assistantOpen.update(value => !value);
-  }
-
-  createAssistantChat() {
-    if (!this.articleId) return;
-    const title = `Chat ${this.assistantChats().length + 1}`;
-    this.articleAssistantService.createChat(this.articleId, title).subscribe(chat => {
-      this.assistantChats.update(chats => [chat, ...chats]);
-      this.selectedChatId.set(chat.id);
-      this.assistantMessages.set([]);
-    });
-  }
-
-  selectAssistantChat(chatId: string) {
-    this.selectedChatId.set(chatId);
-    if (!this.articleId) return;
-    this.articleAssistantService.listMessages(this.articleId, chatId).subscribe(messages => {
-      this.assistantMessages.set(messages);
-    });
-  }
-
-  sendAssistantMessage() {
-    if (!this.articleId || !this.selectedChatId() || !this.assistantInput.trim() || this.assistantLoading()) {
-      return;
-    }
-
-    const prompt = this.assistantInput.trim();
-    this.assistantMessages.update(messages => [
-      ...messages,
-      { id: `tmp-${Date.now()}`, role: 'USER', content: prompt, createdAt: new Date().toISOString() }
-    ]);
-    this.assistantInput = '';
-    this.assistantLoading.set(true);
-
-    this.articleAssistantService.sendMessage(this.articleId, this.selectedChatId()!, prompt, this.assistantMode)
-      .pipe(finalize(() => this.assistantLoading.set(false)))
-      .subscribe({
-        next: response => this.assistantMessages.update(messages => [...messages, response.assistantMessage]),
-        error: () => this.assistantMessages.update(messages => [
-          ...messages,
-          { id: `err-${Date.now()}`, role: 'ASSISTANT', content: 'Assistant request failed. Try again.', createdAt: new Date().toISOString() }
-        ])
-      });
-  }
-
-  submitArticle() {
-    const request: CreateArticleRequest = {
-      title: this.title,
-      imageUrl: this.previewImageUrl,
-      published: !this.isDraft,
-      markdownContent: this.markdownContent,
-    };
-
-    const request$ = this.articleId
-      ? this.articlesService.update(this.articleId, request)
-      : this.articlesService.create(request);
-
-    request$.subscribe({
-      next: res => {
-        this.router.navigate(['/articles', res.articleResponse.id]);
-      },
-      error: err => console.error(err),
-    });
-  }
-
-  pageTitle(): string {
-    return this.articleId ? 'Edit article' : 'New article';
-  }
-
-  submitLabel(): string {
-    return this.articleId ? 'Save' : 'Upload';
-  }
-
-  private loadArticleForEditing(articleId: string) {
+  private loadEditorData(articleId: string) {
     this.loadingArticle.set(true);
     this.loadFailed.set(false);
-
-    this.articlesService.getById(articleId).subscribe({
-      next: article => {
-        this.applyArticle(article);
-        this.syncState();
+    this.articlesService.getEditPage(articleId).subscribe({
+      next: payload => {
+        this.applyArticle(payload.article);
+        this.articleImages.set(payload.images ?? []);
+        this.assistantChats.set(payload.chats ?? []);
+        this.selectedChatId.set(payload.selectedChatId ?? null);
+        this.assistantMessages.set(payload.messages ?? []);
+        this.captureSnapshot();
         this.loadingArticle.set(false);
+        this.applyPendingAction();
       },
       error: (error: HttpErrorResponse) => {
-        console.error('Failed to load article for editing', error);
         this.loadingArticle.set(false);
+        if (error.status === 404 || error.status === 400) {
+          this.router.navigate(['/not-found']);
+          return;
+        }
         this.loadFailed.set(true);
       }
     });
   }
 
-  private loadArticleImages(articleId: string) {
-    this.articleImagesService.list(articleId).subscribe({
-      next: images => this.articleImages.set(images),
-      error: err => console.error('Failed to load article images', err),
-    });
-  }
-
-  private loadAssistantChats(articleId: string) {
-    this.articleAssistantService.listChats(articleId).subscribe(chats => {
-      this.assistantChats.set(chats);
-      if (!chats.length) {
-        return;
-      }
-      this.selectedChatId.set(chats[0].id);
-      this.selectAssistantChat(chats[0].id);
+  private loadAssistantMessages(articleId: string, chatId: string): void {
+    this.articleAssistantService.listMessages(articleId, chatId).subscribe({
+      next: messages => this.assistantMessages.set(messages),
+      error: () => this.assistantMessages.set([]),
     });
   }
 
@@ -554,25 +400,158 @@ export class EditArticlePage implements OnDestroy {
     this.previewImageName = data.imageUrl ? 'Current preview image' : '';
     this.isDraft = !data.published;
     this.markdownContent = data.markdownContent ?? '';
+    this.validateRequiredFields();
   }
 
-  private decodeHtml(value: string): string {
-    const textarea = document.createElement('textarea');
-    textarea.innerHTML = value;
-    return textarea.value;
+  private validateRequiredFields(): void {
+    this.titleError.set(this.submitted && !this.title.trim());
+    this.contentError.set(this.submitted && !this.markdownContent.trim());
+    this.coverError.set(this.submitted && !this.previewImageUrl.trim());
   }
 
-  private stopAssistantResize() {
-    this.isResizingAssistant = false;
-    document.body.style.cursor = '';
-    document.body.style.userSelect = '';
-    if (this.onAssistantResizeMove) {
-      document.removeEventListener('mousemove', this.onAssistantResizeMove);
-      this.onAssistantResizeMove = undefined;
+  private snapshotState(): string {
+    return JSON.stringify({
+      title: this.title,
+      markdownContent: this.markdownContent,
+      isDraft: this.isDraft,
+      previewImageUrl: this.previewImageUrl,
+    });
+  }
+
+  private captureSnapshot(): void {
+    this.initialSnapshot = this.snapshotState();
+  }
+
+  private applyLinePrefix(prefix: string) {
+    const textarea = this.markdownInput?.nativeElement;
+    if (!textarea) return;
+    const value = this.markdownContent;
+    const start = textarea.selectionStart ?? 0;
+    const end = textarea.selectionEnd ?? start;
+    const blockStart = value.lastIndexOf('\n', Math.max(0, start - 1)) + 1;
+    const blockEndRaw = value.indexOf('\n', end);
+    const blockEnd = blockEndRaw === -1 ? value.length : blockEndRaw;
+    const blockText = value.slice(blockStart, blockEnd);
+    const transformed = blockText.split('\n').map(line => `${prefix}${line}`).join('\n');
+    this.markdownContent = value.slice(0, blockStart) + transformed + value.slice(blockEnd);
+    this.validateRequiredFields();
+  }
+
+  private applyNumberedList() {
+    const textarea = this.markdownInput?.nativeElement;
+    if (!textarea) return;
+    const value = this.markdownContent;
+    const start = textarea.selectionStart ?? 0;
+    const end = textarea.selectionEnd ?? start;
+    const blockStart = value.lastIndexOf('\n', Math.max(0, start - 1)) + 1;
+    const blockEndRaw = value.indexOf('\n', end);
+    const blockEnd = blockEndRaw === -1 ? value.length : blockEndRaw;
+    const blockText = value.slice(blockStart, blockEnd);
+    const transformed = blockText.split('\n').map((line, idx) => `${idx + 1}. ${line}`).join('\n');
+    this.markdownContent = value.slice(0, blockStart) + transformed + value.slice(blockEnd);
+    this.validateRequiredFields();
+  }
+
+  private handleAssistantResize(event: PointerEvent): void {
+    if (this.resizePointerId !== event.pointerId) return;
+    const viewportWidth = window.innerWidth || 0;
+    const nextWidth = viewportWidth - event.clientX;
+    const minWidth = 352;
+    const maxWidth = Math.max(minWidth, Math.floor(viewportWidth / 2));
+    const bounded = Math.max(minWidth, Math.min(nextWidth, maxWidth));
+    this.assistantPanelWidth.set(bounded);
+  }
+
+  private stopAssistantResize(event: PointerEvent): void {
+    if (this.resizePointerId !== event.pointerId) return;
+    this.teardownAssistantResize();
+  }
+
+  private teardownAssistantResize(): void {
+    this.resizePointerId = null;
+    document.removeEventListener('pointermove', this.onResizePointerMove);
+    document.removeEventListener('pointerup', this.onResizePointerUp);
+  }
+
+  private async copyText(value: string, button: HTMLElement): Promise<void> {
+    if (!value.trim()) {
+      return;
     }
-    if (this.onAssistantResizeUp) {
-      document.removeEventListener('mouseup', this.onAssistantResizeUp);
-      this.onAssistantResizeUp = undefined;
+    const previous = button.textContent ?? 'Copy';
+    try {
+      if (navigator.clipboard?.writeText && window.isSecureContext) {
+        await navigator.clipboard.writeText(value);
+      } else {
+        const textarea = document.createElement('textarea');
+        textarea.value = value;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+      }
+      button.textContent = 'Copied';
+      setTimeout(() => {
+        button.textContent = previous;
+      }, 1200);
+    } catch {
+      button.textContent = 'Failed';
+      setTimeout(() => {
+        button.textContent = previous;
+      }, 1200);
     }
+  }
+
+  private async ensureDraftArticle(action: 'assistant' | 'images'): Promise<void> {
+    if (this.articleId || this.draftCreationLoading()) {
+      return;
+    }
+    this.draftCreationLoading.set(true);
+
+    const nextDraftIndex = Number(sessionStorage.getItem('create_article_draft_index') ?? '0') + 1;
+    sessionStorage.setItem('create_article_draft_index', String(nextDraftIndex));
+
+    const request: CreateArticleRequest = {
+      title: this.title.trim() || `Draft ${nextDraftIndex}`,
+      imageUrl: this.previewImageUrl || '',
+      published: false,
+      markdownContent: this.markdownContent.trim() || `Draft ${nextDraftIndex}`,
+    };
+
+    sessionStorage.setItem(this.pendingActionStorageKey, action);
+    await new Promise<void>((resolve) => {
+      this.articlesService.create(request).subscribe({
+        next: (res) => {
+          const createdId = res.articleResponse.id;
+          this.articleId = createdId;
+          this.applyArticle(res);
+          this.captureSnapshot();
+          this.router.navigate(['/edit-article', createdId], { replaceUrl: true });
+          resolve();
+        },
+        error: () => {
+          sessionStorage.removeItem(this.pendingActionStorageKey);
+          this.draftCreationLoading.set(false);
+          resolve();
+        },
+      });
+    });
+  }
+
+  private applyPendingAction(): void {
+    const pendingAction = sessionStorage.getItem(this.pendingActionStorageKey);
+    if (pendingAction !== 'assistant' && pendingAction !== 'images') {
+      this.draftCreationLoading.set(false);
+      return;
+    }
+    sessionStorage.removeItem(this.pendingActionStorageKey);
+    this.draftCreationLoading.set(false);
+    if (pendingAction === 'assistant') {
+      this.assistantOpen.set(true);
+      return;
+    }
+    this.openImageLibrary();
   }
 }

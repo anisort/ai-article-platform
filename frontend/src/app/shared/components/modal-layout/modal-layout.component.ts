@@ -13,6 +13,7 @@ export class ModalLayoutComponent {
   readonly kicker = input<string | null>(null);
   readonly searchPlaceholder = input<string | null>(null);
   readonly searchValue = input('');
+  readonly contentScrollable = input(true);
 
   readonly searchValueChange = output<string>();
 

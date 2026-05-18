@@ -3,6 +3,7 @@ package com.articles.api;
 import com.articles.dto.article.ArticleWithUserResponse;
 import com.articles.dto.article.CreateArticleRequest;
 import com.articles.dto.article.ArticlePreviewResponse;
+import com.articles.dto.article.EditArticlePageResponse;
 import com.articles.services.facade.ArticleFacadeService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -35,6 +36,12 @@ public class ArticleApi {
     public ArticleWithUserResponse getArticle(@PathVariable UUID articleId, @AuthenticationPrincipal Jwt jwt) {
         UUID requesterId = jwt == null ? null : UUID.fromString(jwt.getSubject());
         return articleFacadeService.getArticle(articleId, requesterId);
+    }
+
+    @GetMapping("/{articleId}/edit-page")
+    public EditArticlePageResponse getEditPage(@PathVariable UUID articleId, @AuthenticationPrincipal Jwt jwt) {
+        UUID requesterId = UUID.fromString(jwt.getSubject());
+        return articleFacadeService.getEditPage(articleId, requesterId);
     }
 
     @PostMapping

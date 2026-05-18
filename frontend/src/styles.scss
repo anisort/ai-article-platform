@@ -77,6 +77,22 @@ ion-modal.profile-connections-ionic-modal::part(content) {
     overflow: hidden;
 }
 
+ion-modal.article-images-ionic-modal {
+    --width: min(100%, 900px);
+    --height: min(86vh, 980px);
+    --border-radius: 10px;
+    --background: var(--color-surface-elevated);
+}
+
+ion-modal.article-images-ionic-modal::part(content) {
+    background: var(--color-surface-elevated);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
 body.theme-dark {
     color-scheme: dark;
     --color-primary: #8df688;
@@ -113,4 +129,134 @@ body.theme-dark {
     --color-button-primary-bg: var(--color-primary);
     --color-button-primary-text: #ffffff;
     background: var(--color-surface-base);
+}
+
+.markdown-rendered {
+    color: var(--color-text-body);
+    line-height: 1.75;
+    font-size: 1rem;
+}
+
+.markdown-rendered h1,
+.markdown-rendered h2,
+.markdown-rendered h3,
+.markdown-rendered h4,
+.markdown-rendered h5,
+.markdown-rendered h6 {
+    margin-top: 1.2rem;
+    margin-bottom: 0.75rem;
+    color: var(--color-accent-ink);
+    line-height: 1.2;
+}
+
+.markdown-rendered h1:first-child,
+.markdown-rendered h2:first-child,
+.markdown-rendered h3:first-child {
+    margin-top: 0;
+}
+
+.markdown-rendered p,
+.markdown-rendered ul,
+.markdown-rendered ol,
+.markdown-rendered blockquote {
+    margin: 0 0 0.95rem;
+}
+
+.markdown-rendered a {
+    color: var(--color-accent-berry);
+}
+
+.markdown-rendered blockquote {
+    padding: 0.75rem 1rem;
+    border-left: 3px solid var(--color-border-strong);
+    border-radius: 0 6px 6px 0;
+    background: color-mix(in srgb, var(--color-surface-elevated) 70%, var(--color-surface-rose));
+    color: var(--color-text-muted);
+}
+
+.markdown-rendered :not(pre) > code {
+    padding: 0.14rem 0.35rem;
+    border-radius: 4px;
+    background: color-mix(in srgb, var(--color-surface-base) 82%, white);
+    border: 1px solid var(--color-border-soft);
+    font-size: 0.9em;
+    font-family: "Cascadia Code", "Fira Code", monospace;
+}
+
+.markdown-rendered pre {
+    margin: 1rem 0;
+    padding: 2.1rem 0.95rem 0.95rem;
+    border-radius: 8px;
+    background: color-mix(in srgb, var(--color-surface-soft) 88%, var(--color-surface-panel));
+    border: 1px solid color-mix(in srgb, var(--color-border-soft) 78%, var(--color-border-strong));
+    overflow-x: auto;
+    position: relative;
+}
+
+.markdown-rendered .article-code-toolbar {
+    position: absolute;
+    top: 0.5rem;
+    left: 0.7rem;
+    right: 0.7rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem;
+}
+
+.markdown-rendered .article-code-language {
+    font-size: 0.74rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: color-mix(in srgb, var(--color-text-muted) 92%, var(--color-accent-ink));
+    font-weight: 700;
+}
+
+.markdown-rendered .article-code-copy {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--color-border-soft);
+    background: color-mix(in srgb, var(--color-surface-elevated) 72%, var(--color-surface-panel));
+    color: var(--color-accent-ink);
+    border-radius: 6px;
+    font-size: 0.76rem;
+    padding: 0.22rem 0.55rem;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.markdown-rendered .article-code-copy:hover {
+    background: color-mix(in srgb, var(--color-surface-rose) 28%, var(--color-surface-elevated));
+}
+
+.markdown-rendered pre code {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--color-accent-ink);
+    font-size: 0.93rem;
+    line-height: 1.65;
+    font-family: "Cascadia Code", "Fira Code", monospace;
+}
+
+.markdown-rendered pre code.hljs {
+    display: block;
+    background: transparent !important;
+    color: var(--color-accent-ink) !important;
+}
+
+.markdown-rendered pre code.hljs * {
+    color: inherit !important;
+}
+
+.markdown-rendered img {
+    display: block;
+    width: min(100%, 860px);
+    height: clamp(240px, 30vw, 380px);
+    margin: 1rem auto;
+    border-radius: 8px;
+    object-fit: cover;
+    border: 1px solid var(--color-border-soft);
+    background: var(--color-surface-elevated);
 }

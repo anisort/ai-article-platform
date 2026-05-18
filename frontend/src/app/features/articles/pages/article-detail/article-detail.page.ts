@@ -1,8 +1,7 @@
 import { CommonModule, DatePipe } from '@angular/common';
-import { AfterViewInit, Component, ElementRef, OnInit, Renderer2, ViewChild, computed, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
-import { MarkdownModule } from 'ngx-markdown';
 import { AuthService } from '../../../../core/services/auth.service';
 import { ArticlesService } from '../../services/articles.service';
 import { ArticleWithUserResponse } from '../../models/article-response.model';
@@ -11,23 +10,22 @@ import { PageIntroComponent } from '../../../../shared/components/page-intro/pag
 import { ProfileSummaryCardComponent } from '../../../profile/components/profile-summary-card/profile-summary-card.component';
 import { UserProfile } from '../../../profile/models/user-profile.model';
 import { LoadingStateComponent } from '../../../../shared/components/loading-state/loading-state.component';
+import { MarkdownRenderService } from '../../../../shared/services/markdown-render.service';
 
 @Component({
   selector: 'app-article-detail-page',
   standalone: true,
-  imports: [CommonModule, RouterLink, MarkdownModule, DatePipe, PageIntroComponent, ProfileSummaryCardComponent, LoadingStateComponent],
+  imports: [CommonModule, RouterLink, DatePipe, PageIntroComponent, ProfileSummaryCardComponent, LoadingStateComponent],
   templateUrl: './article-detail.page.html',
   styleUrl: './article-detail.page.scss',
 })
-export class ArticleDetailPage implements OnInit, AfterViewInit {
+export class ArticleDetailPage implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly articlesService = inject(ArticlesService);
   private readonly authService = inject(AuthService);
   private readonly myArticlesService = inject(MyArticlesService);
-  private readonly renderer = inject(Renderer2);
-
-  @ViewChild('markdownHost') private markdownHost?: ElementRef<HTMLElement>;
+  private readonly markdownRenderService = inject(MarkdownRenderService);
 
   article = signal<ArticleWithUserResponse | null>(null);
   loading = signal(true);
@@ -61,14 +59,6 @@ export class ArticleDetailPage implements OnInit, AfterViewInit {
     };
   });
 
-  ngAfterViewInit(): void {
-    this.scheduleCodeBlockEnhancement();
-  }
-
-  onMarkdownReady(): void {
-    this.scheduleCodeBlockEnhancement();
-  }
-
   ngOnInit(): void {
     const articleId = this.route.snapshot.paramMap.get('id');
 
@@ -83,7 +73,6 @@ export class ArticleDetailPage implements OnInit, AfterViewInit {
         this.liked.set(article.articleResponse.likedByRequester);
         this.likesCount.set(article.articleResponse.likesCount ?? 0);
         this.loading.set(false);
-        this.scheduleCodeBlockEnhancement();
       },
       error: (error: HttpErrorResponse) => {
         this.loading.set(false);
@@ -146,63 +135,19 @@ export class ArticleDetailPage implements OnInit, AfterViewInit {
     if (!article) {
       return '';
     }
-    return article.markdownContent ?? '';
+    return this.markdownRenderService.render(article.markdownContent ?? '');
   }
 
-  private scheduleCodeBlockEnhancement(): void {
-    setTimeout(() => this.enhanceCodeBlocks(), 0);
+  onArticleContentClick(event: MouseEvent): void {
+    const target = event.target instanceof Element ? event.target : null;
+    const copyButton = target?.closest('.article-code-copy') as HTMLElement | null;
+    if (!copyButton) return;
+    const pre = copyButton.closest('pre');
+    const code = pre?.querySelector('code')?.textContent ?? '';
+    this.copyCodeToClipboard(copyButton, code);
   }
 
-  private enhanceCodeBlocks(): void {
-    const root = this.markdownHost?.nativeElement;
-    if (!root) {
-      return;
-    }
-
-    const blocks = Array.from(root.querySelectorAll('pre'));
-    for (const pre of blocks) {
-      if (pre.dataset['enhanced'] === 'true') {
-        continue;
-      }
-
-      const code = pre.querySelector('code');
-      if (!code) {
-        continue;
-      }
-
-      const language = this.detectCodeLanguage(code.className);
-      const toolbar = this.renderer.createElement('div');
-      toolbar.className = 'article-code-toolbar';
-
-      const languageLabel = this.renderer.createElement('span');
-      languageLabel.className = 'article-code-language';
-      languageLabel.textContent = language;
-
-      const copyButton = this.renderer.createElement('button');
-      copyButton.className = 'article-code-copy';
-      copyButton.type = 'button';
-      copyButton.textContent = 'Copy';
-      this.renderer.listen(copyButton, 'click', () => {
-        this.copyCodeToClipboard(copyButton, code.textContent ?? '');
-      });
-
-      this.renderer.appendChild(toolbar, languageLabel);
-      this.renderer.appendChild(toolbar, copyButton);
-      this.renderer.insertBefore(pre, toolbar, pre.firstChild);
-      pre.dataset['enhanced'] = 'true';
-    }
-  }
-
-  private detectCodeLanguage(className: string): string {
-    const classTokens = className.split(' ').map(token => token.trim()).filter(Boolean);
-    const token = classTokens.find(value => value.startsWith('language-') || value.startsWith('lang-'));
-    if (!token) {
-      return 'text';
-    }
-    return token.replace('language-', '').replace('lang-', '') || 'text';
-  }
-
-  private async copyCodeToClipboard(button: HTMLButtonElement, value: string): Promise<void> {
+  private async copyCodeToClipboard(button: HTMLElement, value: string): Promise<void> {
     if (!value.trim()) {
       return;
     }

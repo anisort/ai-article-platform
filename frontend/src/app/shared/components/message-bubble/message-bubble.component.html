@@ -1,0 +1,6 @@
+<div class="message-bubble" [class.message-bubble--user]="isUser()">
+  <div class="message-bubble__content markdown-rendered" [innerHTML]="html()"></div>
+  @if (showInsert()) {
+    <button type="button" class="message-bubble__insert" (click)="insert.emit()">{{ insertLabel() }}</button>
+  }
+</div>

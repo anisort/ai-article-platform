@@ -1,0 +1,26 @@
+<div class="toolbar">
+  <div class="toolbar-group">
+    <app-select-field
+      [value]="headingLabel()"
+      [options]="headingOptions"
+      (valueChange)="onHeadingLevelSelect($event)"
+    />
+    <button type="button" class="toolbar-icon toolbar-icon--accent" (click)="applyHeading.emit()" title="Apply"><ion-icon name="checkmark-outline"></ion-icon></button>
+  </div>
+  <div class="toolbar-group">
+    <button type="button" class="toolbar-icon toolbar-icon--text" (click)="bold.emit()" title="Bold">B</button>
+    <button type="button" class="toolbar-icon toolbar-icon--text toolbar-icon--italic" (click)="italic.emit()" title="Italic">i</button>
+    <button type="button" class="toolbar-icon toolbar-icon--text toolbar-icon--underline" (click)="underline.emit()" title="Underline">U</button>
+    <button type="button" class="toolbar-icon toolbar-icon--text toolbar-icon--strike" (click)="strike.emit()" title="Strikethrough">S</button>
+  </div>
+  <div class="toolbar-group">
+    <button type="button" class="toolbar-icon" (click)="quote.emit()" title="Quote"><ion-icon name="chatbox-ellipses-outline"></ion-icon></button>
+    <button type="button" class="toolbar-icon" (click)="link.emit()" title="Link"><ion-icon name="link-outline"></ion-icon></button>
+    <button type="button" class="toolbar-icon" (click)="image.emit()" title="Image"><ion-icon name="image-outline"></ion-icon></button>
+    <button type="button" class="toolbar-icon" (click)="code.emit()" title="Code"><ion-icon name="code-slash-outline"></ion-icon></button>
+  </div>
+  <div class="toolbar-group">
+    <button type="button" class="toolbar-icon" (click)="bulletList.emit()" title="Bullet list"><ion-icon name="list-outline"></ion-icon></button>
+    <button type="button" class="toolbar-icon toolbar-icon--text" (click)="numberedList.emit()" title="Numbered list">1.</button>
+  </div>
+</div>

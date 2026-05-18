@@ -1,185 +1,125 @@
-<section class="edit-page" [class.edit-page--assistant-open]="assistantOpen()" [style.--assistant-width.px]="assistantWidthPx()">
-  <div class="edit-content">
-    <div class="editor-top">
-      <p class="page-label">{{ pageTitle() }}</p>
-      @if (loadingArticle()) { <app-loading-state label="Loading" title="Loading article..." [compact]="true"></app-loading-state> }
-      @if (loadFailed()) { <div class="editor-status editor-status--error">Article could not be loaded for editing.</div> }
+<section class="edit-article-page">
+  <app-page-intro
+    [kicker]="pageTitle()"
+    [title]="''"
+    [description]="''"
+  />
 
-      <div class="title-row">
-        <input class="title-input" type="text" placeholder="Title" [value]="title" (input)="onTitleInput($event)">
-        <div class="primary-actions">
-          <button type="button" class="action-button" (click)="submitArticle()">{{ submitLabel() }}</button>
-        </div>
-      </div>
+  <input class="title-input title-input--hero" type="text" [value]="title" (input)="onTitleInput($event)" placeholder="Title" />
+  @if (titleError()) { <small class="field-error">Title is required.</small> }
 
-      <div class="editor-meta">
-        <div class="editor-meta-left">
-          <label class="draft-toggle">
-            <input type="checkbox" [checked]="isDraft" (change)="onDraftToggle($event)">
-            <span class="draft-box"></span>
-            <span class="draft-label">draft</span>
-          </label>
-          <div class="cover-control">
-            <button type="button" class="cover-button" (click)="toggleCoverDialog()">{{ previewImageUrl ? 'Cover set' : 'Cover' }}</button>
-          </div>
-        </div>
-        <div class="toolbar">
-          <div class="toolbar-group">
-            <div class="heading-dropdown">
-              <button type="button" class="toolbar-chip toolbar-chip--select" (click)="toggleHeadingDropdown()" title="Heading">
-                <span>{{ headingLabel() }}</span><ion-icon name="chevron-down-outline"></ion-icon>
+  @if (loadingArticle()) {
+    <app-loading-state label="Loading" title="Loading article..." />
+  } @else {
+    <div class="edit-article-shell" [class.edit-article-shell--assistant-open]="assistantOpen()">
+      <div class="editor-column">
+        @if (loadFailed()) {
+          <div class="editor-status editor-status--error">Article could not be loaded for editing.</div>
+        }
+
+        <div class="editor-form">
+          <p class="editing-panel-label">Editing panel</p>
+          <div class="editor-actions-row">
+            <div class="editor-actions-left">
+              <label class="draft-toggle">
+                <input type="checkbox" [checked]="isDraft" (change)="onDraftToggle($event)">
+                <span class="draft-box"></span>
+                <span>Draft</span>
+              </label>
+
+              <button type="button" class="secondary-button" (click)="openCoverDialog()">
+                {{ previewImageUrl ? 'Cover set' : 'Set cover' }}
               </button>
-              @if (headingDropdownOpen) {
-                <div class="heading-dropdown-menu">
-                  <button type="button" class="heading-option" (click)="selectHeading(1)">H1</button>
-                  <button type="button" class="heading-option" (click)="selectHeading(2)">H2</button>
-                  <button type="button" class="heading-option" (click)="selectHeading(3)">H3</button>
-                  <button type="button" class="heading-option" (click)="selectHeading(4)">H4</button>
-                </div>
-              }
-            </div>
-            <button type="button" class="toolbar-icon toolbar-icon--accent" (click)="applyHeadingLevel()" title="Apply"><ion-icon name="checkmark-outline"></ion-icon></button>
-          </div>
-          <div class="toolbar-group">
-            <button type="button" class="toolbar-icon toolbar-icon--text" (click)="addBold()" title="Bold">B</button>
-            <button type="button" class="toolbar-icon toolbar-icon--text toolbar-icon--italic" (click)="addItalic()" title="Italic">i</button>
-            <button type="button" class="toolbar-icon toolbar-icon--text toolbar-icon--underline" (click)="appendWrap('<u>', '</u>', 'underlined text')" title="Underline">U</button>
-          </div>
-          <div class="toolbar-group">
-            <button type="button" class="toolbar-icon" (click)="addQuote()" title="Quote"><ion-icon name="text-outline"></ion-icon></button>
-            <button type="button" class="toolbar-icon" (click)="addLink()" title="Link"><ion-icon name="link-outline"></ion-icon></button>
-            <button type="button" class="toolbar-icon" (click)="addImageMarkdown()" title="Image"><ion-icon name="image-outline"></ion-icon></button>
-            <button type="button" class="toolbar-icon" (click)="addCode()" title="Code"><ion-icon name="code-slash-outline"></ion-icon></button>
-            <button type="button" class="toolbar-icon" (click)="openImageLibrary()" title="Image folder"><ion-icon name="folder-open-outline"></ion-icon></button>
-          </div>
-          <div class="toolbar-group">
-            <button type="button" class="toolbar-icon" (click)="addList()" title="Bullet list"><ion-icon name="list-outline"></ion-icon></button>
-            <button type="button" class="toolbar-icon" (click)="addNumberedList()" title="Numbered list"><ion-icon name="reorder-three-outline"></ion-icon></button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="editor-grid">
-      <div class="editor-tabs">
-        <button type="button" class="editor-tab" [class.editor-tab--active]="editorTab === 'write'" (click)="setEditorTab('write')">Write</button>
-        <button type="button" class="editor-tab" [class.editor-tab--active]="editorTab === 'preview'" (click)="setEditorTab('preview')">Preview</button>
-        @if (articleId) {
-          <button type="button" class="editor-tab editor-tab--assistant" (click)="toggleAssistant()">{{ assistantOpen() ? 'Hide assistant' : 'Assistant' }}</button>
-        }
-      </div>
-      @if (editorTab === 'write') {
-        <textarea #markdownInput class="markdown-input" [value]="markdownContent" (input)="onContentInput($event)" placeholder="Write your article in Markdown..."></textarea>
-      } @else {
-        <article class="preview-pane" [innerHTML]="renderMarkdown(markdownContent)"></article>
-      }
-    </div>
-  </div>
-
-  @if (articleId) {
-    <aside class="assistant-panel" [class.assistant-panel--open]="assistantOpen()">
-      <div
-        class="assistant-resize-handle"
-        title="Resize assistant"
-        role="separator"
-        aria-orientation="vertical"
-        (mousedown)="onAssistantResizeStart($event)">
-      </div>
-      <div class="assistant-panel__header">
-        <strong>Article Assistant</strong>
-        <div class="assistant-panel__header-actions">
-          <button type="button" class="assistant-button" (click)="createAssistantChat()">New chat</button>
-          <button type="button" class="assistant-button" (click)="toggleAssistant()">Close</button>
-        </div>
-      </div>
-      <div class="assistant-chats">
-        @for (chat of assistantChats(); track chat.id) {
-          <button type="button" class="assistant-chat-item" [class.assistant-chat-item--active]="selectedChatId() === chat.id" (click)="selectAssistantChat(chat.id)">{{ chat.title }}</button>
-        }
-      </div>
-      @if (selectedChatId()) {
-        <div class="assistant-mode">
-          <label><input type="radio" name="assistantMode" value="THINKING" [(ngModel)]="assistantMode"> Thinking</label>
-          <label><input type="radio" name="assistantMode" value="CODE" [(ngModel)]="assistantMode"> Code</label>
-          <label><input type="radio" name="assistantMode" value="PRECISE" [(ngModel)]="assistantMode"> Precise</label>
-        </div>
-        <div class="assistant-messages" (click)="onAssistantMessagesClick($event)">
-          @for (message of assistantMessages(); track message.id) {
-            <div class="assistant-message" [class.assistant-message--user]="message.role === 'USER'">
-              <div class="assistant-message__content" [innerHTML]="renderAssistantMarkdown(message.content)"></div>
-              @if (message.role === 'ASSISTANT') {
-                <button type="button" class="assistant-message__insert" (click)="insertAssistantMessage(message.content)">Insert</button>
-              }
-            </div>
-          }
-          @if (assistantLoading()) { <app-loading-state label="Loading" title="Thinking..." [compact]="true"></app-loading-state> }
-        </div>
-        <div class="assistant-input">
-          <textarea [(ngModel)]="assistantInput" rows="3" placeholder="Ask assistant..."></textarea>
-          <button type="button" class="assistant-button" (click)="sendAssistantMessage()" [disabled]="assistantLoading()">Send</button>
-        </div>
-      } @else {
-        <div class="assistant-empty">Create or pick a chat.</div>
-      }
-    </aside>
-  }
-
-  @if (imageLibraryOpen()) {
-    <div class="image-library-modal-backdrop" (click)="closeImageLibrary()"></div>
-    <section class="image-library-modal">
-      <div class="image-library__header">
-        <strong>Article Images</strong>
-        <div class="image-library__header-actions">
-          @if (articleId) {
-            <label class="image-library__upload"><input type="file" accept="image/*" (change)="onArticleImageSelected($event)">Add image</label>
-          }
-          <button type="button" class="image-item__button" (click)="closeImageLibrary()">Close</button>
-        </div>
-      </div>
-      @if (!articleId) {
-        <p class="image-library__empty">Save article first to manage article image folder.</p>
-      } @else if (articleImageUploading()) {
-        <app-loading-state label="Loading" title="Uploading image..." [compact]="true"></app-loading-state>
-      } @else if (!articleImages().length) {
-        <p class="image-library__empty">No images yet.</p>
-      } @else {
-        <div class="image-library__grid">
-          @for (image of articleImages(); track image.id) {
-            <figure class="image-item">
-              <img [src]="image.imageUrl" alt="Article image">
-              <div class="image-item__actions">
-                <button type="button" class="image-item__button" (click)="insertArticleImage(image)">Insert</button>
-                <button type="button" class="image-item__button image-item__button--danger" (click)="removeArticleImage(image)">Delete</button>
+              <button type="button" class="secondary-button" [disabled]="draftCreationLoading()" (click)="openImageLibrary()">Images folder</button>
+              <div class="submit-group">
+                <button type="button" class="primary-button" [disabled]="!canSubmit()" (click)="submitArticle()">{{ submitLabel() }}</button>
+                @if (!canSubmit()) {
+                  <div class="validation-popover-anchor">
+                    <button
+                      type="button"
+                      class="validation-hint-button"
+                      aria-label="Validation info">
+                      !
+                    </button>
+                    <div class="validation-popover" role="tooltip">
+                      <p>Missing:</p>
+                      <ul>
+                        @for (item of validationMissingItems(); track item) {
+                          <li>{{ item }}</li>
+                        }
+                      </ul>
+                    </div>
+                  </div>
+                }
               </div>
-            </figure>
-          }
+            </div>
+            <app-article-editor-toolbar
+              [headingLevel]="headingLevel"
+              [headingDropdownOpen]="headingDropdownOpen"
+              (headingDropdownToggle)="toggleHeadingDropdown()"
+              (headingSelected)="selectHeading($event)"
+              (applyHeading)="applyHeadingLevel()"
+              (bold)="addBold()"
+              (italic)="addItalic()"
+              (underline)="appendWrap('<u>', '</u>', 'underlined text')"
+              (strike)="addStrike()"
+              (quote)="addQuote()"
+              (link)="addLink()"
+              (image)="addImageMarkdown()"
+              (code)="addCode()"
+              (bulletList)="addList()"
+              (numberedList)="addNumberedList()"
+            />
+          </div>
         </div>
-      }
-    </section>
-  }
 
-  @if (coverDialogOpen()) {
-    <div class="cover-modal-backdrop" (click)="closeCoverDialog()"></div>
-    <section class="cover-modal" role="dialog" aria-modal="true" aria-label="Cover image dialog">
-      @if (!previewImageUrl) {
-        <label class="cover-upload">
-          <input type="file" accept="image/*" (change)="onPreviewSelected($event)">
-          Choose image
-        </label>
-      } @else {
-        <img class="cover-preview" [src]="previewImageUrl" alt="Article cover">
-        <div class="cover-actions">
-          <label class="cover-upload">
-            <input type="file" accept="image/*" (change)="onPreviewSelected($event)">
-            Replace
+        <div class="segment-row">
+          <app-segmented-control
+            [options]="editorTabs"
+            [active]="editorTab"
+            ariaLabel="Editor mode"
+            (changed)="setEditorTab($event)"
+          />
+          <button type="button" class="secondary-button" [disabled]="draftCreationLoading()" (click)="toggleAssistant()">{{ assistantOpen() ? 'Hide assistant' : 'Assistant' }}</button>
+        </div>
+
+        @if (draftCreationLoading()) {
+          <app-loading-state label="Creating draft" title="Please wait..." [compact]="true" />
+        }
+
+        @if (editorTab === 'write') {
+          <label class="field field--editor">
+            <textarea #markdownInput class="editor-textarea" [value]="markdownContent" (input)="onContentInput($event)" placeholder="Write your article in Markdown..."></textarea>
+            @if (contentError()) { <small class="field-error">Content is required.</small> }
           </label>
-          <button type="button" class="cover-remove" (click)="removeCoverImage()">Remove</button>
+        } @else {
+          <article class="preview-pane markdown-rendered" [innerHTML]="renderMarkdown(markdownContent)" (click)="onPreviewClick($event)"></article>
+        }
+      </div>
+
+      @if (assistantOpen()) {
+        <div class="assistant-column" [style.width.px]="assistantPanelWidth()">
+          <button
+            type="button"
+            class="assistant-resize-handle"
+            aria-label="Resize assistant panel"
+            (pointerdown)="startAssistantResize($event)"
+          ></button>
+
+          <app-article-assistant-panel
+            [articleId]="articleId"
+            [initialChats]="assistantChats()"
+            [initialSelectedChatId]="selectedChatId()"
+            [initialMessages]="assistantMessages()"
+            [initialMode]="assistantMode"
+            [rendered]="renderAssistantMarkdown.bind(this)"
+            (closePanel)="toggleAssistant()"
+            (insertMessage)="insertAssistantMessage($event)"
+            (messagesClick)="onAssistantMessagesClick($event)"
+            (chatSelected)="onAssistantChatSelected($event)"
+          />
         </div>
       }
-      @if (previewImageUploading()) {
-        <app-loading-state label="Loading" title="Uploading..." [compact]="true"></app-loading-state>
-      }
-      <button type="button" class="cover-close" (click)="closeCoverDialog()">Close</button>
-    </section>
+    </div>
   }
 </section>

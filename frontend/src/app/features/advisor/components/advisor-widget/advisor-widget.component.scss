@@ -36,7 +36,7 @@
   width: min(24rem, calc(100vw - 2rem));
   height: 30rem;
   background: var(--color-surface-elevated);
-  border: 1px solid var(--color-border-strong);
+  border: 1px solid var(--color-border-soft);
   border-radius: 8px;
   box-shadow: var(--shadow-strong);
   display: grid;
@@ -57,10 +57,10 @@
 }
 
 .advisor-clear {
-  border: 1px solid var(--color-border-strong);
+  border: 1px solid var(--color-border-soft);
   border-radius: 6px;
   background: color-mix(in srgb, var(--color-surface-elevated) 78%, var(--color-surface-rose));
-  color: var(--color-accent-berry);
+  color: var(--color-accent-ink);
   font-size: 0.85rem;
   font-weight: 600;
   padding: 0.35rem 0.55rem;
@@ -73,27 +73,6 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-}
-
-.message {
-  max-width: 85%;
-  padding: 0.55rem 0.7rem;
-  border-radius: 6px;
-  background: var(--color-surface-panel);
-  border: 1px solid var(--color-border-soft);
-  color: var(--color-text-body);
-  font-size: 0.92rem;
-  line-height: 1.5;
-}
-
-.message :last-child {
-  margin-bottom: 0;
-}
-
-.message--user {
-  margin-left: auto;
-  background: color-mix(in srgb, var(--color-primary) 16%, var(--color-surface-panel));
-  border-color: color-mix(in srgb, var(--color-primary) 30%, var(--color-border-soft));
 }
 
 .advisor-input {
@@ -139,6 +118,7 @@
 
 .advisor-send i {
   font-size: 0.95rem;
+  color: #fff;
 }
 
 .advisor-send:disabled {
