@@ -2,7 +2,7 @@ package com.articles.services.facade;
 
 import com.articles.config.CacheNames;
 import com.articles.dto.article.ArticlePreviewResponse;
-import com.articles.dto.user.AuthorResponse;
+import com.articles.dto.user.UserBriefResponse;
 import com.articles.entities.Article;
 import com.articles.services.core.ArticleLikeService;
 import com.articles.services.core.ArticleService;
@@ -81,7 +81,7 @@ public class ArticleRecommendationFacadeService {
 
         List<Article> selected = articleService.getPublishedArticlesByIds(new ArrayList<>(orderedIds));
         Map<UUID, Article> byId = selected.stream().collect(Collectors.toMap(Article::getId, Function.identity()));
-        Map<UUID, AuthorResponse> authors = userService.getAuthors(selected);
+        Map<UUID, UserBriefResponse> authors = userService.getAuthors(selected);
 
         return orderedIds.stream()
                 .map(byId::get)

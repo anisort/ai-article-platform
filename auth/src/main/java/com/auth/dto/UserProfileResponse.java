@@ -11,7 +11,7 @@ public record UserProfileResponse(
         String avatar,
         boolean ownProfile,
         boolean following,
-        List<UserSummaryResponse> followers,
-        List<UserSummaryResponse> followingUsers
+        List<UserBriefResponse> followers,
+        List<UserBriefResponse> followingUsers
 ) {
 }

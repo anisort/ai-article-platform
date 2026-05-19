@@ -5,7 +5,7 @@ import { environment } from '../../../../environments/environment';
 import { CreateArticleRequest } from '../models/create-article-request.model';
 import { ArticleWithUserResponse } from '../models/article-response.model';
 import { ArticlePreview } from '../models/article-preview.model';
-import { EditArticlePageResponse } from '../models/edit-article-payload.model';
+import { EditArticlePageResponse } from '../models/edit-article-page-response.model';
 
 export type SearchMode = 'title' | 'semantic';
 

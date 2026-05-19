@@ -1,23 +1,23 @@
 package com.articles.dto.article;
 
 import com.articles.entities.Article;
-import com.articles.dto.user.AuthorResponse;
+import com.articles.dto.user.UserBriefResponse;
 
 import java.io.Serializable;
 
 public record ArticleWithUserResponse(
         ArticleResponse articleResponse,
-        AuthorResponse authorResponse
+        UserBriefResponse UserBriefResponse
 ) implements Serializable {
     public static ArticleWithUserResponse mapToResponse(
             Article article,
-            AuthorResponse authorResponse,
+            UserBriefResponse UserBriefResponse,
             long likesCount,
             boolean likedByRequester
     ) {
         return new ArticleWithUserResponse(
                 ArticleResponse.fromEntity(article, likesCount, likedByRequester),
-                authorResponse
+                UserBriefResponse
         );
     }
 }

@@ -6,14 +6,14 @@ import com.llm.entities.AssistantMessageRole;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
-public record ArticleAssistantMessageResponse(
+public record AssistantMessageResponse(
         UUID id,
         AssistantMessageRole role,
         String content,
         ZonedDateTime createdAt
 ) {
-    public static ArticleAssistantMessageResponse fromEntity(ArticleAssistantMessage message) {
-        return new ArticleAssistantMessageResponse(
+    public static AssistantMessageResponse fromEntity(ArticleAssistantMessage message) {
+        return new AssistantMessageResponse(
                 message.getId(),
                 message.getRole(),
                 message.getContent(),
@@ -21,3 +21,4 @@ public record ArticleAssistantMessageResponse(
         );
     }
 }
+

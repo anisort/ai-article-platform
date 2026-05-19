@@ -1,5 +1,6 @@
 package com.auth.api;
 
+import com.auth.dto.ToggleFollowResponse;
 import com.auth.dto.UserProfileResponse;
 import com.auth.services.UserProfileService;
 import org.springframework.http.MediaType;
@@ -37,5 +38,10 @@ public class UserProfileController {
                                         @RequestPart("name") String name,
                                         @RequestPart(value = "avatar", required = false) MultipartFile avatar) {
         return userProfileService.updateMe(UUID.fromString(jwt.getSubject()), username, name, avatar);
+    }
+
+    @PostMapping("/{userId}/follow")
+    public ToggleFollowResponse toggleFollow(@PathVariable UUID userId, @AuthenticationPrincipal Jwt jwt) {
+        return userProfileService.toggleFollow(UUID.fromString(jwt.getSubject()), userId);
     }
 }

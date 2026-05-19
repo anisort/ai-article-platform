@@ -1,9 +1,8 @@
 package com.llm.api;
 
+import com.llm.dto.discovery.ArticleIdsResponse;
 import com.llm.dto.discovery.ArticleRecommendationRequest;
-import com.llm.dto.discovery.ArticleRecommendationResponse;
 import com.llm.dto.discovery.SemanticSearchRequest;
-import com.llm.dto.discovery.SemanticSearchResponse;
 import com.llm.services.facade.ArticleDiscoveryFacade;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,12 +17,12 @@ public class ArticleDiscoveryController {
     }
 
     @PostMapping("/articles/search")
-    public SemanticSearchResponse searchArticles(@RequestBody SemanticSearchRequest request) {
+    public ArticleIdsResponse searchArticles(@RequestBody SemanticSearchRequest request) {
         return articleDiscoveryFacade.searchArticles(request);
     }
 
     @PostMapping("/articles/recommend")
-    public ArticleRecommendationResponse recommendArticles(@RequestBody ArticleRecommendationRequest request) {
+    public ArticleIdsResponse recommendArticles(@RequestBody ArticleRecommendationRequest request) {
         return articleDiscoveryFacade.recommendArticles(request);
     }
 }

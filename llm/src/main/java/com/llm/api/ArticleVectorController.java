@@ -1,6 +1,6 @@
 package com.llm.api;
 
-import com.llm.dto.article.ArticleEmbeddingDocument;
+import com.llm.dto.article.ArticleEmbeddingRequest;
 import com.llm.services.llm.ArticleVectorService;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,8 +17,8 @@ public class ArticleVectorController {
     }
 
     @PostMapping
-    public void addArticleToVectorStore(@RequestBody ArticleEmbeddingDocument document) {
-        articleVectorService.addOrUpdate(document);
+    public void addArticleToVectorStore(@RequestBody ArticleEmbeddingRequest payload) {
+        articleVectorService.addOrUpdate(payload);
     }
 
     @DeleteMapping("/{articleId}")
@@ -26,3 +26,4 @@ public class ArticleVectorController {
         articleVectorService.delete(articleId);
     }
 }
+

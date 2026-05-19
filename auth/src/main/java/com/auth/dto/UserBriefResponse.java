@@ -4,15 +4,15 @@ import com.auth.entities.CustomUserDetails;
 
 import java.util.UUID;
 
-public record UserSummaryResponse(
+public record UserBriefResponse(
         UUID id,
         String username,
         String name,
         String avatar
 ) {
-    public static UserSummaryResponse fromEntity(CustomUserDetails user) {
+    public static UserBriefResponse fromEntity(CustomUserDetails user) {
         if (user == null) return null;
-        return new UserSummaryResponse(
+        return new UserBriefResponse(
                 user.getId(),
                 user.getUsername(),
                 user.getName(),

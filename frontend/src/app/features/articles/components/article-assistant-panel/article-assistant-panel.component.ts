@@ -2,8 +2,8 @@ import { CommonModule } from '@angular/common';
 import { Component, OnChanges, SimpleChanges, inject, input, output, signal } from '@angular/core';
 import { finalize } from 'rxjs';
 import {
-  ArticleAssistantChat,
-  ArticleAssistantMessage,
+  AssistantChatResponse,
+  AssistantMessageResponse,
   AssistantResponseMode
 } from '../../../advisor/models/article-assistant.model';
 import { LoadingStateComponent } from '../../../../shared/components/loading-state/loading-state.component';
@@ -20,9 +20,9 @@ import { ArticleAssistantService } from '../../../advisor/services/article-assis
 })
 export class ArticleAssistantPanelComponent implements OnChanges {
   readonly articleId = input<string | null>(null);
-  readonly initialChats = input<ArticleAssistantChat[]>([]);
+  readonly initialChats = input<AssistantChatResponse[]>([]);
   readonly initialSelectedChatId = input<string | null>(null);
-  readonly initialMessages = input<ArticleAssistantMessage[]>([]);
+  readonly initialMessages = input<AssistantMessageResponse[]>([]);
   readonly initialMode = input<AssistantResponseMode>('THINKING');
   readonly rendered = input.required<(value: string) => string>();
 
@@ -31,9 +31,9 @@ export class ArticleAssistantPanelComponent implements OnChanges {
   readonly messagesClick = output<MouseEvent>();
   readonly chatSelected = output<string>();
   readonly loading = signal(false);
-  readonly chats = signal<ArticleAssistantChat[]>([]);
+  readonly chats = signal<AssistantChatResponse[]>([]);
   readonly selectedChatId = signal<string | null>(null);
-  readonly messages = signal<ArticleAssistantMessage[]>([]);
+  readonly messages = signal<AssistantMessageResponse[]>([]);
   readonly mode = signal<AssistantResponseMode>('THINKING');
   readonly inputText = signal('');
 

@@ -1,6 +1,6 @@
 package com.llm.dto.assistant;
 
-public record CreateArticleAssistantChatRequest(
+public record AssistantCreateChatRequest(
         String title
 ) {
 }

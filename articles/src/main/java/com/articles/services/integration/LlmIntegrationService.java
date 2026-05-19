@@ -1,7 +1,7 @@
 package com.articles.services.integration;
 
 import com.articles.dto.ai.ArticleDescriptionResponse;
-import com.articles.dto.ai.ArticleEmbeddingPayload;
+import com.articles.dto.ai.ArticleEmbeddingRequest;
 import com.articles.dto.ai.ArticleRecommendationRequest;
 import com.articles.dto.ai.ArticleRecommendationResponse;
 import com.articles.dto.ai.SemanticSearchRequest;
@@ -30,7 +30,7 @@ public class LlmIntegrationService {
         this.llmRestClient = llmRestClient;
     }
 
-    public String generateDescription(ArticleEmbeddingPayload payload) {
+    public String generateDescription(ArticleEmbeddingRequest payload) {
         ArticleDescriptionResponse response = requestWithAuth("/api/v1/assistant/description")
                 .body(payload)
                 .retrieve()
@@ -38,7 +38,7 @@ public class LlmIntegrationService {
         return response == null ? null : response.description();
     }
 
-    public void addToVectorStore(ArticleEmbeddingPayload payload) {
+    public void addToVectorStore(ArticleEmbeddingRequest payload) {
         requestWithAuth("/api/v1/vector/articles")
                 .body(payload)
                 .retrieve()
@@ -134,6 +134,7 @@ public class LlmIntegrationService {
         return "Bearer " + jwt.getTokenValue();
     }
 }
+
 
 
 

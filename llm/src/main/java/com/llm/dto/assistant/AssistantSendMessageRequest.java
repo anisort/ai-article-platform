@@ -1,6 +1,6 @@
 package com.llm.dto.assistant;
 
-public record SendArticleAssistantMessageRequest(
+public record AssistantSendMessageRequest(
         String message,
         AssistantResponseMode mode
 ) {

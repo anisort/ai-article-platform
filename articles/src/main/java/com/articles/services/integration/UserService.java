@@ -1,6 +1,6 @@
 package com.articles.services.integration;
 
-import com.articles.dto.user.AuthorResponse;
+import com.articles.dto.user.UserBriefResponse;
 import com.articles.dto.profile.UserProfileResponse;
 import com.articles.entities.Article;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -25,7 +25,7 @@ public class UserService {
         this.restClient = restClient;
     }
 
-    public List<AuthorResponse> getUsers(List<UUID> ids) {
+    public List<UserBriefResponse> getUsers(List<UUID> ids) {
         return restClient.post()
                 .uri("/api/v1/internal/users/batch")
                 .body(ids)
@@ -33,7 +33,7 @@ public class UserService {
                 .body(new ParameterizedTypeReference<>() {});
     }
 
-    public Map<UUID, AuthorResponse> getAuthors(List<Article> articles) {
+    public Map<UUID, UserBriefResponse> getAuthors(List<Article> articles) {
 
         List<UUID> authorIds = articles.stream()
                 .map(Article::getAuthorId)
@@ -42,7 +42,7 @@ public class UserService {
 
         return getUsers(authorIds).stream()
                 .collect(Collectors.toMap(
-                        AuthorResponse::id,
+                        UserBriefResponse::id,
                         author -> author
                 ));
     }

@@ -19,13 +19,6 @@ public class ArticleLikeService {
     }
 
     @Transactional(readOnly = true)
-    public List<UUID> getLikedArticleIds(UUID userId) {
-        return articleLikeRepository.findByUserId(userId).stream()
-                .map(articleLike -> articleLike.getArticle().getId())
-                .toList();
-    }
-
-    @Transactional(readOnly = true)
     public List<Article> getLikedArticles(UUID userId) {
         return articleLikeRepository.findByUserId(userId).stream()
                 .map(ArticleLike::getArticle)

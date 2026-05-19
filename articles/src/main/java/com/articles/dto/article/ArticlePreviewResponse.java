@@ -1,6 +1,6 @@
 package com.articles.dto.article;
 
-import com.articles.dto.user.AuthorResponse;
+import com.articles.dto.user.UserBriefResponse;
 import com.articles.entities.Article;
 
 import java.io.Serializable;
@@ -13,9 +13,9 @@ public record ArticlePreviewResponse(
         String imageUrl,
         ZonedDateTime createdAt,
         boolean published,
-        AuthorResponse author
+        UserBriefResponse author
 ) implements Serializable {
-    public static ArticlePreviewResponse fromEntity(Article article, AuthorResponse author) {
+    public static ArticlePreviewResponse fromEntity(Article article, UserBriefResponse author) {
         return new ArticlePreviewResponse(
                 article.getId(),
                 article.getTitle(),

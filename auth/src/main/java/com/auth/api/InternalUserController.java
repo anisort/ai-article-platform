@@ -1,6 +1,6 @@
 package com.auth.api;
 
-import com.auth.dto.UserResponse;
+import com.auth.dto.UserBriefResponse;
 import com.auth.services.InternalUserService;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,7 +18,7 @@ public class InternalUserController {
     }
 
     @PostMapping("/batch")
-    public List<UserResponse> batch(@RequestBody List<UUID> ids) {
-        return internalUserService.getByIds(ids).stream().map(UserResponse::fromEntity).toList();
+    public List<UserBriefResponse> batch(@RequestBody List<UUID> ids) {
+        return internalUserService.getByIds(ids).stream().map(UserBriefResponse::fromEntity).toList();
     }
 }

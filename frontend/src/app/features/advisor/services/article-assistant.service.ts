@@ -2,10 +2,10 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
 import {
-  ArticleAssistantChat,
-  ArticleAssistantMessage,
+  AssistantChatResponse,
+  AssistantMessageResponse,
+  AssistantSendMessageResponse,
   AssistantResponseMode,
-  SendArticleAssistantMessageResponse
 } from '../models/article-assistant.model';
 import { Observable } from 'rxjs';
 
@@ -16,12 +16,12 @@ export class ArticleAssistantService {
   private readonly http = inject(HttpClient);
   private readonly apiUrl = `${environment.apiUrlLlm}/v1/assistant/articles`;
 
-  createChat(articleId: string, title: string): Observable<ArticleAssistantChat> {
-    return this.http.post<ArticleAssistantChat>(`${this.apiUrl}/${articleId}/chats`, { title });
+  createChat(articleId: string, title: string): Observable<AssistantChatResponse> {
+    return this.http.post<AssistantChatResponse>(`${this.apiUrl}/${articleId}/chats`, { title });
   }
 
-  listMessages(articleId: string, chatId: string): Observable<ArticleAssistantMessage[]> {
-    return this.http.get<ArticleAssistantMessage[]>(`${this.apiUrl}/${articleId}/chats/${chatId}/messages`);
+  listMessages(articleId: string, chatId: string): Observable<AssistantMessageResponse[]> {
+    return this.http.get<AssistantMessageResponse[]>(`${this.apiUrl}/${articleId}/chats/${chatId}/messages`);
   }
 
   sendMessage(
@@ -29,8 +29,8 @@ export class ArticleAssistantService {
     chatId: string,
     message: string,
     mode: AssistantResponseMode
-  ): Observable<SendArticleAssistantMessageResponse> {
-    return this.http.post<SendArticleAssistantMessageResponse>(
+  ): Observable<AssistantSendMessageResponse> {
+    return this.http.post<AssistantSendMessageResponse>(
       `${this.apiUrl}/${articleId}/chats/${chatId}/messages`,
       { message, mode }
     );

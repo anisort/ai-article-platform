@@ -2,7 +2,7 @@ package com.articles.services.facade;
 
 import com.articles.config.CacheNames;
 import com.articles.dto.article.ArticlePreviewResponse;
-import com.articles.dto.user.AuthorResponse;
+import com.articles.dto.user.UserBriefResponse;
 import com.articles.entities.Article;
 import com.articles.services.core.ArticleService;
 import com.articles.services.integration.LlmIntegrationService;
@@ -52,7 +52,7 @@ public class ArticleSearchFacadeService {
 
         List<Article> articles = articleService.getPublishedArticlesByIds(articleIds);
         Map<UUID, Article> byId = articles.stream().collect(Collectors.toMap(Article::getId, Function.identity()));
-        Map<UUID, AuthorResponse> authors = userService.getAuthors(articles);
+        Map<UUID, UserBriefResponse> authors = userService.getAuthors(articles);
 
         return articleIds.stream()
                 .map(byId::get)
@@ -71,7 +71,7 @@ public class ArticleSearchFacadeService {
         }
 
         List<Article> articles = articleService.searchPublishedArticlesByTitle(query.trim());
-        Map<UUID, AuthorResponse> authors = userService.getAuthors(articles);
+        Map<UUID, UserBriefResponse> authors = userService.getAuthors(articles);
         return articles.stream()
                 .map(article -> ArticlePreviewResponse.fromEntity(article, authors.get(article.getAuthorId())))
                 .toList();

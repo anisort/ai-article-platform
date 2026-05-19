@@ -1,7 +1,7 @@
 package com.llm.api;
 
 import com.llm.dto.article.ArticleDescriptionResponse;
-import com.llm.dto.article.ArticleEmbeddingDraft;
+import com.llm.dto.article.ArticleEmbeddingRequest;
 import com.llm.services.facade.ArticleDescriptionFacade;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,7 +16,8 @@ public class ArticleDescriptionController {
     }
 
     @PostMapping("/description")
-    public ArticleDescriptionResponse generateDescription(@RequestBody ArticleEmbeddingDraft draft) {
-        return articleDescriptionFacade.generateDescription(draft);
+    public ArticleDescriptionResponse generateDescription(@RequestBody ArticleEmbeddingRequest payload) {
+        return articleDescriptionFacade.generateDescription(payload);
     }
 }
+

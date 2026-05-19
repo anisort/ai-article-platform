@@ -1,5 +1,7 @@
 package com.articles.dto.profile;
 
+import com.articles.dto.user.UserBriefResponse;
+
 import java.util.List;
 import java.util.UUID;
 
@@ -11,7 +13,7 @@ public record UserProfileResponse(
         String avatar,
         boolean ownProfile,
         boolean following,
-        List<UserSummaryProfileResponse> followers,
-        List<UserSummaryProfileResponse> followingUsers
+        List<UserBriefResponse> followers,
+        List<UserBriefResponse> followingUsers
 ) {
 }

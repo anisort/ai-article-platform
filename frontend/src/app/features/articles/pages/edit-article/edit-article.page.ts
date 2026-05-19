@@ -19,8 +19,8 @@ import { CreateArticleRequest } from '../../models/create-article-request.model'
 import { UploadService } from '../../../../shared/services/upload.service';
 import { ArticleImage } from '../../models/article-image.model';
 import {
-  ArticleAssistantChat,
-  ArticleAssistantMessage,
+  AssistantChatResponse,
+  AssistantMessageResponse,
   AssistantResponseMode
 } from '../../../advisor/models/article-assistant.model';
 import { ArticleAssistantService } from '../../../advisor/services/article-assistant.service';
@@ -58,9 +58,9 @@ export class EditArticlePage implements OnDestroy, PendingChangesComponent {
   loadFailed = signal(false);
   articleImages = signal<ArticleImage[]>([]);
   editorTab: 'write' | 'preview' = 'write';
-  assistantChats = signal<ArticleAssistantChat[]>([]);
+  assistantChats = signal<AssistantChatResponse[]>([]);
   selectedChatId = signal<string | null>(null);
-  assistantMessages = signal<ArticleAssistantMessage[]>([]);
+  assistantMessages = signal<AssistantMessageResponse[]>([]);
   assistantMode: AssistantResponseMode = 'THINKING';
   assistantOpen = signal(false);
   assistantPanelWidth = signal(448);

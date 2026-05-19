@@ -5,7 +5,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { AuthService } from '../../../../core/services/auth.service';
 import { ArticlesService } from '../../services/articles.service';
 import { ArticleWithUserResponse } from '../../models/article-response.model';
-import { MyArticlesService } from '../../../profile/services/my-articles.service';
+import { ProfileService } from '../../../profile/services/profile.service';
 import { PageIntroComponent } from '../../../../shared/components/page-intro/page-intro.component';
 import { ProfileSummaryCardComponent } from '../../../profile/components/profile-summary-card/profile-summary-card.component';
 import { UserProfile } from '../../../profile/models/user-profile.model';
@@ -24,7 +24,7 @@ export class ArticleDetailPage implements OnInit {
   private readonly router = inject(Router);
   private readonly articlesService = inject(ArticlesService);
   private readonly authService = inject(AuthService);
-  private readonly myArticlesService = inject(MyArticlesService);
+  private readonly profileService = inject(ProfileService);
   private readonly markdownRenderService = inject(MarkdownRenderService);
 
   article = signal<ArticleWithUserResponse | null>(null);
@@ -95,7 +95,7 @@ export class ArticleDetailPage implements OnInit {
     }
 
     this.likeLoading.set(true);
-    this.myArticlesService.toggleLike(articleId).subscribe({
+    this.profileService.toggleArticleLike(articleId).subscribe({
       next: response => {
         this.liked.set(response.liked);
         this.likesCount.set(response.likesCount);

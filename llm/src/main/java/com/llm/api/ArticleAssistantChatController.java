@@ -1,10 +1,10 @@
 package com.llm.api;
 
-import com.llm.dto.assistant.ArticleAssistantChatResponse;
-import com.llm.dto.assistant.ArticleAssistantMessageResponse;
-import com.llm.dto.assistant.CreateArticleAssistantChatRequest;
-import com.llm.dto.assistant.SendArticleAssistantMessageRequest;
-import com.llm.dto.assistant.SendArticleAssistantMessageResponse;
+import com.llm.dto.assistant.AssistantChatResponse;
+import com.llm.dto.assistant.AssistantCreateChatRequest;
+import com.llm.dto.assistant.AssistantMessageResponse;
+import com.llm.dto.assistant.AssistantSendMessageRequest;
+import com.llm.dto.assistant.AssistantSendMessageResponse;
 import com.llm.services.chat.ArticleAssistantService;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,20 +22,20 @@ public class ArticleAssistantChatController {
     }
 
     @PostMapping
-    public ArticleAssistantChatResponse createArticleChat(
+    public AssistantChatResponse createArticleChat(
             @PathVariable UUID articleId,
-            @RequestBody(required = false) CreateArticleAssistantChatRequest request
+            @RequestBody(required = false) AssistantCreateChatRequest request
     ) {
         return articleAssistantService.createChat(articleId, request == null ? null : request.title());
     }
 
     @GetMapping
-    public List<ArticleAssistantChatResponse> listArticleChats(@PathVariable UUID articleId) {
+    public List<AssistantChatResponse> listArticleChats(@PathVariable UUID articleId) {
         return articleAssistantService.listChats(articleId);
     }
 
     @GetMapping("/{chatId}/messages")
-    public List<ArticleAssistantMessageResponse> listArticleChatMessages(
+    public List<AssistantMessageResponse> listArticleChatMessages(
             @PathVariable UUID articleId,
             @PathVariable UUID chatId
     ) {
@@ -43,11 +43,12 @@ public class ArticleAssistantChatController {
     }
 
     @PostMapping("/{chatId}/messages")
-    public SendArticleAssistantMessageResponse sendArticleChatMessage(
+    public AssistantSendMessageResponse sendArticleChatMessage(
             @PathVariable UUID articleId,
             @PathVariable UUID chatId,
-            @RequestBody SendArticleAssistantMessageRequest request
+            @RequestBody AssistantSendMessageRequest request
     ) {
         return articleAssistantService.sendMessage(articleId, chatId, request);
     }
 }
+

@@ -23,6 +23,7 @@
   display: block;
   aspect-ratio: 16 / 10;
   background: var(--surface-soft);
+  overflow: hidden;
 }
 
 .article-card--small .card-media {
@@ -47,6 +48,7 @@
 .card-fallback {
   display: grid;
   place-items: center;
+  box-sizing: border-box;
   padding: 1rem;
   font-weight: 600;
   text-align: center;

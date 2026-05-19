@@ -10,7 +10,7 @@ export interface ArticleResponse {
   likedByRequester: boolean;
 }
 
-export interface AuthorResponse {
+export interface UserBriefResponse {
   id: string;
   username: string;
   name: string;
@@ -19,5 +19,5 @@ export interface AuthorResponse {
 
 export interface ArticleWithUserResponse {
   articleResponse: ArticleResponse;
-  authorResponse: AuthorResponse;
+  authorResponse: UserBriefResponse;
 }

@@ -1,10 +1,10 @@
 package com.llm.services.chat;
 
-import com.llm.dto.assistant.ArticleAssistantChatResponse;
-import com.llm.dto.assistant.ArticleAssistantMessageResponse;
+import com.llm.dto.assistant.AssistantChatResponse;
+import com.llm.dto.assistant.AssistantMessageResponse;
 import com.llm.dto.assistant.AssistantResponseMode;
-import com.llm.dto.assistant.SendArticleAssistantMessageRequest;
-import com.llm.dto.assistant.SendArticleAssistantMessageResponse;
+import com.llm.dto.assistant.AssistantSendMessageRequest;
+import com.llm.dto.assistant.AssistantSendMessageResponse;
 import com.llm.entities.ArticleAssistantChat;
 import com.llm.entities.ArticleAssistantMessage;
 import com.llm.entities.AssistantMessageRole;
@@ -38,32 +38,32 @@ public class ArticleAssistantService {
         this.assistantService = assistantService;
     }
 
-    public ArticleAssistantChatResponse createChat(UUID articleId, String title) {
+    public AssistantChatResponse createChat(UUID articleId, String title) {
         ArticleAssistantChat chat = new ArticleAssistantChat();
         chat.setArticleId(articleId);
         chat.setTitle((title == null || title.isBlank()) ? "New chat" : title.trim());
         ArticleAssistantChat saved = chatRepository.save(chat);
-        return ArticleAssistantChatResponse.fromEntity(saved);
+        return AssistantChatResponse.fromEntity(saved);
     }
 
-    public List<ArticleAssistantChatResponse> listChats(UUID articleId) {
+    public List<AssistantChatResponse> listChats(UUID articleId) {
         return chatRepository.findByArticleIdOrderByCreatedAtDesc(articleId).stream()
-                .map(ArticleAssistantChatResponse::fromEntity)
+                .map(AssistantChatResponse::fromEntity)
                 .toList();
     }
 
-    public List<ArticleAssistantMessageResponse> listMessages(UUID articleId, UUID chatId) {
+    public List<AssistantMessageResponse> listMessages(UUID articleId, UUID chatId) {
         ArticleAssistantChat chat = getChat(articleId, chatId);
         return messageRepository.findByChatOrderByCreatedAtAsc(chat).stream()
-                .map(ArticleAssistantMessageResponse::fromEntity)
+                .map(AssistantMessageResponse::fromEntity)
                 .toList();
     }
 
     @Transactional
-    public SendArticleAssistantMessageResponse sendMessage(
+    public AssistantSendMessageResponse sendMessage(
             UUID articleId,
             UUID chatId,
-            SendArticleAssistantMessageRequest request
+            AssistantSendMessageRequest request
     ) {
         ArticleAssistantChat chat = getChat(articleId, chatId);
         String userMessage = request.message() == null ? "" : request.message().trim();
@@ -84,10 +84,7 @@ public class ArticleAssistantService {
         assistant.setContent(answer);
         ArticleAssistantMessage savedAssistant = messageRepository.save(assistant);
 
-        return SendArticleAssistantMessageResponse.of(
-                chatId,
-                ArticleAssistantMessageResponse.fromEntity(savedAssistant)
-        );
+        return new AssistantSendMessageResponse(chatId, AssistantMessageResponse.fromEntity(savedAssistant));
     }
 
     private ArticleAssistantChat getChat(UUID articleId, UUID chatId) {
@@ -100,3 +97,4 @@ public class ArticleAssistantService {
     }
 
 }
+

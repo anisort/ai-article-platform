@@ -6,6 +6,12 @@ import { environment } from '../../../../environments/environment';
 import { ProfilePageResponse } from '../models/profile-page-response.model';
 import { ToggleFollowResponse, UserProfile } from '../models/user-profile.model';
 
+export interface ToggleArticleLikeResponse {
+  articleId: string;
+  liked: boolean;
+  likesCount: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -22,6 +28,10 @@ export class ProfileService {
 
   toggleFollow(userId: string): Observable<ToggleFollowResponse> {
     return this.http.post<ToggleFollowResponse>(`${this.apiUrl}/${userId}/follow`, {});
+  }
+
+  toggleArticleLike(articleId: string): Observable<ToggleArticleLikeResponse> {
+    return this.http.post<ToggleArticleLikeResponse>(`${this.profilePageApiUrl}/articles/${articleId}/like`, {});
   }
 
   updateOwnProfile(username: string, name: string, avatar?: File | null): Observable<UserProfile> {

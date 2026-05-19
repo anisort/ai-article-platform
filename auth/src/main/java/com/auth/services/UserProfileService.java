@@ -1,7 +1,8 @@
 package com.auth.services;
 
 import com.auth.dto.UserProfileResponse;
-import com.auth.dto.UserSummaryResponse;
+import com.auth.dto.UserBriefResponse;
+import com.auth.dto.ToggleFollowResponse;
 import com.auth.entities.CustomUserDetails;
 import com.auth.entities.UserFollow;
 import com.auth.repositories.UserFollowRepository;
@@ -16,6 +17,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
@@ -45,10 +47,10 @@ public class UserProfileService {
         boolean ownProfile = userId.equals(viewerId);
         boolean following = viewerId != null && userFollowRepository.existsByFollowerIdAndFollowingId(viewerId, userId);
 
-        List<UserSummaryResponse> followers = ownProfile
+        List<UserBriefResponse> followers = ownProfile
                 ? getFollowUsers(userFollowRepository.findByFollowingId(userId), UserFollow::getFollowerId)
                 : List.of();
-        List<UserSummaryResponse> followingUsers = ownProfile
+        List<UserBriefResponse> followingUsers = ownProfile
                 ? getFollowUsers(userFollowRepository.findByFollowerId(userId), UserFollow::getFollowingId)
                 : List.of();
 
@@ -101,7 +103,29 @@ public class UserProfileService {
         );
     }
 
-    private List<UserSummaryResponse> getFollowUsers(List<UserFollow> follows, Function<UserFollow, UUID> idExtractor) {
+    @Transactional
+    public ToggleFollowResponse toggleFollow(UUID followerId, UUID targetUserId) {
+        if (followerId.equals(targetUserId)) {
+            throw new ResponseStatusException(BAD_REQUEST, "You cannot follow yourself");
+        }
+
+        userRepository.findById(targetUserId)
+                .orElseThrow(() -> new ResponseStatusException(NOT_FOUND));
+
+        boolean alreadyFollowing = userFollowRepository.existsByFollowerIdAndFollowingId(followerId, targetUserId);
+        if (alreadyFollowing) {
+            userFollowRepository.deleteByFollowerIdAndFollowingId(followerId, targetUserId);
+            return new ToggleFollowResponse(targetUserId, false);
+        }
+
+        UserFollow follow = new UserFollow();
+        follow.setFollowerId(followerId);
+        follow.setFollowingId(targetUserId);
+        userFollowRepository.save(follow);
+        return new ToggleFollowResponse(targetUserId, true);
+    }
+
+    private List<UserBriefResponse> getFollowUsers(List<UserFollow> follows, Function<UserFollow, UUID> idExtractor) {
         List<UUID> ids = follows.stream()
                 .map(idExtractor)
                 .distinct()
@@ -113,9 +137,9 @@ public class UserProfileService {
         return ids.stream()
                 .map(usersById::get)
                 .filter(Objects::nonNull)
-                .map(UserSummaryResponse::fromEntity)
-                .sorted(Comparator.comparing(UserSummaryResponse::name, Comparator.nullsLast(String::compareToIgnoreCase))
-                        .thenComparing(UserSummaryResponse::username, Comparator.nullsLast(String::compareToIgnoreCase)))
+                .map(UserBriefResponse::fromEntity)
+                .sorted(Comparator.comparing(UserBriefResponse::name, Comparator.nullsLast(String::compareToIgnoreCase))
+                        .thenComparing(UserBriefResponse::username, Comparator.nullsLast(String::compareToIgnoreCase)))
                 .toList();
     }
 }

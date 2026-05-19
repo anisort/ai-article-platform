@@ -1,7 +1,7 @@
 package com.articles.services.core;
 
-import com.articles.dto.ai.ArticleEmbeddingPayload;
-import com.articles.dto.user.AuthorResponse;
+import com.articles.dto.ai.ArticleEmbeddingRequest;
+import com.articles.dto.user.UserBriefResponse;
 import com.articles.entities.Article;
 import com.articles.services.integration.LlmIntegrationService;
 import org.slf4j.Logger;
@@ -19,10 +19,10 @@ public class ArticleEmbeddingService {
         this.llmIntegrationService = llmIntegrationService;
     }
 
-    public void syncArticleEmbedding(Article article, AuthorResponse author) {
-        ArticleEmbeddingPayload payload = ArticleEmbeddingPayload.fromArticle(article, author, null);
+    public void syncArticleEmbedding(Article article, UserBriefResponse author) {
+        ArticleEmbeddingRequest payload = ArticleEmbeddingRequest.fromArticle(article, author, null);
         String description = loadDescription(payload, article.getId());
-        syncVector(ArticleEmbeddingPayload.fromArticle(article, author, description), article.getId());
+        syncVector(ArticleEmbeddingRequest.fromArticle(article, author, description), article.getId());
     }
 
     public void deleteArticleEmbedding(java.util.UUID articleId) {
@@ -33,7 +33,7 @@ public class ArticleEmbeddingService {
         }
     }
 
-    private String loadDescription(ArticleEmbeddingPayload payload, java.util.UUID articleId) {
+    private String loadDescription(ArticleEmbeddingRequest payload, java.util.UUID articleId) {
         String description;
         try {
             description = llmIntegrationService.generateDescription(payload);
@@ -50,7 +50,7 @@ public class ArticleEmbeddingService {
         return description;
     }
 
-    private void syncVector(ArticleEmbeddingPayload payload, java.util.UUID articleId) {
+    private void syncVector(ArticleEmbeddingRequest payload, java.util.UUID articleId) {
         try {
             llmIntegrationService.addToVectorStore(payload);
         } catch (Exception ex) {
@@ -58,3 +58,4 @@ public class ArticleEmbeddingService {
         }
     }
 }
+

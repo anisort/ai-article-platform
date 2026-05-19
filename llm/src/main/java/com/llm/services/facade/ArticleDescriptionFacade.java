@@ -1,7 +1,7 @@
 package com.llm.services.facade;
 
 import com.llm.dto.article.ArticleDescriptionResponse;
-import com.llm.dto.article.ArticleEmbeddingDraft;
+import com.llm.dto.article.ArticleEmbeddingRequest;
 import com.llm.services.llm.AssistantService;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.stereotype.Service;
@@ -17,17 +17,18 @@ public class ArticleDescriptionFacade {
         this.assistantService = assistantService;
     }
 
-    public ArticleDescriptionResponse generateDescription(ArticleEmbeddingDraft draft) {
+    public ArticleDescriptionResponse generateDescription(ArticleEmbeddingRequest payload) {
         String prompt = """
                 Create a concise article description in 2-3 sentences based on the provided content.
                 Title: %s
                 Author: %s
                 Content:
                 %s
-                """.formatted(draft.title(), draft.author(), draft.text());
+                """.formatted(payload.title(), payload.author(), payload.content());
 
         ChatResponse response = assistantService.getResponse(prompt, UUID.randomUUID());
         String description = response == null ? null : response.getResult().getOutput().getText();
         return ArticleDescriptionResponse.of(description);
     }
 }
+

@@ -1,6 +1,6 @@
 package com.llm.services.llm;
 
-import com.llm.dto.article.ArticleEmbeddingDocument;
+import com.llm.dto.article.ArticleEmbeddingRequest;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.VectorStore;
@@ -19,7 +19,7 @@ public class ArticleVectorService {
         this.vectorStore = vectorStore;
     }
 
-    public void addOrUpdate(ArticleEmbeddingDocument article) {
+    public void addOrUpdate(ArticleEmbeddingRequest article) {
         if (article == null || article.id() == null) {
             return;
         }
@@ -31,7 +31,7 @@ public class ArticleVectorService {
                 "Title: %s\nAuthor: %s\nDescription: %s\nImage: %s",
                 article.title(),
                 article.author(),
-                article.description(),
+                article.content(),
                 article.image()
         );
         Document document = new Document(
@@ -68,3 +68,4 @@ public class ArticleVectorService {
                 .toList();
     }
 }
+
