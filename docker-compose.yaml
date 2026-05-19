@@ -34,10 +34,20 @@ services:
     volumes:
       - pg-data-llm:/var/lib/postgresql
 
+  redis:
+    image: redis:7.2-alpine
+    container_name: redis-cache
+    command: [ "redis-server", "--requirepass", "1234" ]
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+
 volumes:
   pg-data-articles:
   pg-data-auth:
   pg-data-llm:
+  redis-data:
 
 
 # auth - authorization + user managment

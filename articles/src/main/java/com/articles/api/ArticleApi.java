@@ -27,11 +27,6 @@ public class ArticleApi {
         return articleFacadeService.getPublishedArticles();
     }
 
-    @GetMapping("/author/{authorId}")
-    public List<ArticlePreviewResponse> getPublishedArticlesByAuthor(@PathVariable UUID authorId) {
-        return articleFacadeService.getPublishedArticlesByAuthor(authorId);
-    }
-
     @GetMapping("/{articleId}")
     public ArticleWithUserResponse getArticle(@PathVariable UUID articleId, @AuthenticationPrincipal Jwt jwt) {
         UUID requesterId = jwt == null ? null : UUID.fromString(jwt.getSubject());

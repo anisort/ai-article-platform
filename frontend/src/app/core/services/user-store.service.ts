@@ -29,10 +29,6 @@ export class UserStoreService {
     );
   }
 
-  update(user: UserInfoModel): void {
-    this.subject.next(user);
-  }
-
   clear(): void {
     this.subject.next(null);
   }

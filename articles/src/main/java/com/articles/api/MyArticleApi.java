@@ -25,18 +25,6 @@ public class MyArticleApi {
         this.myArticleFacadeService = myArticleFacadeService;
     }
 
-    @GetMapping
-    public List<ArticleWithUserResponse> getMyArticles(@AuthenticationPrincipal Jwt jwt) {
-        UUID authorId = UUID.fromString(jwt.getSubject());
-        return myArticleFacadeService.getMyArticles(authorId);
-    }
-
-    @GetMapping("/likes")
-    public LikedArticlesResponse getMyLikedArticles(@AuthenticationPrincipal Jwt jwt) {
-        UUID userId = UUID.fromString(jwt.getSubject());
-        return myArticleFacadeService.getLikedArticles(userId);
-    }
-
     @PostMapping("/{articleId}/like")
     public ToggleArticleLikeResponse toggleLike(
             @PathVariable UUID articleId,

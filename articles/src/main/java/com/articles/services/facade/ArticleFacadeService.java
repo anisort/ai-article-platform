@@ -1,5 +1,6 @@
 package com.articles.services.facade;
 
+import com.articles.config.CacheNames;
 import com.articles.dto.article.ArticleWithUserResponse;
 import com.articles.dto.article.EditArticlePageResponse;
 import com.articles.dto.assistant.ArticleAssistantChatSummary;
@@ -15,6 +16,9 @@ import com.articles.services.core.ArticleLikeService;
 import com.articles.services.core.ArticleService;
 import com.articles.services.integration.LlmIntegrationService;
 import com.articles.services.integration.UserService;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -47,6 +51,7 @@ public class ArticleFacadeService {
         this.llmIntegrationService = llmIntegrationService;
     }
 
+    @Cacheable(cacheNames = CacheNames.ARTICLES_LIST, key = "'all'")
     public List<ArticlePreviewResponse> getPublishedArticles() {
         List<Article> articles = articleService.getPublishedArticles();
         Map<UUID, AuthorResponse> authors = userService.getAuthors(articles);
@@ -55,14 +60,10 @@ public class ArticleFacadeService {
                 .toList();
     }
 
-    public List<ArticlePreviewResponse> getPublishedArticlesByAuthor(UUID authorId) {
-        List<Article> articles = articleService.getPublishedArticlesByAuthor(authorId);
-        Map<UUID, AuthorResponse> authors = userService.getAuthors(articles);
-        return articles.stream()
-                .map(article -> ArticlePreviewResponse.fromEntity(article, authors.get(article.getAuthorId())))
-                .toList();
-    }
-
+    @Cacheable(
+            cacheNames = CacheNames.ARTICLE_BY_ID,
+            key = "#articleId.toString().concat(':').concat(T(java.lang.String).valueOf(#requesterId))"
+    )
     public ArticleWithUserResponse getArticle(UUID articleId, UUID requesterId) {
         Article article = requesterId == null
                 ? articleService.requirePublished(articleId)
@@ -79,6 +80,13 @@ public class ArticleFacadeService {
         );
     }
 
+    @Caching(evict = {
+            @CacheEvict(cacheNames = CacheNames.ARTICLES_LIST, key = "'all'"),
+            @CacheEvict(cacheNames = CacheNames.ARTICLE_BY_ID, allEntries = true),
+            @CacheEvict(cacheNames = CacheNames.SEARCH_BY_TITLE, allEntries = true),
+            @CacheEvict(cacheNames = CacheNames.SEARCH_BY_SEMANTIC, allEntries = true),
+            @CacheEvict(cacheNames = CacheNames.RECOMMENDATIONS_ANON, allEntries = true)
+    })
     public ArticleWithUserResponse create(CreateArticleRequest request, UUID authorId) {
         Article article = articleService.create(request, authorId);
         Map<UUID, AuthorResponse> authors = userService.getAuthors(List.of(article));
@@ -87,6 +95,13 @@ public class ArticleFacadeService {
         return ArticleWithUserResponse.mapToResponse(article, author, 0, false);
     }
 
+    @Caching(evict = {
+            @CacheEvict(cacheNames = CacheNames.ARTICLES_LIST, key = "'all'"),
+            @CacheEvict(cacheNames = CacheNames.ARTICLE_BY_ID, allEntries = true),
+            @CacheEvict(cacheNames = CacheNames.SEARCH_BY_TITLE, allEntries = true),
+            @CacheEvict(cacheNames = CacheNames.SEARCH_BY_SEMANTIC, allEntries = true),
+            @CacheEvict(cacheNames = CacheNames.RECOMMENDATIONS_ANON, allEntries = true)
+    })
     public ArticleWithUserResponse update(UUID articleId, CreateArticleRequest request, UUID requesterId) {
         Article article = articleService.requireOwned(articleId, requesterId);
         Article updatedArticle = articleService.update(article, request);
@@ -96,6 +111,13 @@ public class ArticleFacadeService {
         return ArticleWithUserResponse.mapToResponse(updatedArticle, author, 0, false);
     }
 
+    @Caching(evict = {
+            @CacheEvict(cacheNames = CacheNames.ARTICLES_LIST, key = "'all'"),
+            @CacheEvict(cacheNames = CacheNames.ARTICLE_BY_ID, allEntries = true),
+            @CacheEvict(cacheNames = CacheNames.SEARCH_BY_TITLE, allEntries = true),
+            @CacheEvict(cacheNames = CacheNames.SEARCH_BY_SEMANTIC, allEntries = true),
+            @CacheEvict(cacheNames = CacheNames.RECOMMENDATIONS_ANON, allEntries = true)
+    })
     public void delete(UUID articleId, UUID requesterId) {
         Article article = articleService.requireOwned(articleId, requesterId);
         articleEmbeddingService.deleteArticleEmbedding(articleId);

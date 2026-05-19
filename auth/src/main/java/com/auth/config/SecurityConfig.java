@@ -99,7 +99,6 @@ public class SecurityConfig {
                         .requestMatchers("/login", "/.well-known/appspecific/**", "/error").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/users/me").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/v1/users/*/follow").authenticated()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/internal/users/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/internal/users/batch").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/users/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/users").permitAll()

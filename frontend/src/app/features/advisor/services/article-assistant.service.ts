@@ -20,10 +20,6 @@ export class ArticleAssistantService {
     return this.http.post<ArticleAssistantChat>(`${this.apiUrl}/${articleId}/chats`, { title });
   }
 
-  listChats(articleId: string): Observable<ArticleAssistantChat[]> {
-    return this.http.get<ArticleAssistantChat[]>(`${this.apiUrl}/${articleId}/chats`);
-  }
-
   listMessages(articleId: string, chatId: string): Observable<ArticleAssistantMessage[]> {
     return this.http.get<ArticleAssistantMessage[]>(`${this.apiUrl}/${articleId}/chats/${chatId}/messages`);
   }

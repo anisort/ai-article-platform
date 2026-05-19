@@ -21,9 +21,4 @@ public class InternalUserController {
     public List<UserResponse> batch(@RequestBody List<UUID> ids) {
         return internalUserService.getByIds(ids).stream().map(UserResponse::fromEntity).toList();
     }
-
-    @GetMapping("/{userId}")
-    public UserResponse getById(@PathVariable UUID userId) {
-        return UserResponse.fromEntity(internalUserService.getById(userId));
-    }
 }

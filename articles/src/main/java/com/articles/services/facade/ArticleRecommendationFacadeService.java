@@ -1,5 +1,6 @@
 package com.articles.services.facade;
 
+import com.articles.config.CacheNames;
 import com.articles.dto.article.ArticlePreviewResponse;
 import com.articles.dto.user.AuthorResponse;
 import com.articles.entities.Article;
@@ -7,6 +8,7 @@ import com.articles.services.core.ArticleLikeService;
 import com.articles.services.core.ArticleService;
 import com.articles.services.integration.LlmIntegrationService;
 import com.articles.services.integration.UserService;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -39,6 +41,11 @@ public class ArticleRecommendationFacadeService {
         this.userService = userService;
     }
 
+    @Cacheable(
+            cacheNames = CacheNames.RECOMMENDATIONS_ANON,
+            key = "#limit",
+            condition = "#userId == null"
+    )
     public List<ArticlePreviewResponse> getRecommendations(UUID userId, int limit) {
         int safeLimit = Math.max(1, Math.min(limit, 50));
         List<Article> latest = articleService.getPublishedArticles();

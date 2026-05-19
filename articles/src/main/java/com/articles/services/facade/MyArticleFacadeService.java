@@ -1,5 +1,6 @@
 package com.articles.services.facade;
 
+import com.articles.config.CacheNames;
 import com.articles.dto.article.ArticleWithUserResponse;
 import com.articles.dto.user.AuthorResponse;
 import com.articles.dto.like.LikedArticlesResponse;
@@ -8,6 +9,8 @@ import com.articles.entities.Article;
 import com.articles.services.core.ArticleLikeService;
 import com.articles.services.core.ArticleService;
 import com.articles.services.integration.UserService;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -48,6 +51,10 @@ public class MyArticleFacadeService {
         return new LikedArticlesResponse(articleLikeService.getLikedArticleIds(userId));
     }
 
+    @Caching(evict = {
+            @CacheEvict(cacheNames = CacheNames.ARTICLE_BY_ID, allEntries = true),
+            @CacheEvict(cacheNames = CacheNames.RECOMMENDATIONS_ANON, allEntries = true)
+    })
     public ToggleArticleLikeResponse toggleLike(UUID articleId, UUID userId) {
         Article article = articleService.requirePublished(articleId);
         boolean liked = articleLikeService.toggleLike(userId, article);

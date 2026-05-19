@@ -1,11 +1,13 @@
 package com.articles.services.facade;
 
+import com.articles.config.CacheNames;
 import com.articles.dto.article.ArticlePreviewResponse;
 import com.articles.dto.user.AuthorResponse;
 import com.articles.entities.Article;
 import com.articles.services.core.ArticleService;
 import com.articles.services.integration.LlmIntegrationService;
 import com.articles.services.integration.UserService;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -34,6 +36,10 @@ public class ArticleSearchFacadeService {
         this.articleFacadeService = articleFacadeService;
     }
 
+    @Cacheable(
+            cacheNames = CacheNames.SEARCH_BY_SEMANTIC,
+            key = "#query == null ? '' : #query.trim().toLowerCase()"
+    )
     public List<ArticlePreviewResponse> searchBySemantic(String query) {
         if (query == null || query.isBlank()) {
             return articleFacadeService.getPublishedArticles();
@@ -55,6 +61,10 @@ public class ArticleSearchFacadeService {
                 .toList();
     }
 
+    @Cacheable(
+            cacheNames = CacheNames.SEARCH_BY_TITLE,
+            key = "#query == null ? '' : #query.trim().toLowerCase()"
+    )
     public List<ArticlePreviewResponse> searchByTitleOrAuthor(String query) {
         if (query == null || query.isBlank()) {
             return articleFacadeService.getPublishedArticles();

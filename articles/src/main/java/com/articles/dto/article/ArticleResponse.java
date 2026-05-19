@@ -2,6 +2,7 @@ package com.articles.dto.article;
 
 import com.articles.entities.Article;
 
+import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
@@ -15,7 +16,7 @@ public record ArticleResponse(
         boolean published,
         long likesCount,
         boolean likedByRequester
-) {
+) implements Serializable {
     public static ArticleResponse fromEntity(Article a, long likesCount, boolean likedByRequester) {
         return new ArticleResponse(
                 a.getId(),
