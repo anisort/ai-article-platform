@@ -23,7 +23,7 @@ export class AuthService {
   }
 
   isAuthenticated() {
-    return !!this.oauthService.getAccessToken();
+    return this.oauthService.hasValidAccessToken();
   }
 
   get role() {
@@ -32,7 +32,9 @@ export class AuthService {
   }
 
   get token() {
-    return this.oauthService.getAccessToken();
+    return this.oauthService.hasValidAccessToken()
+      ? this.oauthService.getAccessToken()
+      : null;
   }
 
   get userId(): string | null {

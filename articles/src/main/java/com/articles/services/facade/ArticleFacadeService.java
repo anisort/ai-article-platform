@@ -62,7 +62,7 @@ public class ArticleFacadeService {
 
     @Cacheable(
             cacheNames = CacheNames.ARTICLE_BY_ID,
-            key = "#articleId.toString().concat(':').concat(T(java.lang.String).valueOf(#requesterId))"
+            key = "#articleId.toString().concat(':').concat(#requesterId == null ? 'anon' : #requesterId.toString())"
     )
     public ArticleWithUserResponse getArticle(UUID articleId, UUID requesterId) {
         Article article = requesterId == null

@@ -3,7 +3,7 @@ import {environment} from '../../../environments/environment';
 
 export const authConfig: AuthConfig = {
   issuer: environment.oauthIssuer,
-  redirectUri: 'http://localhost:4200/home',
+  redirectUri: `${window.location.origin}/home`,
   clientId: environment.oauthClientId,
   responseType: 'code',
   scope: 'openid profile',

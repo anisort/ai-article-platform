@@ -7,17 +7,17 @@ import java.io.Serializable;
 
 public record ArticleWithUserResponse(
         ArticleResponse articleResponse,
-        UserBriefResponse UserBriefResponse
+        UserBriefResponse authorResponse
 ) implements Serializable {
     public static ArticleWithUserResponse mapToResponse(
             Article article,
-            UserBriefResponse UserBriefResponse,
+            UserBriefResponse authorResponse,
             long likesCount,
             boolean likedByRequester
     ) {
         return new ArticleWithUserResponse(
                 ArticleResponse.fromEntity(article, likesCount, likedByRequester),
-                UserBriefResponse
+                authorResponse
         );
     }
 }

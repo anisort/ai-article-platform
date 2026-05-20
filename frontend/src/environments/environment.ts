@@ -1,10 +1,10 @@
 export const environment = {
   production: false,
-  apiUrlAuth: 'http://localhost:8080/api',
-  apiUrlUpload: 'http://localhost:9090/api',
-  apiUrlArticles: 'http://localhost:7070/api',
-  apiUrlLlm: 'http://localhost:8090/api',
+  apiUrlAuth: 'http://localhost:81/auth/api',
+  apiUrlUpload: 'http://localhost:81/api/files',
+  apiUrlArticles: 'http://localhost:81/api/articles',
+  apiUrlLlm: 'http://localhost:81/api/llm',
   oauthClientId: 'auth-client-articles',
-  oauthIssuer: 'http://localhost:8080',
+  oauthIssuer: 'http://localhost:81/auth',
   oauthSecret: 'secret'
 };
