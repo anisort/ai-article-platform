@@ -9,8 +9,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.UUID;
-
 @Service
 public class RegistrationService {
 
@@ -40,9 +38,6 @@ public class RegistrationService {
 
         CustomUserDetails user = new CustomUserDetails();
         request.toUser(user);
-        if (user.getId() == null) {
-            user.setId(UUID.randomUUID());
-        }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
