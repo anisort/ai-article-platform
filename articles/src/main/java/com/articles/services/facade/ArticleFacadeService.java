@@ -15,7 +15,7 @@ import com.articles.services.core.ArticleImageService;
 import com.articles.services.core.ArticleLikeService;
 import com.articles.services.core.ArticleService;
 import com.articles.services.integration.LlmIntegrationService;
-import com.articles.services.integration.UserService;
+import com.articles.services.integration.UserIntegrationService;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
@@ -31,7 +31,7 @@ public class ArticleFacadeService {
     private final ArticleService articleService;
     private final ArticleLikeService articleLikeService;
     private final ArticleImageService articleImageService;
-    private final UserService userService;
+    private final UserIntegrationService userIntegrationService;
     private final ArticleEmbeddingService articleEmbeddingService;
     private final LlmIntegrationService llmIntegrationService;
 
@@ -39,14 +39,14 @@ public class ArticleFacadeService {
             ArticleService articleService,
             ArticleLikeService articleLikeService,
             ArticleImageService articleImageService,
-            UserService userService,
+            UserIntegrationService userIntegrationService,
             ArticleEmbeddingService articleEmbeddingService,
             LlmIntegrationService llmIntegrationService
     ) {
         this.articleService = articleService;
         this.articleLikeService = articleLikeService;
         this.articleImageService = articleImageService;
-        this.userService = userService;
+        this.userIntegrationService = userIntegrationService;
         this.articleEmbeddingService = articleEmbeddingService;
         this.llmIntegrationService = llmIntegrationService;
     }
@@ -54,7 +54,7 @@ public class ArticleFacadeService {
     @Cacheable(cacheNames = CacheNames.ARTICLES_LIST, key = "'all'")
     public List<ArticlePreviewResponse> getPublishedArticles() {
         List<Article> articles = articleService.getPublishedArticles();
-        Map<UUID, UserBriefResponse> authors = userService.getAuthors(articles);
+        Map<UUID, UserBriefResponse> authors = userIntegrationService.getAuthors(articles);
         return articles.stream()
                 .map(article -> ArticlePreviewResponse.fromEntity(article, authors.get(article.getAuthorId())))
                 .toList();
@@ -69,7 +69,7 @@ public class ArticleFacadeService {
                 ? articleService.requirePublished(articleId)
                 : articleService.requireAccessible(articleId, requesterId);
 
-        Map<UUID, UserBriefResponse> authors = userService.getAuthors(List.of(article));
+        Map<UUID, UserBriefResponse> authors = userIntegrationService.getAuthors(List.of(article));
         long likesCount = articleLikeService.getLikesCount(article.getId());
         boolean likedByRequester = requesterId != null && articleLikeService.isArticleLikedByUser(article.getId(), requesterId);
         return ArticleWithUserResponse.mapToResponse(
@@ -89,7 +89,7 @@ public class ArticleFacadeService {
     })
     public ArticleWithUserResponse create(CreateArticleRequest request, UUID authorId) {
         Article article = articleService.create(request, authorId);
-        Map<UUID, UserBriefResponse> authors = userService.getAuthors(List.of(article));
+        Map<UUID, UserBriefResponse> authors = userIntegrationService.getAuthors(List.of(article));
         UserBriefResponse author = authors.get(article.getAuthorId());
         articleEmbeddingService.syncArticleEmbedding(article, author);
         return ArticleWithUserResponse.mapToResponse(article, author, 0, false);
@@ -105,7 +105,7 @@ public class ArticleFacadeService {
     public ArticleWithUserResponse update(UUID articleId, CreateArticleRequest request, UUID requesterId) {
         Article article = articleService.requireOwned(articleId, requesterId);
         Article updatedArticle = articleService.update(article, request);
-        Map<UUID, UserBriefResponse> authors = userService.getAuthors(List.of(updatedArticle));
+        Map<UUID, UserBriefResponse> authors = userIntegrationService.getAuthors(List.of(updatedArticle));
         UserBriefResponse author = authors.get(updatedArticle.getAuthorId());
         articleEmbeddingService.syncArticleEmbedding(updatedArticle, author);
         return ArticleWithUserResponse.mapToResponse(updatedArticle, author, 0, false);
@@ -128,7 +128,7 @@ public class ArticleFacadeService {
 
     public EditArticlePageResponse getEditPage(UUID articleId, UUID requesterId) {
         Article article = articleService.requireOwned(articleId, requesterId);
-        Map<UUID, UserBriefResponse> authors = userService.getAuthors(List.of(article));
+        Map<UUID, UserBriefResponse> authors = userIntegrationService.getAuthors(List.of(article));
         long likesCount = articleLikeService.getLikesCount(article.getId());
         boolean likedByRequester = articleLikeService.isArticleLikedByUser(article.getId(), requesterId);
         ArticleWithUserResponse articleResponse = ArticleWithUserResponse.mapToResponse(

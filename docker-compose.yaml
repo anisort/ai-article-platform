@@ -24,13 +24,13 @@ services:
       - GOOGLE_CLIENT_SECRET=${GOOGLE_OAUTH2_CLIENT_SECRET}
       - GITHUB_CLIENT_ID=${GITHUB_OAUTH2_CLIENT_ID}
       - GITHUB_CLIENT_SECRET=${GITHUB_OAUTH2_CLIENT_SECRET}
-      - GOOGLE_APPLICATION_CREDENTIALS=/secrets/credentials.json
-    volumes:
-      - ./secret/credentials.json:/secrets/credentials.json:ro
+      - GOOGLE_APPLICATION_CREDENTIALS=/run/secrets/gcp_credentials
+    secrets:
+      - gcp_credentials
     ports:
       - "8080:8080"
     networks:
-      - lib-network
+      - ai-articles-network
 
   articles:
     build:
@@ -63,7 +63,7 @@ services:
     ports:
       - "7070:7070"
     networks:
-      - lib-network
+      - ai-articles-network
 
   files:
     build:
@@ -76,13 +76,13 @@ services:
       - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=${RESOURCE_SERVER_ISSUER_URI}
       - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI=${RESOURCE_SERVER_JWK_SET_URI}
       - CORS_FRONTEND_URL_HOST=${FRONTEND_URL_HOST}
-      - GOOGLE_APPLICATION_CREDENTIALS=/secrets/credentials.json
-    volumes:
-      - ./secret/credentials.json:/secrets/credentials.json:ro
+      - GOOGLE_APPLICATION_CREDENTIALS=/run/secrets/gcp_credentials
+    secrets:
+      - gcp_credentials
     ports:
       - "9090:9090"
     networks:
-      - lib-network
+      - ai-articles-network
 
   llm:
     build:
@@ -111,13 +111,13 @@ services:
       - SPRING_AI_VERTEX_AI_GEMINI_PROJECT_ID=${VERTEX_PROJECT_ID}
       - SPRING_AI_VERTEX_AI_GEMINI_LOCATION=${VERTEX_LOCATION}
       - GOOGLE_STORAGE_BUCKET=${GCP_STORAGE_BUCKET_NAME}
-      - GOOGLE_APPLICATION_CREDENTIALS=/secrets/credentials.json
-    volumes:
-      - ./secret/credentials.json:/secrets/credentials.json:ro
+      - GOOGLE_APPLICATION_CREDENTIALS=/run/secrets/gcp_credentials
+    secrets:
+      - gcp_credentials
     ports:
       - "8090:8090"
     networks:
-      - lib-network
+      - ai-articles-network
 
   frontend:
     build:
@@ -132,7 +132,7 @@ services:
     ports:
       - "4200:4200"
     networks:
-      - lib-network
+      - ai-articles-network
 
   pg-auth:
     image: postgres:16
@@ -146,7 +146,7 @@ services:
     volumes:
       - pg-data-auth:/var/lib/postgresql/data
     networks:
-      - lib-network
+      - ai-articles-network
 
   pg-articles:
     image: postgres:16
@@ -160,7 +160,7 @@ services:
     volumes:
       - pg-data-articles:/var/lib/postgresql/data
     networks:
-      - lib-network
+      - ai-articles-network
 
   pg-llm:
     image: pgvector/pgvector:pg16
@@ -175,7 +175,7 @@ services:
     volumes:
       - pg-data-llm:/var/lib/postgresql
     networks:
-      - lib-network
+      - ai-articles-network
 
   redis:
     image: redis:7.2-alpine
@@ -186,7 +186,7 @@ services:
     volumes:
       - redis-data:/data
     networks:
-      - lib-network
+      - ai-articles-network
 
   nginx:
     image: nginx:1.27-alpine
@@ -202,7 +202,7 @@ services:
     volumes:
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
     networks:
-      - lib-network
+      - ai-articles-network
 
 volumes:
   pg-data-auth:
@@ -211,4 +211,8 @@ volumes:
   redis-data:
 
 networks:
-  lib-network:
+  ai-articles-network:
+
+secrets:
+  gcp_credentials:
+    file: ./secret/credentials.json

@@ -8,26 +8,16 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/articles")
-public class ArticleMediaApi {
+public class ArticleMediaController {
 
     private final ArticleMediaFacadeService articleMediaFacadeService;
 
-    public ArticleMediaApi(ArticleMediaFacadeService articleMediaFacadeService) {
+    public ArticleMediaController(ArticleMediaFacadeService articleMediaFacadeService) {
         this.articleMediaFacadeService = articleMediaFacadeService;
-    }
-
-    @GetMapping("/{articleId}/images")
-    public List<ArticleImageResponse> listArticleImages(
-            @PathVariable UUID articleId,
-            @AuthenticationPrincipal Jwt jwt
-    ) {
-        UUID requesterId = UUID.fromString(jwt.getSubject());
-        return articleMediaFacadeService.listArticleImages(articleId, requesterId);
     }
 
     @PostMapping("/{articleId}/images")

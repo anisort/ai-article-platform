@@ -12,6 +12,6 @@ public class LoginController {
 
     @GetMapping("/")
     public String root() {
-        return "redirect:http://localhost:4200/";
+        return "redirect:http://localhost:81/";
     }
 }

@@ -11,6 +11,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Column;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.ZonedDateTime;
@@ -18,6 +20,8 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "article_assistant_message")
+@Getter
+@Setter
 public class ArticleAssistantMessage {
 
     @Id
@@ -36,36 +40,4 @@ public class ArticleAssistantMessage {
 
     @CreationTimestamp
     private ZonedDateTime createdAt;
-
-    public UUID getId() {
-        return id;
-    }
-
-    public ArticleAssistantChat getChat() {
-        return chat;
-    }
-
-    public void setChat(ArticleAssistantChat chat) {
-        this.chat = chat;
-    }
-
-    public AssistantMessageRole getRole() {
-        return role;
-    }
-
-    public void setRole(AssistantMessageRole role) {
-        this.role = role;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public ZonedDateTime getCreatedAt() {
-        return createdAt;
-    }
 }

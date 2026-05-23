@@ -17,11 +17,11 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/profile-page")
-public class ProfilePageApi {
+public class ProfilePageController {
 
     private final ProfilePageFacadeService profilePageFacadeService;
 
-    public ProfilePageApi(ProfilePageFacadeService profilePageFacadeService) {
+    public ProfilePageController(ProfilePageFacadeService profilePageFacadeService) {
         this.profilePageFacadeService = profilePageFacadeService;
     }
 

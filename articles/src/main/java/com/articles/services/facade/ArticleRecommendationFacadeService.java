@@ -7,7 +7,7 @@ import com.articles.entities.Article;
 import com.articles.services.core.ArticleLikeService;
 import com.articles.services.core.ArticleService;
 import com.articles.services.integration.LlmIntegrationService;
-import com.articles.services.integration.UserService;
+import com.articles.services.integration.UserIntegrationService;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -27,18 +27,18 @@ public class ArticleRecommendationFacadeService {
     private final ArticleService articleService;
     private final ArticleLikeService articleLikeService;
     private final LlmIntegrationService llmIntegrationService;
-    private final UserService userService;
+    private final UserIntegrationService userIntegrationService;
 
     public ArticleRecommendationFacadeService(
             ArticleService articleService,
             ArticleLikeService articleLikeService,
             LlmIntegrationService llmIntegrationService,
-            UserService userService
+            UserIntegrationService userIntegrationService
     ) {
         this.articleService = articleService;
         this.articleLikeService = articleLikeService;
         this.llmIntegrationService = llmIntegrationService;
-        this.userService = userService;
+        this.userIntegrationService = userIntegrationService;
     }
 
     @Cacheable(
@@ -81,7 +81,7 @@ public class ArticleRecommendationFacadeService {
 
         List<Article> selected = articleService.getPublishedArticlesByIds(new ArrayList<>(orderedIds));
         Map<UUID, Article> byId = selected.stream().collect(Collectors.toMap(Article::getId, Function.identity()));
-        Map<UUID, UserBriefResponse> authors = userService.getAuthors(selected);
+        Map<UUID, UserBriefResponse> authors = userIntegrationService.getAuthors(selected);
 
         return orderedIds.stream()
                 .map(byId::get)

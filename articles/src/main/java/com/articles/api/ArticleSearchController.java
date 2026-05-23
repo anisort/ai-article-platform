@@ -11,11 +11,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/search/articles")
-public class ArticleSearchApi {
+public class ArticleSearchController {
 
     private final ArticleSearchFacadeService articleSearchFacadeService;
 
-    public ArticleSearchApi(ArticleSearchFacadeService articleSearchFacadeService) {
+    public ArticleSearchController(ArticleSearchFacadeService articleSearchFacadeService) {
         this.articleSearchFacadeService = articleSearchFacadeService;
     }
 

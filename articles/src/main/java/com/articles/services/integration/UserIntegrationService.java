@@ -17,11 +17,11 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
-public class UserService {
+public class UserIntegrationService {
 
     private final RestClient restClient;
 
-    public UserService(@Qualifier("userRestClient") RestClient restClient) {
+    public UserIntegrationService(@Qualifier("userRestClient") RestClient restClient) {
         this.restClient = restClient;
     }
 

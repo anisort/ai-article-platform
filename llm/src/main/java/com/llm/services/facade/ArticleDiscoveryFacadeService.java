@@ -5,15 +5,19 @@ import com.llm.dto.discovery.ArticleRecommendationRequest;
 import com.llm.dto.discovery.SemanticSearchRequest;
 import com.llm.services.llm.ArticleRecommendationService;
 import com.llm.services.llm.ArticleVectorService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ArticleDiscoveryFacade {
+public class ArticleDiscoveryFacadeService {
+
+    private static final Logger log = LoggerFactory.getLogger(ArticleDiscoveryFacadeService.class);
 
     private final ArticleVectorService articleVectorService;
     private final ArticleRecommendationService articleRecommendationService;
 
-    public ArticleDiscoveryFacade(
+    public ArticleDiscoveryFacadeService(
             ArticleVectorService articleVectorService,
             ArticleRecommendationService articleRecommendationService
     ) {
@@ -24,9 +28,20 @@ public class ArticleDiscoveryFacade {
     public ArticleIdsResponse searchArticles(SemanticSearchRequest request) {
         double threshold = request.similarityThreshold() == null ? 0.6 : request.similarityThreshold();
         int topK = request.topK() == null ? 20 : request.topK();
-        return ArticleIdsResponse.of(
-                articleVectorService.similaritySearchArticleIds(request.query(), threshold, topK)
-        );
+        try {
+            return ArticleIdsResponse.of(
+                    articleVectorService.similaritySearchArticleIds(request.query(), threshold, topK)
+            );
+        } catch (Exception ex) {
+            log.error(
+                    "Semantic search failed in ArticleDiscoveryFacadeService. query='{}', threshold={}, topK={}",
+                    request.query(),
+                    threshold,
+                    topK,
+                    ex
+            );
+            throw ex;
+        }
     }
 
     public ArticleIdsResponse recommendArticles(ArticleRecommendationRequest request) {

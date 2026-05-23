@@ -4,9 +4,11 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.Getter;
 
 @Entity
 @Table(name = "vector_store")
+@Getter
 public class VectorStoreDocument {
 
     @Id
@@ -14,12 +16,4 @@ public class VectorStoreDocument {
 
     @Column(name = "metadata")
     private String metadata;
-
-    public String getId() {
-        return id;
-    }
-
-    public String getMetadata() {
-        return metadata;
-    }
 }

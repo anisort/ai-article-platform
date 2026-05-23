@@ -9,11 +9,11 @@ import org.springframework.stereotype.Service;
 import java.util.UUID;
 
 @Service
-public class ArticleDescriptionFacade {
+public class ArticleDescriptionFacadeService {
 
     private final AssistantService assistantService;
 
-    public ArticleDescriptionFacade(AssistantService assistantService) {
+    public ArticleDescriptionFacadeService(AssistantService assistantService) {
         this.assistantService = assistantService;
     }
 

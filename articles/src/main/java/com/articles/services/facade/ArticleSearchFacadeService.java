@@ -6,7 +6,7 @@ import com.articles.dto.user.UserBriefResponse;
 import com.articles.entities.Article;
 import com.articles.services.core.ArticleService;
 import com.articles.services.integration.LlmIntegrationService;
-import com.articles.services.integration.UserService;
+import com.articles.services.integration.UserIntegrationService;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -20,20 +20,17 @@ import java.util.stream.Collectors;
 public class ArticleSearchFacadeService {
 
     private final ArticleService articleService;
-    private final UserService userService;
+    private final UserIntegrationService userIntegrationService;
     private final LlmIntegrationService llmIntegrationService;
-    private final ArticleFacadeService articleFacadeService;
 
     public ArticleSearchFacadeService(
             ArticleService articleService,
-            UserService userService,
-            LlmIntegrationService llmIntegrationService,
-            ArticleFacadeService articleFacadeService
+            UserIntegrationService userIntegrationService,
+            LlmIntegrationService llmIntegrationService
     ) {
         this.articleService = articleService;
-        this.userService = userService;
+        this.userIntegrationService = userIntegrationService;
         this.llmIntegrationService = llmIntegrationService;
-        this.articleFacadeService = articleFacadeService;
     }
 
     @Cacheable(
@@ -42,7 +39,7 @@ public class ArticleSearchFacadeService {
     )
     public List<ArticlePreviewResponse> searchBySemantic(String query) {
         if (query == null || query.isBlank()) {
-            return articleFacadeService.getPublishedArticles();
+            return mapToPreview(articleService.getPublishedArticles());
         }
 
         List<UUID> articleIds = llmIntegrationService.searchArticleIds(query);
@@ -52,7 +49,7 @@ public class ArticleSearchFacadeService {
 
         List<Article> articles = articleService.getPublishedArticlesByIds(articleIds);
         Map<UUID, Article> byId = articles.stream().collect(Collectors.toMap(Article::getId, Function.identity()));
-        Map<UUID, UserBriefResponse> authors = userService.getAuthors(articles);
+        Map<UUID, UserBriefResponse> authors = userIntegrationService.getAuthors(articles);
 
         return articleIds.stream()
                 .map(byId::get)
@@ -67,11 +64,15 @@ public class ArticleSearchFacadeService {
     )
     public List<ArticlePreviewResponse> searchByTitleOrAuthor(String query) {
         if (query == null || query.isBlank()) {
-            return articleFacadeService.getPublishedArticles();
+            return mapToPreview(articleService.getPublishedArticles());
         }
 
         List<Article> articles = articleService.searchPublishedArticlesByTitle(query.trim());
-        Map<UUID, UserBriefResponse> authors = userService.getAuthors(articles);
+        return mapToPreview(articles);
+    }
+
+    private List<ArticlePreviewResponse> mapToPreview(List<Article> articles) {
+        Map<UUID, UserBriefResponse> authors = userIntegrationService.getAuthors(articles);
         return articles.stream()
                 .map(article -> ArticlePreviewResponse.fromEntity(article, authors.get(article.getAuthorId())))
                 .toList();

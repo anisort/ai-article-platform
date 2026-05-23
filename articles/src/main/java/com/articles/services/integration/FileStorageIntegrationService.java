@@ -6,11 +6,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
 @Service
-public class FileStorageService {
+public class FileStorageIntegrationService {
 
     private final RestClient filesRestClient;
 
-    public FileStorageService(@Qualifier("filesRestClient") RestClient filesRestClient) {
+    public FileStorageIntegrationService(@Qualifier("filesRestClient") RestClient filesRestClient) {
         this.filesRestClient = filesRestClient;
     }
 

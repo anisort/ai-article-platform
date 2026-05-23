@@ -14,11 +14,11 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/articles")
-public class ArticleApi {
+public class ArticleController {
 
     private final ArticleFacadeService articleFacadeService;
 
-    public ArticleApi(ArticleFacadeService articleFacadeService) {
+    public ArticleController(ArticleFacadeService articleFacadeService) {
         this.articleFacadeService = articleFacadeService;
     }
 

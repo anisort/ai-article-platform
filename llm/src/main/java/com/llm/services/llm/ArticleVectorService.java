@@ -1,6 +1,8 @@
 package com.llm.services.llm;
 
 import com.llm.dto.article.ArticleEmbeddingRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.VectorStore;
@@ -12,6 +14,8 @@ import java.util.UUID;
 
 @Service
 public class ArticleVectorService {
+
+    private static final Logger log = LoggerFactory.getLogger(ArticleVectorService.class);
 
     private final VectorStore vectorStore;
 
@@ -59,13 +63,23 @@ public class ArticleVectorService {
                 .topK(topK)
                 .filterExpression("published == true")
                 .build();
-
-        return vectorStore.similaritySearch(request).stream()
-                .map(document -> document.getMetadata().get("article_id"))
-                .filter(String.class::isInstance)
-                .map(String.class::cast)
-                .map(UUID::fromString)
-                .toList();
+        try {
+            return vectorStore.similaritySearch(request).stream()
+                    .map(document -> document.getMetadata().get("article_id"))
+                    .filter(String.class::isInstance)
+                    .map(String.class::cast)
+                    .map(UUID::fromString)
+                    .toList();
+        } catch (Exception ex) {
+            log.error(
+                    "vectorStore.similaritySearch failed. query='{}', threshold={}, topK={}",
+                    query,
+                    similarityThreshold,
+                    topK,
+                    ex
+            );
+            throw ex;
+        }
     }
 }
 

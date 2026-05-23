@@ -9,7 +9,7 @@ import com.articles.dto.user.UserBriefResponse;
 import com.articles.entities.Article;
 import com.articles.services.core.ArticleLikeService;
 import com.articles.services.core.ArticleService;
-import com.articles.services.integration.UserService;
+import com.articles.services.integration.UserIntegrationService;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
@@ -22,22 +22,22 @@ import java.util.UUID;
 @Service
 public class ProfilePageFacadeService {
 
-    private final UserService userService;
+    private final UserIntegrationService userIntegrationService;
     private final ArticleService articleService;
     private final ArticleLikeService articleLikeService;
 
     public ProfilePageFacadeService(
-            UserService userService,
+            UserIntegrationService userIntegrationService,
             ArticleService articleService,
             ArticleLikeService articleLikeService
     ) {
-        this.userService = userService;
+        this.userIntegrationService = userIntegrationService;
         this.articleService = articleService;
         this.articleLikeService = articleLikeService;
     }
 
     public ProfilePageResponse getOwnProfilePage(UUID userId, String authorizationHeader) {
-        UserProfileResponse profile = userService.getMyProfile(authorizationHeader);
+        UserProfileResponse profile = userIntegrationService.getMyProfile(authorizationHeader);
         List<Article> ownArticles = articleService.getArticlesByAuthor(userId);
         List<Article> likedArticles = articleLikeService.getLikedArticles(userId);
         Map<UUID, UserBriefResponse> authors = getAuthors(ownArticles, likedArticles);
@@ -51,9 +51,9 @@ public class ProfilePageFacadeService {
     }
 
     public ProfilePageResponse getForeignProfilePage(UUID userId, String authorizationHeader) {
-        UserProfileResponse profile = userService.getProfileById(userId, authorizationHeader);
+        UserProfileResponse profile = userIntegrationService.getProfileById(userId, authorizationHeader);
         List<Article> publishedArticles = articleService.getPublishedArticlesByAuthor(userId);
-        Map<UUID, UserBriefResponse> authors = userService.getAuthors(publishedArticles);
+        Map<UUID, UserBriefResponse> authors = userIntegrationService.getAuthors(publishedArticles);
 
         return new ProfilePageResponse(
                 profile,
@@ -80,7 +80,7 @@ public class ProfilePageFacadeService {
         List<Article> allArticles = new ArrayList<>(ownArticles.size() + likedArticles.size());
         allArticles.addAll(ownArticles);
         allArticles.addAll(likedArticles);
-        return userService.getAuthors(allArticles);
+        return userIntegrationService.getAuthors(allArticles);
     }
 
     private List<ArticlePreviewResponse> mapArticlePreviews(List<Article> articles, Map<UUID, UserBriefResponse> authors) {

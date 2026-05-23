@@ -11,10 +11,6 @@ export class ArticleImagesService {
   private readonly apiUrl = `${environment.apiUrlArticles}/v1/articles`;
   private readonly http = inject(HttpClient);
 
-  list(articleId: string): Observable<ArticleImage[]> {
-    return this.http.get<ArticleImage[]>(`${this.apiUrl}/${articleId}/images`);
-  }
-
   add(articleId: string, imageUrl: string): Observable<ArticleImage> {
     return this.http.post<ArticleImage>(`${this.apiUrl}/${articleId}/images`, { imageUrl });
   }

@@ -4,13 +4,12 @@ import com.articles.dto.image.ArticleImageResponse;
 import com.articles.entities.ArticleImage;
 import com.articles.services.core.ArticleImageService;
 import com.articles.services.core.ArticleService;
-import com.articles.services.integration.FileStorageService;
+import com.articles.services.integration.FileStorageIntegrationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
 import java.util.UUID;
 
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -20,21 +19,16 @@ public class ArticleMediaFacadeService {
 
     private final ArticleService articleService;
     private final ArticleImageService articleImageService;
-    private final FileStorageService fileStorageService;
+    private final FileStorageIntegrationService fileStorageIntegrationService;
 
     public ArticleMediaFacadeService(
             ArticleService articleService,
             ArticleImageService articleImageService,
-            FileStorageService fileStorageService
+            FileStorageIntegrationService fileStorageIntegrationService
     ) {
         this.articleService = articleService;
         this.articleImageService = articleImageService;
-        this.fileStorageService = fileStorageService;
-    }
-
-    public List<ArticleImageResponse> listArticleImages(UUID articleId, UUID requesterId) {
-        articleService.requireOwned(articleId, requesterId);
-        return articleImageService.listByArticleId(articleId).stream().map(ArticleImageResponse::fromEntity).toList();
+        this.fileStorageIntegrationService = fileStorageIntegrationService;
     }
 
     public ArticleImageResponse addArticleImage(UUID articleId, UUID requesterId, String imageUrl) {
@@ -50,7 +44,7 @@ public class ArticleMediaFacadeService {
         articleService.requireOwned(articleId, requesterId);
         ArticleImage image = articleImageService.findByIdAndArticleId(imageId, articleId)
                 .orElseThrow(() -> new ResponseStatusException(NOT_FOUND));
-        fileStorageService.deleteByUrl(image.getImageUrl(), bearerToken);
+        fileStorageIntegrationService.deleteByUrl(image.getImageUrl(), bearerToken);
         articleImageService.delete(image);
     }
 }
