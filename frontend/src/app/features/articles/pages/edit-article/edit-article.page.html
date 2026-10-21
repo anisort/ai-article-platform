@@ -32,7 +32,17 @@
               </button>
               <button type="button" class="secondary-button" [disabled]="draftCreationLoading()" (click)="openImageLibrary()">Images folder</button>
               <div class="submit-group">
-                <button type="button" class="primary-button" [disabled]="!canSubmit()" (click)="submitArticle()">{{ submitLabel() }}</button>
+                <button
+                  type="button"
+                  class="primary-button"
+                  [disabled]="!canSubmit() || savingArticle()"
+                  [attr.aria-busy]="savingArticle()"
+                  (click)="submitArticle()">
+                  @if (savingArticle()) {
+                    <span class="button-spinner" aria-hidden="true"></span>
+                  }
+                  <span aria-live="polite">{{ savingArticle() ? submittingLabel() : submitLabel() }}</span>
+                </button>
                 @if (!canSubmit()) {
                   <div class="validation-popover-anchor">
                     <button

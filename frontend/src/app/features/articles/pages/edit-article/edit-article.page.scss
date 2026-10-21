@@ -265,11 +265,31 @@
   border: 1px solid color-mix(in srgb, var(--color-accent-berry) 75%, var(--color-border-soft));
   background: var(--color-accent-berry);
   color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
 }
 
 .primary-button:disabled {
   opacity: 0.55;
   cursor: not-allowed;
+}
+
+.button-spinner {
+  width: 0.9rem;
+  height: 0.9rem;
+  box-sizing: border-box;
+  border: 2px solid rgba(255, 255, 255, 0.45);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: button-spinner-rotate 0.7s linear infinite;
+}
+
+@keyframes button-spinner-rotate {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .secondary-button {

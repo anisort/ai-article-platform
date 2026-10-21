@@ -56,7 +56,8 @@ public class ArticleFacadeService {
         List<Article> articles = articleService.getPublishedArticles();
         Map<UUID, UserBriefResponse> authors = userIntegrationService.getAuthors(articles);
         return articles.stream()
-                .map(article -> ArticlePreviewResponse.fromEntity(article, authors.get(article.getAuthorId())))
+                .map(article -> ArticlePreviewResponse.
+                        fromEntity(article, authors.get(article.getAuthorId())))
                 .toList();
     }
 

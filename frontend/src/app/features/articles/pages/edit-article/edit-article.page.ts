@@ -65,6 +65,7 @@ export class EditArticlePage implements OnDestroy, PendingChangesComponent {
   assistantOpen = signal(false);
   assistantPanelWidth = signal(448);
   draftCreationLoading = signal(false);
+  savingArticle = signal(false);
   articleId: string | null = null;
   submitted = false;
   titleError = signal(false);
@@ -301,6 +302,10 @@ export class EditArticlePage implements OnDestroy, PendingChangesComponent {
   }
 
   submitArticle() {
+    if (this.savingArticle()) {
+      return;
+    }
+
     this.submitted = true;
     this.validateRequiredFields();
     if (!this.canSubmit()) {
@@ -315,7 +320,10 @@ export class EditArticlePage implements OnDestroy, PendingChangesComponent {
     };
 
     const request$ = this.articleId ? this.articlesService.update(this.articleId, request) : this.articlesService.create(request);
-    request$.subscribe({
+    this.savingArticle.set(true);
+    request$
+      .pipe(finalize(() => this.savingArticle.set(false)))
+      .subscribe({
       next: res => {
         this.captureSnapshot();
         this.router.navigate(['/articles', res.articleResponse.id]);
@@ -325,6 +333,7 @@ export class EditArticlePage implements OnDestroy, PendingChangesComponent {
 
   pageTitle(): string { return this.articleId ? 'Edit article' : 'Create article'; }
   submitLabel(): string { return this.articleId ? 'Save article' : 'Publish article'; }
+  submittingLabel(): string { return this.articleId ? 'Saving...' : 'Publishing...'; }
   canSubmit(): boolean { return this.title.trim().length > 0 && this.markdownContent.trim().length > 0 && this.previewImageUrl.trim().length > 0; }
   validationMissingItems(): string[] {
     const missing: string[] = [];
