@@ -1,3 +1,4 @@
 .env
 secret/credentials.json
 .idea/
+/docs/doxygen/html/
