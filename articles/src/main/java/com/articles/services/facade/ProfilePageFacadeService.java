@@ -19,6 +19,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * Defines profile page facade service.
+ */
 @Service
 public class ProfilePageFacadeService {
 
@@ -36,6 +39,12 @@ public class ProfilePageFacadeService {
         this.articleLikeService = articleLikeService;
     }
 
+/**
+ * Returns get own profile page.
+ * @param userId the userId
+ * @param authorizationHeader the authorizationHeader
+ * @return the result of the operation
+ */
     public ProfilePageResponse getOwnProfilePage(UUID userId, String authorizationHeader) {
         UserProfileResponse profile = userIntegrationService.getMyProfile(authorizationHeader);
         List<Article> ownArticles = articleService.getArticlesByAuthor(userId);
@@ -50,6 +59,12 @@ public class ProfilePageFacadeService {
         );
     }
 
+/**
+ * Returns get foreign profile page.
+ * @param userId the userId
+ * @param authorizationHeader the authorizationHeader
+ * @return the result of the operation
+ */
     public ProfilePageResponse getForeignProfilePage(UUID userId, String authorizationHeader) {
         UserProfileResponse profile = userIntegrationService.getProfileById(userId, authorizationHeader);
         List<Article> publishedArticles = articleService.getPublishedArticlesByAuthor(userId);
@@ -69,6 +84,12 @@ public class ProfilePageFacadeService {
             @CacheEvict(cacheNames = CacheNames.ARTICLE_BY_ID, allEntries = true),
             @CacheEvict(cacheNames = CacheNames.RECOMMENDATIONS_ANON, allEntries = true)
     })
+/**
+ * Returns toggle like.
+ * @param articleId the articleId
+ * @param userId the userId
+ * @return the result of the operation
+ */
     public ToggleArticleLikeResponse toggleLike(UUID articleId, UUID userId) {
         Article article = articleService.requirePublished(articleId);
         boolean liked = articleLikeService.toggleLike(userId, article);
@@ -76,6 +97,12 @@ public class ProfilePageFacadeService {
         return new ToggleArticleLikeResponse(articleId, liked, likesCount);
     }
 
+/**
+ * Returns get authors.
+ * @param ownArticles the ownArticles
+ * @param likedArticles the likedArticles
+ * @return the result of the operation
+ */
     private Map<UUID, UserBriefResponse> getAuthors(List<Article> ownArticles, List<Article> likedArticles) {
         List<Article> allArticles = new ArrayList<>(ownArticles.size() + likedArticles.size());
         allArticles.addAll(ownArticles);
@@ -83,6 +110,13 @@ public class ProfilePageFacadeService {
         return userIntegrationService.getAuthors(allArticles);
     }
 
+/**
+ * Returns map article previews.
+ * @param articles the articles
+ * @param UUID the UUID
+ * @param authors the authors
+ * @return the result of the operation
+ */
     private List<ArticlePreviewResponse> mapArticlePreviews(List<Article> articles, Map<UUID, UserBriefResponse> authors) {
         return articles.stream()
                 .map(article -> ArticlePreviewResponse.fromEntity(article, authors.get(article.getAuthorId())))

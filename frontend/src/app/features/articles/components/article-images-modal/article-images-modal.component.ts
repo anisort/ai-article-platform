@@ -12,6 +12,9 @@ import { ArticleImage } from '../../models/article-image.model';
   templateUrl: './article-images-modal.component.html',
   styleUrl: './article-images-modal.component.scss',
 })
+/**
+ * Defines the article images modal component class.
+ */
 export class ArticleImagesModalComponent {
   private readonly modalController = inject(ModalController);
 
@@ -19,6 +22,10 @@ export class ArticleImagesModalComponent {
   @Input() uploading = false;
   @Input() images: ArticleImage[] = [];
 
+/**
+ * Performs the on file selected operation.
+ * @param event the event
+ */
   onFileSelected(event: Event): void {
     const file = (event.target as HTMLInputElement).files?.[0];
     if (file) {
@@ -26,14 +33,25 @@ export class ArticleImagesModalComponent {
     }
   }
 
+/**
+ * Performs the insert operation.
+ * @param image the image
+ */
   insert(image: ArticleImage): void {
     this.modalController.dismiss({ action: 'insert', image });
   }
 
+/**
+ * Performs the remove operation.
+ * @param image the image
+ */
   remove(image: ArticleImage): void {
     this.modalController.dismiss({ action: 'remove', image });
   }
 
+/**
+ * Performs the close operation.
+ */
   close(): void {
     this.modalController.dismiss();
   }

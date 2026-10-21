@@ -5,6 +5,9 @@ import jakarta.validation.constraints.NotNull;
 
 import java.util.UUID;
 
+/**
+ * Carries user response.
+ */
 public record UserResponse(
         @NotNull UUID id,
         @NotNull String username,
@@ -12,6 +15,11 @@ public record UserResponse(
         @NotNull String name,
         String avatar
         ) {
+/**
+ * Returns from entity.
+ * @param user the user
+ * @return the result of the operation
+ */
     public static UserResponse fromEntity(CustomUserDetails user) {
         if (user == null) return null;
         return new UserResponse(

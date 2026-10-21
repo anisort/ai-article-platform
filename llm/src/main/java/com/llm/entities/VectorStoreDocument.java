@@ -6,6 +6,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Getter;
 
+/**
+ * Defines vector store document.
+ */
 @Entity
 @Table(name = "vector_store")
 @Getter

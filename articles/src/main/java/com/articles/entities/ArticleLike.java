@@ -8,6 +8,9 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
+/**
+ * Defines article like.
+ */
 @Entity
 @IdClass(ArticleLikeId.class)
 @Table(name = "article_like")

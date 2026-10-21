@@ -9,6 +9,9 @@ import lombok.Setter;
 import java.io.Serializable;
 import java.util.UUID;
 
+/**
+ * Defines article like id.
+ */
 @Getter
 @Setter
 @NoArgsConstructor

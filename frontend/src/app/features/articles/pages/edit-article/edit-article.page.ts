@@ -42,6 +42,9 @@ import { MarkdownRenderService } from '../../../../shared/services/markdown-rend
   templateUrl: './edit-article.page.html',
   styleUrls: ['./edit-article.page.scss'],
 })
+/**
+ * Defines the edit article page class.
+ */
 export class EditArticlePage implements OnDestroy, PendingChangesComponent {
   @ViewChild('markdownInput') markdownInput?: ElementRef<HTMLTextAreaElement>;
 
@@ -91,6 +94,9 @@ export class EditArticlePage implements OnDestroy, PendingChangesComponent {
     { value: 'preview', label: 'Preview' },
   ];
 
+/**
+ * Performs the constructor operation.
+ */
   constructor() {
     this.articleId = this.route.snapshot.paramMap.get('id');
     if (this.articleId) {
@@ -100,32 +106,61 @@ export class EditArticlePage implements OnDestroy, PendingChangesComponent {
     this.captureSnapshot();
   }
 
+/**
+ * Performs the ng on destroy operation.
+ */
   ngOnDestroy() {
     this.teardownAssistantResize();
   }
 
+/**
+ * Performs the has pending changes operation.
+ * @returns the operation result
+ */
   hasPendingChanges(): boolean {
     return this.initialSnapshot !== this.snapshotState();
   }
 
+/**
+ * Performs the on title input operation.
+ * @param event the event
+ */
   onTitleInput(event: Event) {
     this.title = (event.target as HTMLInputElement).value;
     this.validateRequiredFields();
   }
 
+/**
+ * Performs the on content input operation.
+ * @param event the event
+ */
   onContentInput(event: Event) {
     this.markdownContent = (event.target as HTMLTextAreaElement).value;
     this.validateRequiredFields();
   }
 
+/**
+ * Performs the on draft toggle operation.
+ * @param event the event
+ */
   onDraftToggle(event: Event) {
     this.isDraft = (event.target as HTMLInputElement).checked;
   }
 
+/**
+ * Performs the render markdown operation.
+ * @param text the text
+ * @returns the operation result
+ */
   renderMarkdown(text: string): string {
     return this.markdownRenderService.render(text);
   }
 
+/**
+ * Performs the render assistant markdown operation.
+ * @param text the text
+ * @returns the operation result
+ */
   renderAssistantMarkdown(text: string): string {
     return this.markdownRenderService.renderAssistant(text);
   }
@@ -134,6 +169,9 @@ export class EditArticlePage implements OnDestroy, PendingChangesComponent {
   selectHeading(level: 1 | 2 | 3 | 4) { this.headingLevel = level; this.headingDropdownOpen = false; }
   setEditorTab(tab: 'write' | 'preview') { this.editorTab = tab; }
 
+/**
+ * Performs the apply heading level operation.
+ */
   applyHeadingLevel() {
     const textarea = this.markdownInput?.nativeElement;
     if (!textarea) {
@@ -155,6 +193,12 @@ export class EditArticlePage implements OnDestroy, PendingChangesComponent {
     this.validateRequiredFields();
   }
 
+/**
+ * Performs the append wrap operation.
+ * @param prefix the prefix
+ * @param suffix the suffix
+ * @param placeholder the placeholder
+ */
   appendWrap(prefix: string, suffix: string, placeholder: string) {
     const textarea = this.markdownInput?.nativeElement;
     if (!textarea) return;
@@ -168,6 +212,11 @@ export class EditArticlePage implements OnDestroy, PendingChangesComponent {
     this.validateRequiredFields();
   }
 
+/**
+ * Performs the append block operation.
+ * @param text the text
+ * @param placeholder the placeholder
+ */
   appendBlock(text: string, placeholder = '') {
     const textarea = this.markdownInput?.nativeElement;
     if (!textarea) return;
@@ -190,6 +239,9 @@ export class EditArticlePage implements OnDestroy, PendingChangesComponent {
   addCode() { this.appendBlock('```ts\n{{selection}}\n```', '{{selection}}'); }
   addImageMarkdown() { this.appendBlock('![caption]({{selection}})', '{{selection}}'); }
 
+/**
+ * Performs the open cover dialog operation.
+ */
   async openCoverDialog() {
     const modal = await this.modalController.create({
       component: ArticleCoverModalComponent,
@@ -205,6 +257,9 @@ export class EditArticlePage implements OnDestroy, PendingChangesComponent {
     }
   }
 
+/**
+ * Performs the open image library operation.
+ */
   async openImageLibrary() {
     if (!this.articleId) {
       await this.ensureDraftArticle('images');
@@ -226,16 +281,27 @@ export class EditArticlePage implements OnDestroy, PendingChangesComponent {
     }
   }
 
+/**
+ * Performs the remove cover image operation.
+ */
   removeCoverImage() {
     this.previewImageUrl = '';
     this.previewImageName = '';
     this.validateRequiredFields();
   }
 
+/**
+ * Performs the insert article image operation.
+ * @param image the image
+ */
   insertArticleImage(image: ArticleImage) {
     this.appendBlock(`![image](${image.imageUrl})`);
   }
 
+/**
+ * Performs the remove article image operation.
+ * @param image the image
+ */
   removeArticleImage(image: ArticleImage) {
     if (!this.articleId) return;
     this.articleImagesService.delete(this.articleId, image.id).subscribe({
@@ -243,6 +309,9 @@ export class EditArticlePage implements OnDestroy, PendingChangesComponent {
     });
   }
 
+/**
+ * Performs the toggle assistant operation.
+ */
   async toggleAssistant() {
     if (this.draftCreationLoading()) {
       return;
@@ -256,6 +325,10 @@ export class EditArticlePage implements OnDestroy, PendingChangesComponent {
     this.assistantOpen.update(value => !value);
   }
 
+/**
+ * Performs the start assistant resize operation.
+ * @param event the event
+ */
   startAssistantResize(event: PointerEvent): void {
     event.preventDefault();
     this.resizePointerId = event.pointerId;
@@ -263,6 +336,10 @@ export class EditArticlePage implements OnDestroy, PendingChangesComponent {
     document.addEventListener('pointerup', this.onResizePointerUp);
   }
 
+/**
+ * Performs the on assistant messages click operation.
+ * @param event the event
+ */
   onAssistantMessagesClick(event: MouseEvent) {
     const target = event.target instanceof Element ? event.target : null;
     const copyButton = target?.closest('.article-code-copy') as HTMLElement | null;
@@ -273,6 +350,10 @@ export class EditArticlePage implements OnDestroy, PendingChangesComponent {
     }
   }
 
+/**
+ * Performs the on preview click operation.
+ * @param event the event
+ */
   onPreviewClick(event: MouseEvent): void {
     const target = event.target instanceof Element ? event.target : null;
     const copyButton = target?.closest('.article-code-copy') as HTMLElement | null;
@@ -282,6 +363,10 @@ export class EditArticlePage implements OnDestroy, PendingChangesComponent {
     this.copyText(code, copyButton);
   }
 
+/**
+ * Performs the on assistant chat selected operation.
+ * @param chatId the chatId
+ */
   onAssistantChatSelected(chatId: string): void {
     const articleId = this.articleId;
     if (!articleId) return;
@@ -289,6 +374,10 @@ export class EditArticlePage implements OnDestroy, PendingChangesComponent {
     this.loadAssistantMessages(articleId, chatId);
   }
 
+/**
+ * Performs the insert assistant message operation.
+ * @param content the content
+ */
   insertAssistantMessage(content: string) {
     const textarea = this.markdownInput?.nativeElement;
     if (!textarea) return;
@@ -301,6 +390,9 @@ export class EditArticlePage implements OnDestroy, PendingChangesComponent {
     this.validateRequiredFields();
   }
 
+/**
+ * Performs the submit article operation.
+ */
   submitArticle() {
     if (this.savingArticle()) {
       return;
@@ -335,6 +427,10 @@ export class EditArticlePage implements OnDestroy, PendingChangesComponent {
   submitLabel(): string { return this.articleId ? 'Save article' : 'Publish article'; }
   submittingLabel(): string { return this.articleId ? 'Saving...' : 'Publishing...'; }
   canSubmit(): boolean { return this.title.trim().length > 0 && this.markdownContent.trim().length > 0 && this.previewImageUrl.trim().length > 0; }
+/**
+ * Performs the validation missing items operation.
+ * @returns the operation result
+ */
   validationMissingItems(): string[] {
     const missing: string[] = [];
     if (!this.title.trim()) missing.push('Title');
@@ -343,6 +439,10 @@ export class EditArticlePage implements OnDestroy, PendingChangesComponent {
     return missing;
   }
 
+/**
+ * Performs the upload preview file operation.
+ * @param file the file
+ */
   private uploadPreviewFile(file: File): void {
     this.previewImageName = file.name;
     this.previewImageUploading.set(true);
@@ -356,6 +456,10 @@ export class EditArticlePage implements OnDestroy, PendingChangesComponent {
       });
   }
 
+/**
+ * Performs the upload article image operation.
+ * @param file the file
+ */
   private uploadArticleImage(file: File): void {
     if (!this.articleId) return;
     this.articleImageUploading.set(true);
@@ -370,6 +474,10 @@ export class EditArticlePage implements OnDestroy, PendingChangesComponent {
       });
   }
 
+/**
+ * Performs the load editor data operation.
+ * @param articleId the articleId
+ */
   private loadEditorData(articleId: string) {
     this.loadingArticle.set(true);
     this.loadFailed.set(false);
@@ -395,6 +503,11 @@ export class EditArticlePage implements OnDestroy, PendingChangesComponent {
     });
   }
 
+/**
+ * Performs the load assistant messages operation.
+ * @param articleId the articleId
+ * @param chatId the chatId
+ */
   private loadAssistantMessages(articleId: string, chatId: string): void {
     this.articleAssistantService.listMessages(articleId, chatId).subscribe({
       next: messages => this.assistantMessages.set(messages),
@@ -402,6 +515,10 @@ export class EditArticlePage implements OnDestroy, PendingChangesComponent {
     });
   }
 
+/**
+ * Performs the apply article operation.
+ * @param article the article
+ */
   private applyArticle(article: ArticleWithUserResponse) {
     const data = article.articleResponse;
     this.title = data.title;
@@ -412,12 +529,19 @@ export class EditArticlePage implements OnDestroy, PendingChangesComponent {
     this.validateRequiredFields();
   }
 
+/**
+ * Performs the validate required fields operation.
+ */
   private validateRequiredFields(): void {
     this.titleError.set(this.submitted && !this.title.trim());
     this.contentError.set(this.submitted && !this.markdownContent.trim());
     this.coverError.set(this.submitted && !this.previewImageUrl.trim());
   }
 
+/**
+ * Performs the snapshot state operation.
+ * @returns the operation result
+ */
   private snapshotState(): string {
     return JSON.stringify({
       title: this.title,
@@ -427,10 +551,17 @@ export class EditArticlePage implements OnDestroy, PendingChangesComponent {
     });
   }
 
+/**
+ * Performs the capture snapshot operation.
+ */
   private captureSnapshot(): void {
     this.initialSnapshot = this.snapshotState();
   }
 
+/**
+ * Performs the apply line prefix operation.
+ * @param prefix the prefix
+ */
   private applyLinePrefix(prefix: string) {
     const textarea = this.markdownInput?.nativeElement;
     if (!textarea) return;
@@ -446,6 +577,9 @@ export class EditArticlePage implements OnDestroy, PendingChangesComponent {
     this.validateRequiredFields();
   }
 
+/**
+ * Performs the apply numbered list operation.
+ */
   private applyNumberedList() {
     const textarea = this.markdownInput?.nativeElement;
     if (!textarea) return;
@@ -461,6 +595,10 @@ export class EditArticlePage implements OnDestroy, PendingChangesComponent {
     this.validateRequiredFields();
   }
 
+/**
+ * Performs the handle assistant resize operation.
+ * @param event the event
+ */
   private handleAssistantResize(event: PointerEvent): void {
     if (this.resizePointerId !== event.pointerId) return;
     const viewportWidth = window.innerWidth || 0;
@@ -471,17 +609,30 @@ export class EditArticlePage implements OnDestroy, PendingChangesComponent {
     this.assistantPanelWidth.set(bounded);
   }
 
+/**
+ * Performs the stop assistant resize operation.
+ * @param event the event
+ */
   private stopAssistantResize(event: PointerEvent): void {
     if (this.resizePointerId !== event.pointerId) return;
     this.teardownAssistantResize();
   }
 
+/**
+ * Performs the teardown assistant resize operation.
+ */
   private teardownAssistantResize(): void {
     this.resizePointerId = null;
     document.removeEventListener('pointermove', this.onResizePointerMove);
     document.removeEventListener('pointerup', this.onResizePointerUp);
   }
 
+/**
+ * Performs the copy text operation.
+ * @param value the value
+ * @param button the button
+ * @returns the operation result
+ */
   private async copyText(value: string, button: HTMLElement): Promise<void> {
     if (!value.trim()) {
       return;
@@ -513,6 +664,11 @@ export class EditArticlePage implements OnDestroy, PendingChangesComponent {
     }
   }
 
+/**
+ * Performs the ensure draft article operation.
+ * @param action the action
+ * @returns the operation result
+ */
   private async ensureDraftArticle(action: 'assistant' | 'images'): Promise<void> {
     if (this.articleId || this.draftCreationLoading()) {
       return;
@@ -549,6 +705,9 @@ export class EditArticlePage implements OnDestroy, PendingChangesComponent {
     });
   }
 
+/**
+ * Performs the apply pending action operation.
+ */
   private applyPendingAction(): void {
     const pendingAction = sessionStorage.getItem(this.pendingActionStorageKey);
     if (pendingAction !== 'assistant' && pendingAction !== 'images') {

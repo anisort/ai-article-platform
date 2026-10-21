@@ -13,6 +13,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import static org.springframework.http.HttpStatus.BAD_GATEWAY;
 
+/**
+ * Defines file storage service.
+ */
 @Service
 public class FileStorageService {
 
@@ -23,6 +26,11 @@ public class FileStorageService {
         this.restClient = restClientBuilder.baseUrl(filesApiUrl).build();
     }
 
+/**
+ * Returns upload.
+ * @param file the file
+ * @return the result of the operation
+ */
     public String upload(MultipartFile file) {
         try {
             MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();

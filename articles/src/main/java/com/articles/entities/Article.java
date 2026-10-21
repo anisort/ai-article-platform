@@ -8,6 +8,9 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
+/**
+ * Defines article.
+ */
 @Entity
 @Table(name = "article")
 @Getter

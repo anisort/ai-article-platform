@@ -10,6 +10,9 @@ import { ArticlePreview } from '../../models/article-preview.model';
   templateUrl: './article-preview-card.component.html',
   styleUrl: './article-preview-card.component.scss',
 })
+/**
+ * Defines the article preview card component class.
+ */
 export class ArticlePreviewCardComponent {
   article = input.required<ArticlePreview>();
   size = input<'small' | 'large'>('large');
@@ -22,6 +25,9 @@ export class ArticlePreviewCardComponent {
     return author?.name || author?.username || 'Unknown author';
   });
 
+/**
+ * Performs the on delete click operation.
+ */
   onDeleteClick(): void {
     this.deleteArticle.emit(this.article().id);
   }

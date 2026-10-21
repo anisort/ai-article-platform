@@ -22,6 +22,9 @@ import {
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
+/**
+ * Defines the app component class.
+ */
 export class AppComponent implements OnInit {
   private readonly document = inject(DOCUMENT);
   private readonly themeStorageKey = 'app-theme';
@@ -32,6 +35,10 @@ export class AppComponent implements OnInit {
   authService = inject(AuthService);
   userStore = inject(UserStoreService);
 
+/**
+ * Performs the ng on init operation.
+ * @returns the operation result
+ */
   async ngOnInit(): Promise<void> {
     this.initializeTheme();
     await this.authService.init();
@@ -44,11 +51,17 @@ export class AppComponent implements OnInit {
     }
   }
 
+/**
+ * Performs the toggle theme operation.
+ */
   toggleTheme(): void {
     this.isDarkTheme = !this.isDarkTheme;
     this.applyTheme(this.isDarkTheme);
   }
 
+/**
+ * Performs the initialize theme operation.
+ */
   private initializeTheme(): void {
     const storedTheme = localStorage.getItem(this.themeStorageKey);
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -57,6 +70,11 @@ export class AppComponent implements OnInit {
     this.applyTheme(this.isDarkTheme, false);
   }
 
+/**
+ * Performs the apply theme operation.
+ * @param isDarkTheme the isDarkTheme
+ * @param persist the persist
+ */
   private applyTheme(isDarkTheme: boolean, persist = true): void {
     this.document.body.classList.toggle('theme-dark', isDarkTheme);
     this.document.cookie = `app-theme=${isDarkTheme ? 'dark' : 'light'}; Path=/; Max-Age=31536000; SameSite=Lax`;

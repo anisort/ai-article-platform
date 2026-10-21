@@ -25,6 +25,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * Defines article facade service.
+ */
 @Service
 public class ArticleFacadeService {
 
@@ -52,6 +55,10 @@ public class ArticleFacadeService {
     }
 
     @Cacheable(cacheNames = CacheNames.ARTICLES_LIST, key = "'all'")
+/**
+ * Returns get published articles.
+ * @return the result of the operation
+ */
     public List<ArticlePreviewResponse> getPublishedArticles() {
         List<Article> articles = articleService.getPublishedArticles();
         Map<UUID, UserBriefResponse> authors = userIntegrationService.getAuthors(articles);
@@ -65,6 +72,12 @@ public class ArticleFacadeService {
             cacheNames = CacheNames.ARTICLE_BY_ID,
             key = "#articleId.toString().concat(':').concat(#requesterId == null ? 'anon' : #requesterId.toString())"
     )
+/**
+ * Returns get article.
+ * @param articleId the articleId
+ * @param requesterId the requesterId
+ * @return the result of the operation
+ */
     public ArticleWithUserResponse getArticle(UUID articleId, UUID requesterId) {
         Article article = requesterId == null
                 ? articleService.requirePublished(articleId)
@@ -88,6 +101,12 @@ public class ArticleFacadeService {
             @CacheEvict(cacheNames = CacheNames.SEARCH_BY_SEMANTIC, allEntries = true),
             @CacheEvict(cacheNames = CacheNames.RECOMMENDATIONS_ANON, allEntries = true)
     })
+/**
+ * Returns create.
+ * @param request the request
+ * @param authorId the authorId
+ * @return the result of the operation
+ */
     public ArticleWithUserResponse create(CreateArticleRequest request, UUID authorId) {
         Article article = articleService.create(request, authorId);
         Map<UUID, UserBriefResponse> authors = userIntegrationService.getAuthors(List.of(article));
@@ -103,6 +122,13 @@ public class ArticleFacadeService {
             @CacheEvict(cacheNames = CacheNames.SEARCH_BY_SEMANTIC, allEntries = true),
             @CacheEvict(cacheNames = CacheNames.RECOMMENDATIONS_ANON, allEntries = true)
     })
+/**
+ * Returns update.
+ * @param articleId the articleId
+ * @param request the request
+ * @param requesterId the requesterId
+ * @return the result of the operation
+ */
     public ArticleWithUserResponse update(UUID articleId, CreateArticleRequest request, UUID requesterId) {
         Article article = articleService.requireOwned(articleId, requesterId);
         Article updatedArticle = articleService.update(article, request);
@@ -119,6 +145,11 @@ public class ArticleFacadeService {
             @CacheEvict(cacheNames = CacheNames.SEARCH_BY_SEMANTIC, allEntries = true),
             @CacheEvict(cacheNames = CacheNames.RECOMMENDATIONS_ANON, allEntries = true)
     })
+/**
+ * Performs delete.
+ * @param articleId the articleId
+ * @param requesterId the requesterId
+ */
     public void delete(UUID articleId, UUID requesterId) {
         Article article = articleService.requireOwned(articleId, requesterId);
         articleEmbeddingService.deleteArticleEmbedding(articleId);
@@ -127,6 +158,12 @@ public class ArticleFacadeService {
         articleService.delete(article);
     }
 
+/**
+ * Returns get edit page.
+ * @param articleId the articleId
+ * @param requesterId the requesterId
+ * @return the result of the operation
+ */
     public EditArticlePageResponse getEditPage(UUID articleId, UUID requesterId) {
         Article article = articleService.requireOwned(articleId, requesterId);
         Map<UUID, UserBriefResponse> authors = userIntegrationService.getAuthors(List.of(article));

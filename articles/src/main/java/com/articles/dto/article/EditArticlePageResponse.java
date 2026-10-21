@@ -7,6 +7,9 @@ import com.articles.dto.image.ArticleImageResponse;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Carries edit article page response.
+ */
 public record EditArticlePageResponse(
         ArticleWithUserResponse article,
         List<ArticleImageResponse> images,

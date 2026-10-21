@@ -6,6 +6,9 @@ import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
+/**
+ * Carries article response.
+ */
 public record ArticleResponse(
         UUID id,
         String title,
@@ -17,6 +20,13 @@ public record ArticleResponse(
         long likesCount,
         boolean likedByRequester
 ) implements Serializable {
+/**
+ * Returns from entity.
+ * @param a the a
+ * @param likesCount the likesCount
+ * @param likedByRequester the likedByRequester
+ * @return the result of the operation
+ */
     public static ArticleResponse fromEntity(Article a, long likesCount, boolean likedByRequester) {
         return new ArticleResponse(
                 a.getId(),

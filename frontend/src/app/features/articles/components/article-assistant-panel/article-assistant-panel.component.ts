@@ -18,6 +18,9 @@ import { ArticleAssistantService } from '../../../advisor/services/article-assis
   templateUrl: './article-assistant-panel.component.html',
   styleUrl: './article-assistant-panel.component.scss',
 })
+/**
+ * Defines the article assistant panel component class.
+ */
 export class ArticleAssistantPanelComponent implements OnChanges {
   readonly articleId = input<string | null>(null);
   readonly initialChats = input<AssistantChatResponse[]>([]);
@@ -45,6 +48,10 @@ export class ArticleAssistantPanelComponent implements OnChanges {
     { value: 'PRECISE', label: 'Precise' },
   ];
 
+/**
+ * Performs the ng on changes operation.
+ * @param changes the changes
+ */
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['initialChats']) {
       this.chats.set([...(this.initialChats() ?? [])]);
@@ -60,6 +67,9 @@ export class ArticleAssistantPanelComponent implements OnChanges {
     }
   }
 
+/**
+ * Performs the create chat operation.
+ */
   createChat(): void {
     const articleId = this.articleId();
     if (!articleId) return;
@@ -74,6 +84,10 @@ export class ArticleAssistantPanelComponent implements OnChanges {
       });
   }
 
+/**
+ * Performs the chat options operation.
+ * @returns the operation result
+ */
   chatOptions(): SelectFieldOption[] {
     const items = this.chats().map(chat => ({ value: chat.id, label: chat.title }));
     if (!items.length) {
@@ -82,11 +96,19 @@ export class ArticleAssistantPanelComponent implements OnChanges {
     return items;
   }
 
+/**
+ * Performs the on input change operation.
+ * @param event the event
+ */
   onInputChange(event: Event): void {
     const target = event.target as HTMLTextAreaElement | null;
     this.inputText.set(target?.value ?? '');
   }
 
+/**
+ * Performs the on input keydown operation.
+ * @param event the event
+ */
   onInputKeydown(event: KeyboardEvent): void {
     if (event.key !== 'Enter' || event.shiftKey) {
       return;
@@ -97,6 +119,10 @@ export class ArticleAssistantPanelComponent implements OnChanges {
     }
   }
 
+/**
+ * Performs the on chat select operation.
+ * @param event the event
+ */
   onChatSelect(event: Event | string): void {
     const target = typeof event === 'string'
       ? { value: event }
@@ -108,6 +134,10 @@ export class ArticleAssistantPanelComponent implements OnChanges {
     }
   }
 
+/**
+ * Performs the on mode select operation.
+ * @param event the event
+ */
   onModeSelect(event: Event | string): void {
     const target = typeof event === 'string'
       ? { value: event }
@@ -118,6 +148,9 @@ export class ArticleAssistantPanelComponent implements OnChanges {
     }
   }
 
+/**
+ * Performs the send message operation.
+ */
   sendMessage(): void {
     const articleId = this.articleId();
     const selectedChatId = this.selectedChatId();

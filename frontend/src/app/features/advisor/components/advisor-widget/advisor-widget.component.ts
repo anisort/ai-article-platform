@@ -14,6 +14,9 @@ import { MessageBubbleComponent } from '../../../../shared/components/message-bu
   templateUrl: './advisor-widget.component.html',
   styleUrl: './advisor-widget.component.scss'
 })
+/**
+ * Defines the advisor widget component class.
+ */
 export class AdvisorWidgetComponent {
   private readonly advisorService = inject(AdvisorService);
   private readonly conversationKey = 'advisor_conversation_id';
@@ -25,10 +28,16 @@ export class AdvisorWidgetComponent {
   messages = signal<AdvisorMessage[]>(this.loadMessages());
   conversationId = signal<string | null>(sessionStorage.getItem(this.conversationKey));
 
+/**
+ * Performs the toggle operation.
+ */
   toggle(): void {
     this.isOpen.update(value => !value);
   }
 
+/**
+ * Performs the send operation.
+ */
   send(): void {
     const message = this.input.trim();
     if (!message || this.isLoading()) {
@@ -60,6 +69,9 @@ export class AdvisorWidgetComponent {
     });
   }
 
+/**
+ * Performs the clear session operation.
+ */
   clearSession(): void {
     sessionStorage.removeItem(this.conversationKey);
     sessionStorage.removeItem(this.messagesKey);
@@ -67,10 +79,19 @@ export class AdvisorWidgetComponent {
     this.messages.set([]);
   }
 
+/**
+ * Performs the render markdown operation.
+ * @param text the text
+ * @returns the operation result
+ */
   renderMarkdown(text: string): string {
     return marked.parse(text, { breaks: true }) as string;
   }
 
+/**
+ * Performs the load messages operation.
+ * @returns the operation result
+ */
   private loadMessages(): AdvisorMessage[] {
     const raw = sessionStorage.getItem(this.messagesKey);
     if (!raw) {
@@ -85,6 +106,9 @@ export class AdvisorWidgetComponent {
     }
   }
 
+/**
+ * Performs the persist messages operation.
+ */
   private persistMessages(): void {
     sessionStorage.setItem(this.messagesKey, JSON.stringify(this.messages()));
   }

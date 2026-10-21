@@ -1,7 +1,14 @@
 package com.articles.config;
 
+/**
+ * Defines cache names.
+ */
 public final class CacheNames {
 
+/**
+ * Performs cache names.
+ * @return the result of the operation
+ */
     private CacheNames() {
     }
 

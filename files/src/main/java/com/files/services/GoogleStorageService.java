@@ -12,6 +12,9 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.UUID;
 
+/**
+ * Defines google storage service.
+ */
 @Service
 public class GoogleStorageService {
 
@@ -20,10 +23,19 @@ public class GoogleStorageService {
 
     private final Storage storage;
 
+/**
+ * Performs google storage service.
+ * @param storage the storage
+ */
     public GoogleStorageService(Storage storage) {
         this.storage = storage;
     }
 
+/**
+ * Returns upload file.
+ * @param file the file
+ * @return the result of the operation
+ */
     public String uploadFile(MultipartFile file) throws IOException {
         String objectName = UUID.randomUUID() + "-" + file.getOriginalFilename();
         BlobId blobId = BlobId.of(bucketName, objectName);
@@ -35,6 +47,10 @@ public class GoogleStorageService {
         return String.format("https://storage.googleapis.com/%s/%s", bucketName, objectName);
     }
 
+/**
+ * Performs delete by url.
+ * @param url the url
+ */
     public void deleteByUrl(String url) {
         if (!StringUtils.hasText(url)) {
             return;

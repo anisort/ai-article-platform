@@ -1,3 +1,6 @@
+/**
+ * Defines the user summary interface.
+ */
 export interface UserSummary {
   id: string;
   username: string;
@@ -6,6 +9,9 @@ export interface UserSummary {
   avatar?: string | null;
 }
 
+/**
+ * Defines the user profile interface.
+ */
 export interface UserProfile {
   id: string;
   username: string;
@@ -18,6 +24,9 @@ export interface UserProfile {
   followingUsers: UserSummary[];
 }
 
+/**
+ * Defines the toggle follow response interface.
+ */
 export interface ToggleFollowResponse {
   targetUserId: string;
   following: boolean;

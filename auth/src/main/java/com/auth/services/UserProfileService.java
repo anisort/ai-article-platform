@@ -21,6 +21,9 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
+/**
+ * Defines user profile service.
+ */
 @Service
 public class UserProfileService {
 
@@ -36,10 +39,21 @@ public class UserProfileService {
         this.fileStorageService = fileStorageService;
     }
 
+/**
+ * Returns get me.
+ * @param userId the userId
+ * @return the result of the operation
+ */
     public UserProfileResponse getMe(UUID userId) {
         return getProfile(userId, userId);
     }
 
+/**
+ * Returns get profile.
+ * @param userId the userId
+ * @param viewerId the viewerId
+ * @return the result of the operation
+ */
     public UserProfileResponse getProfile(UUID userId, UUID viewerId) {
         CustomUserDetails user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(NOT_FOUND));
@@ -68,6 +82,14 @@ public class UserProfileService {
     }
 
     @Transactional
+/**
+ * Returns update me.
+ * @param userId the userId
+ * @param username the username
+ * @param name the name
+ * @param avatar the avatar
+ * @return the result of the operation
+ */
     public UserProfileResponse updateMe(UUID userId, String username, String name, MultipartFile avatar) {
         CustomUserDetails user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(NOT_FOUND));
@@ -104,6 +126,12 @@ public class UserProfileService {
     }
 
     @Transactional
+/**
+ * Returns toggle follow.
+ * @param followerId the followerId
+ * @param targetUserId the targetUserId
+ * @return the result of the operation
+ */
     public ToggleFollowResponse toggleFollow(UUID followerId, UUID targetUserId) {
         if (followerId.equals(targetUserId)) {
             throw new ResponseStatusException(BAD_REQUEST, "You cannot follow yourself");
@@ -125,6 +153,13 @@ public class UserProfileService {
         return new ToggleFollowResponse(targetUserId, true);
     }
 
+/**
+ * Returns get follow users.
+ * @param follows the follows
+ * @param UserFollow the UserFollow
+ * @param idExtractor the idExtractor
+ * @return the result of the operation
+ */
     private List<UserBriefResponse> getFollowUsers(List<UserFollow> follows, Function<UserFollow, UUID> idExtractor) {
         List<UUID> ids = follows.stream()
                 .map(idExtractor)

@@ -14,6 +14,9 @@ import java.util.UUID;
 
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
+/**
+ * Defines article media facade service.
+ */
 @Service
 public class ArticleMediaFacadeService {
 
@@ -31,6 +34,13 @@ public class ArticleMediaFacadeService {
         this.fileStorageIntegrationService = fileStorageIntegrationService;
     }
 
+/**
+ * Returns add article image.
+ * @param articleId the articleId
+ * @param requesterId the requesterId
+ * @param imageUrl the imageUrl
+ * @return the result of the operation
+ */
     public ArticleImageResponse addArticleImage(UUID articleId, UUID requesterId, String imageUrl) {
         articleService.requireOwned(articleId, requesterId);
         if (!StringUtils.hasText(imageUrl)) {
@@ -40,6 +50,13 @@ public class ArticleMediaFacadeService {
         return ArticleImageResponse.fromEntity(image);
     }
 
+/**
+ * Performs delete article image.
+ * @param articleId the articleId
+ * @param imageId the imageId
+ * @param requesterId the requesterId
+ * @param bearerToken the bearerToken
+ */
     public void deleteArticleImage(UUID articleId, UUID imageId, UUID requesterId, String bearerToken) {
         articleService.requireOwned(articleId, requesterId);
         ArticleImage image = articleImageService.findByIdAndArticleId(imageId, articleId)

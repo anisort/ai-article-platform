@@ -12,6 +12,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * Defines article vector service.
+ */
 @Service
 public class ArticleVectorService {
 
@@ -19,10 +22,18 @@ public class ArticleVectorService {
 
     private final VectorStore vectorStore;
 
+/**
+ * Performs article vector service.
+ * @param vectorStore the vectorStore
+ */
     public ArticleVectorService(VectorStore vectorStore) {
         this.vectorStore = vectorStore;
     }
 
+/**
+ * Performs add or update.
+ * @param article the article
+ */
     public void addOrUpdate(ArticleEmbeddingRequest article) {
         if (article == null || article.id() == null) {
             return;
@@ -49,6 +60,10 @@ public class ArticleVectorService {
         vectorStore.add(List.of(document));
     }
 
+/**
+ * Performs delete.
+ * @param articleId the articleId
+ */
     public void delete(UUID articleId) {
         if (articleId == null) {
             return;
@@ -56,6 +71,13 @@ public class ArticleVectorService {
         vectorStore.delete(List.of(articleId.toString()));
     }
 
+/**
+ * Returns similarity search article ids.
+ * @param query the query
+ * @param similarityThreshold the similarityThreshold
+ * @param topK the topK
+ * @return the result of the operation
+ */
     public List<UUID> similaritySearchArticleIds(String query, double similarityThreshold, int topK) {
         SearchRequest request = SearchRequest.builder()
                 .query(query)

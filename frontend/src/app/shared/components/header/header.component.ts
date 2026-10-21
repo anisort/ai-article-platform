@@ -20,6 +20,9 @@ import { AvatarComponent } from '../avatar/avatar.component';
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss'
 })
+/**
+ * Defines the header component class.
+ */
 export class HeaderComponent {
   authService = inject(AuthService);
   router = inject(Router);
@@ -31,23 +34,39 @@ export class HeaderComponent {
     return user?.name || user?.username || user?.email || 'Profile';
   });
 
+/**
+ * Performs the constructor operation.
+ */
   constructor() {
     addIcons({ searchOutline })
   }
 
+/**
+ * Performs the on register operation.
+ */
   onRegister() {
     this.router.navigate(['/register']);
   }
 
+/**
+ * Performs the on login operation.
+ */
   onLogin() {
     this.authService.login();
   }
 
+/**
+ * Performs the on logout operation.
+ */
   onLogout() {
     this.userStore.clear();
     this.authService.logout();
   }
 
+/**
+ * Performs the on search submit operation.
+ * @param query the query
+ */
   onSearchSubmit(query: string) {
     this.searchQuery = query;
     this.router.navigate(['/articles'], {

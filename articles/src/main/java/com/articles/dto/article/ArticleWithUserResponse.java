@@ -5,6 +5,9 @@ import com.articles.dto.user.UserBriefResponse;
 
 import java.io.Serializable;
 
+/**
+ * Carries article with user response.
+ */
 public record ArticleWithUserResponse(
         ArticleResponse articleResponse,
         UserBriefResponse authorResponse

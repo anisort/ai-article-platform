@@ -7,10 +7,18 @@ import {FileResponse} from '../models/file-response.model';
 @Injectable({
   providedIn: 'root'
 })
+/**
+ * Defines the upload service class.
+ */
 export class UploadService {
   private readonly apiUrl = `${environment.apiUrlUpload}/v1/files`;
   private readonly http = inject(HttpClient);
 
+/**
+ * Performs the upload file operation.
+ * @param file the file
+ * @returns the operation result
+ */
   uploadFile(file: File): Observable<FileResponse> {
     const formData = new FormData();
     formData.append('file', file);

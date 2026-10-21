@@ -11,12 +11,19 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Defines article assistant chat controller.
+ */
 @RestController
 @RequestMapping("/api/v1/assistant/articles/{articleId}/chats")
 public class ArticleAssistantChatController {
 
     private final ArticleAssistantService articleAssistantService;
 
+/**
+ * Performs article assistant chat controller.
+ * @param articleAssistantService the articleAssistantService
+ */
     public ArticleAssistantChatController(ArticleAssistantService articleAssistantService) {
         this.articleAssistantService = articleAssistantService;
     }
@@ -30,6 +37,10 @@ public class ArticleAssistantChatController {
     }
 
     @GetMapping
+/**
+ * Returns list article chats.
+ * @return the result of the operation
+ */
     public List<AssistantChatResponse> listArticleChats(@PathVariable UUID articleId) {
         return articleAssistantService.listChats(articleId);
     }

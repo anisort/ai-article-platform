@@ -6,9 +6,17 @@ import { UserRegisterService } from './user-register.service';
 @Injectable({
   providedIn: 'root'
 })
+/**
+ * Defines the auth validation service class.
+ */
 export class AuthValidationService {
   private readonly userRegisterService = inject(UserRegisterService);
 
+/**
+ * Performs the username availability validator operation.
+ * @param ignoreUsername the ignoreUsername
+ * @returns the operation result
+ */
   usernameAvailabilityValidator(ignoreUsername?: () => string): AsyncValidatorFn {
     return (control: AbstractControl) => {
       const username = (control.value ?? '').trim();
@@ -30,6 +38,10 @@ export class AuthValidationService {
     };
   }
 
+/**
+ * Performs the email availability validator operation.
+ * @returns the operation result
+ */
   emailAvailabilityValidator(): AsyncValidatorFn {
     return (control: AbstractControl) => {
       const email = (control.value ?? '').trim();
@@ -45,10 +57,20 @@ export class AuthValidationService {
     };
   }
 
+/**
+ * Performs the strong password pattern operation.
+ * @returns the operation result
+ */
   strongPasswordPattern(): RegExp {
     return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).+$/;
   }
 
+/**
+ * Performs the passwords match validator operation.
+ * @param passwordKey the passwordKey
+ * @param repeatPasswordKey the repeatPasswordKey
+ * @returns the operation result
+ */
   passwordsMatchValidator(passwordKey: string, repeatPasswordKey: string): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
       const password = control.get(passwordKey)?.value;

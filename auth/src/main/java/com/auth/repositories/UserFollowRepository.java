@@ -7,6 +7,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Declares user follow repository.
+ */
 public interface UserFollowRepository extends JpaRepository<UserFollow, UserFollowId> {
     boolean existsByFollowerIdAndFollowingId(UUID followerId, UUID followingId);
     List<UserFollow> findByFollowerId(UUID followerId);

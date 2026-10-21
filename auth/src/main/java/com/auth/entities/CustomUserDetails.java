@@ -12,6 +12,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Defines custom user details.
+ */
 @Setter
 @Entity
 @Table(name = "users")
@@ -45,16 +48,28 @@ public class CustomUserDetails implements UserDetails, CredentialsContainer {
     private String name;
 
     @Override
+/**
+ * Returns get username.
+ * @return the result of the operation
+ */
     public String getUsername() {
         return this.username;
     }
 
     @Override
+/**
+ * Returns get password.
+ * @return the result of the operation
+ */
     public String getPassword() {
         return this.password;
     }
 
     @Override
+/**
+ * Returns get authorities.
+ * @return the result of the operation
+ */
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(getRole().name()));
     }
@@ -72,6 +87,9 @@ public class CustomUserDetails implements UserDetails, CredentialsContainer {
     public boolean isEnabled() { return true; }
 
     @Override
+/**
+ * Performs erase credentials.
+ */
     public void eraseCredentials() {
         this.password = null;
     }

@@ -1,3 +1,6 @@
+/**
+ * Defines the user response interface.
+ */
 export interface UserResponse {
   id: string;
   username: string;

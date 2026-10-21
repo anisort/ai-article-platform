@@ -18,6 +18,9 @@ import {
 } from '../../../../shared/components/segmented-control/segmented-control.component';
 import { LoadingStateComponent } from '../../../../shared/components/loading-state/loading-state.component';
 
+/**
+ * Defines the profile tab type.
+ */
 type ProfileTab = 'published' | 'drafts' | 'liked';
 
 @Component({
@@ -35,6 +38,9 @@ type ProfileTab = 'published' | 'drafts' | 'liked';
   templateUrl: './profile.page.html',
   styleUrl: './profile.page.scss',
 })
+/**
+ * Defines the profile page class.
+ */
 export class ProfilePage implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
@@ -80,14 +86,25 @@ export class ProfilePage implements OnInit {
     return base;
   });
 
+/**
+ * Performs the ng on init operation.
+ */
   ngOnInit(): void {
     this.loadProfile();
   }
 
+/**
+ * Performs the set tab operation.
+ * @param tab the tab
+ */
   setTab(tab: ProfileTab): void {
     this.activeTab.set(tab);
   }
 
+/**
+ * Performs the visible articles operation.
+ * @returns the operation result
+ */
   visibleArticles(): ArticlePreview[] {
     switch (this.activeTab()) {
       case 'published':
@@ -99,6 +116,11 @@ export class ProfilePage implements OnInit {
     }
   }
 
+/**
+ * Performs the tab count operation.
+ * @param tab the tab
+ * @returns the operation result
+ */
   tabCount(tab: ProfileTab): number {
     switch (tab) {
       case 'published':
@@ -110,6 +132,10 @@ export class ProfilePage implements OnInit {
     }
   }
 
+/**
+ * Performs the profile title operation.
+ * @returns the operation result
+ */
   profileTitle(): string {
     const profile = this.profile();
     if (!profile) {
@@ -119,6 +145,10 @@ export class ProfilePage implements OnInit {
     return profile.ownProfile ? 'Your profile' : `${this.displayName()} profile`;
   }
 
+/**
+ * Performs the profile copy operation.
+ * @returns the operation result
+ */
   profileCopy(): string {
     const profile = this.profile();
     if (!profile) {
@@ -130,11 +160,20 @@ export class ProfilePage implements OnInit {
       : 'Published articles and social connections of this author.';
   }
 
+/**
+ * Performs the display name operation.
+ * @returns the operation result
+ */
   displayName(): string {
     const profile = this.profile();
     return profile?.name || profile?.username || 'Unknown author';
   }
 
+/**
+ * Performs the open connections modal operation.
+ * @param tab the tab
+ * @returns the operation result
+ */
   async openConnectionsModal(tab: 'following' | 'followers'): Promise<void> {
     const modal = await this.modalController.create({
       component: ProfileConnectionsModalComponent,
@@ -150,15 +189,26 @@ export class ProfilePage implements OnInit {
     await modal.present();
   }
 
+/**
+ * Performs the is own profile operation.
+ * @returns the operation result
+ */
   isOwnProfile(): boolean {
     return this.profile()?.ownProfile ?? false;
   }
 
+/**
+ * Performs the can follow operation.
+ * @returns the operation result
+ */
   canFollow(): boolean {
     const profile = this.profile();
     return !!profile && !profile.ownProfile && this.authService.isAuthenticated();
   }
 
+/**
+ * Performs the toggle follow operation.
+ */
   toggleFollow(): void {
     const profile = this.profile();
     if (!profile || !this.canFollow() || this.followLoading()) {
@@ -177,6 +227,10 @@ export class ProfilePage implements OnInit {
     });
   }
 
+/**
+ * Performs the on delete article operation.
+ * @param articleId the articleId
+ */
   onDeleteArticle(articleId: string): void {
     if (!articleId || !this.isOwnProfile() || this.deletingArticleId()) {
       return;
@@ -199,6 +253,9 @@ export class ProfilePage implements OnInit {
     });
   }
 
+/**
+ * Performs the load profile operation.
+ */
   private loadProfile(): void {
     const userId = this.route.snapshot.paramMap.get('id');
     const currentUserId = this.authService.userId;
@@ -216,6 +273,9 @@ export class ProfilePage implements OnInit {
     this.loadForeignProfile(userId);
   }
 
+/**
+ * Performs the load own profile operation.
+ */
   private loadOwnProfile(): void {
     this.loading.set(true);
 
@@ -235,6 +295,10 @@ export class ProfilePage implements OnInit {
     });
   }
 
+/**
+ * Performs the load foreign profile operation.
+ * @param userId the userId
+ */
   private loadForeignProfile(userId: string): void {
     this.loading.set(true);
 

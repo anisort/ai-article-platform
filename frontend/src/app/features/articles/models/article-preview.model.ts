@@ -1,3 +1,6 @@
+/**
+ * Defines the author preview interface.
+ */
 export interface AuthorPreview {
   id: string;
   username: string;
@@ -5,6 +8,9 @@ export interface AuthorPreview {
   avatar?: string | null;
 }
 
+/**
+ * Defines the article preview interface.
+ */
 export interface ArticlePreview {
   id: string;
   title: string;

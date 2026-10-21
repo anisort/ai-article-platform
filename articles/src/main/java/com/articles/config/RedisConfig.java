@@ -11,10 +11,18 @@ import org.springframework.data.redis.serializer.RedisSerializer;
 import java.time.Duration;
 import java.util.Map;
 
+/**
+ * Defines redis config.
+ */
 @Configuration
 public class RedisConfig {
 
     @Bean
+/**
+ * Returns cache manager.
+ * @param connectionFactory the connectionFactory
+ * @return the result of the operation
+ */
     public RedisCacheManager cacheManager(RedisConnectionFactory connectionFactory) {
         RedisSerializer<Object> valueSerializer = RedisSerializer.java();
         RedisCacheConfiguration defaultCacheConfiguration = RedisCacheConfiguration.defaultCacheConfig()

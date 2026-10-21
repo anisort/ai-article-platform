@@ -8,6 +8,9 @@ import { Component, computed, input } from '@angular/core';
   templateUrl: './avatar.component.html',
   styleUrl: './avatar.component.scss',
 })
+/**
+ * Defines the avatar component class.
+ */
 export class AvatarComponent {
   readonly imageUrl = input<string | null | undefined>(null);
   readonly name = input<string | null | undefined>(null);

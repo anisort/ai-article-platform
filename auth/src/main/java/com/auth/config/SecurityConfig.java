@@ -43,6 +43,9 @@ import org.springframework.security.web.authentication.LoginUrlAuthenticationEnt
 import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
 import org.springframework.web.filter.ForwardedHeaderFilter;
 
+/**
+ * Defines security config.
+ */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -67,6 +70,11 @@ public class SecurityConfig {
 
     @Bean
     @Order(1)
+/**
+ * Returns authorization server security filter chain.
+ * @param http the http
+ * @return the result of the operation
+ */
     public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http) {
 
         http
@@ -93,6 +101,11 @@ public class SecurityConfig {
 
     @Bean
     @Order(2)
+/**
+ * Returns default security filter chain.
+ * @param http the http
+ * @return the result of the operation
+ */
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) {
         http
                 .authorizeHttpRequests((authorize) -> authorize
@@ -120,6 +133,10 @@ public class SecurityConfig {
     }
 
     @Bean
+/**
+ * Returns registered client repository.
+ * @return the result of the operation
+ */
     public RegisteredClientRepository registeredClientRepository() {
         RegisteredClient oidcClient = RegisteredClient.withId(UUID.randomUUID().toString())
                 .clientId(clientId)
@@ -149,6 +166,11 @@ public class SecurityConfig {
     }
 
     @Bean
+/**
+ * Returns user details service.
+ * @param userRepository the userRepository
+ * @return the result of the operation
+ */
     public UserDetailsService userDetailsService(UserRepository userRepository) {
         return login -> userRepository.findByUsername(login)
                 .or(() -> userRepository.findByEmail(login))
@@ -156,6 +178,10 @@ public class SecurityConfig {
     }
 
     @Bean
+/**
+ * Returns jwk source.
+ * @return the result of the operation
+ */
     public JWKSource<SecurityContext> jwkSource() {
         KeyPair keyPair = generateRsaKey();
         RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
@@ -168,6 +194,10 @@ public class SecurityConfig {
         return new ImmutableJWKSet<>(jwkSet);
     }
 
+/**
+ * Returns generate rsa key.
+ * @return the result of the operation
+ */
     private static KeyPair generateRsaKey() {
         KeyPair keyPair;
         try {
@@ -182,11 +212,20 @@ public class SecurityConfig {
     }
 
     @Bean
+/**
+ * Returns jwt decoder.
+ * @param jwkSource the jwkSource
+ * @return the result of the operation
+ */
     public JwtDecoder jwtDecoder(JWKSource<SecurityContext> jwkSource) {
         return OAuth2AuthorizationServerConfiguration.jwtDecoder(jwkSource);
     }
 
     @Bean
+/**
+ * Returns authorization server settings.
+ * @return the result of the operation
+ */
     public AuthorizationServerSettings authorizationServerSettings() {
         return AuthorizationServerSettings.builder()
                 .issuer(issuerUri)
@@ -194,11 +233,19 @@ public class SecurityConfig {
     }
 
     @Bean
+/**
+ * Returns password encoder.
+ * @return the result of the operation
+ */
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
     @Bean
+/**
+ * Returns forwarded header filter.
+ * @return the result of the operation
+ */
     ForwardedHeaderFilter forwardedHeaderFilter() {
         return new ForwardedHeaderFilter();
     }

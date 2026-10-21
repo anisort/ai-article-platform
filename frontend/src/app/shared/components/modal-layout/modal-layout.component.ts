@@ -8,6 +8,9 @@ import { Component, input, output } from '@angular/core';
   templateUrl: './modal-layout.component.html',
   styleUrl: './modal-layout.component.scss',
 })
+/**
+ * Defines the modal layout component class.
+ */
 export class ModalLayoutComponent {
   readonly title = input.required<string>();
   readonly kicker = input<string | null>(null);
@@ -17,6 +20,10 @@ export class ModalLayoutComponent {
 
   readonly searchValueChange = output<string>();
 
+/**
+ * Performs the on search input operation.
+ * @param event the event
+ */
   onSearchInput(event: Event): void {
     const target = event.target as HTMLInputElement | null;
     this.searchValueChange.emit(target?.value ?? '');

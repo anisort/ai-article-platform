@@ -12,12 +12,19 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Defines article recommendation controller.
+ */
 @RestController
 @RequestMapping("/api/v1/articles/recommendations")
 public class ArticleRecommendationController {
 
     private final ArticleRecommendationFacadeService articleRecommendationFacadeService;
 
+/**
+ * Performs article recommendation controller.
+ * @param articleRecommendationFacadeService the articleRecommendationFacadeService
+ */
     public ArticleRecommendationController(ArticleRecommendationFacadeService articleRecommendationFacadeService) {
         this.articleRecommendationFacadeService = articleRecommendationFacadeService;
     }

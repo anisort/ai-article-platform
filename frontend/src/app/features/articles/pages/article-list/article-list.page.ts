@@ -20,6 +20,9 @@ import { finalize } from 'rxjs';
   templateUrl: './article-list.page.html',
   styleUrl: './article-list.page.scss'
 })
+/**
+ * Defines the article list page class.
+ */
 export class ArticleListPage implements OnInit {
   articlesService = inject(ArticlesService);
   route = inject(ActivatedRoute);
@@ -34,6 +37,9 @@ export class ArticleListPage implements OnInit {
     { value: 'title', label: 'Title' },
   ];
 
+/**
+ * Performs the ng on init operation.
+ */
   ngOnInit(): void {
     this.route.queryParamMap.subscribe(params => {
       const query = params.get('q') ?? '';
@@ -56,6 +62,11 @@ export class ArticleListPage implements OnInit {
     });
   }
 
+/**
+ * Performs the load articles operation.
+ * @param query the query
+ * @param mode the mode
+ */
   loadArticles(query = '', mode: SearchMode = 'semantic') {
     const normalizedQuery = query.trim();
     this.loading.set(true);
@@ -71,6 +82,10 @@ export class ArticleListPage implements OnInit {
       });
   }
 
+/**
+ * Performs the on mode change operation.
+ * @param mode the mode
+ */
   onModeChange(mode: SearchMode) {
     this.router.navigate([], {
       relativeTo: this.route,

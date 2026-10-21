@@ -10,6 +10,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Declares article like repository.
+ */
 public interface ArticleLikeRepository extends JpaRepository<ArticleLike, ArticleLikeId> {
     List<ArticleLike> findByUserId(UUID userId);
     List<ArticleLike> findByUserIdOrderByCreatedAtDesc(UUID userId, org.springframework.data.domain.Pageable pageable);

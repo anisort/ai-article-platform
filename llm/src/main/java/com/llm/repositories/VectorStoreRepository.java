@@ -8,6 +8,9 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Declares vector store repository.
+ */
 public interface VectorStoreRepository extends JpaRepository<VectorStoreDocument, String> {
 
     @Query(value = """

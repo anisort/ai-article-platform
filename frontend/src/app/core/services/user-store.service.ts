@@ -4,6 +4,9 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 
+/**
+ * Defines the user info model interface.
+ */
 export interface UserInfoModel {
   sub?: string | null;
   id?: string | null;
@@ -16,6 +19,9 @@ export interface UserInfoModel {
 @Injectable({
   providedIn: 'root',
 })
+/**
+ * Defines the user store service class.
+ */
 export class UserStoreService {
   private readonly http = inject(HttpClient);
   private readonly apiUrl = `${environment.apiUrlAuth}/v1/users/me`;
@@ -23,12 +29,19 @@ export class UserStoreService {
 
   readonly user$: Observable<UserInfoModel | null> = this.subject.asObservable();
 
+/**
+ * Performs the load profile operation.
+ * @returns the operation result
+ */
   loadProfile(): Observable<UserInfoModel> {
     return this.http.get<UserInfoModel>(this.apiUrl).pipe(
       tap(user => this.subject.next(user))
     );
   }
 
+/**
+ * Performs the clear operation.
+ */
   clear(): void {
     this.subject.next(null);
   }

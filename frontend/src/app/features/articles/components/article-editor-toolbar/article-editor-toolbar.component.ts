@@ -21,6 +21,9 @@ import { SelectFieldComponent, SelectFieldOption } from '../../../../shared/comp
   templateUrl: './article-editor-toolbar.component.html',
   styleUrl: './article-editor-toolbar.component.scss',
 })
+/**
+ * Defines the article editor toolbar component class.
+ */
 export class ArticleEditorToolbarComponent {
   readonly headingLevel = input.required<1 | 2 | 3 | 4>();
   readonly headingDropdownOpen = input.required<boolean>();
@@ -47,6 +50,9 @@ export class ArticleEditorToolbarComponent {
     { value: '6', label: 'h6' },
   ];
 
+/**
+ * Performs the constructor operation.
+ */
   constructor() {
     addIcons({
       checkmarkOutline,
@@ -60,10 +66,18 @@ export class ArticleEditorToolbarComponent {
     });
   }
 
+/**
+ * Performs the heading label operation.
+ * @returns the operation result
+ */
   headingLabel(): string {
     return `h${this.headingLevel()}`;
   }
 
+/**
+ * Performs the on heading level select operation.
+ * @param value the value
+ */
   onHeadingLevelSelect(value: string): void {
     const level = Number(value);
     if (level === 1 || level === 2 || level === 3 || level === 4) {

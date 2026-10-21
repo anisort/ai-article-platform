@@ -15,6 +15,9 @@ import { LoadingStateComponent } from '../../../../shared/components/loading-sta
   templateUrl: './home.page.html',
   styleUrl: './home.page.scss'
 })
+/**
+ * Defines the home page class.
+ */
 export class HomePage implements OnInit {
   private readonly articlesService = inject(ArticlesService);
 
@@ -23,6 +26,9 @@ export class HomePage implements OnInit {
   readonly carouselArticles = computed(() => this.recommendations().slice(0, 8));
   readonly feedArticles = computed(() => this.recommendations().slice(8, 20));
 
+/**
+ * Performs the ng on init operation.
+ */
   ngOnInit(): void {
     this.articlesService.getRecommendations(20).subscribe({
       next: items => {

@@ -21,6 +21,16 @@ import java.util.UUID;
 
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
+/**
+ * Application service that manages article assistant chats and their messages.
+ *
+ * <p>Persists chats and messages through {@link ArticleAssistantChatRepository} and
+ * {@link ArticleAssistantMessageRepository}, and delegates response generation to
+ * {@link AssistantService}.</p>
+ */
+/**
+ * Defines article assistant service.
+ */
 @Service
 public class ArticleAssistantService {
 
@@ -28,6 +38,13 @@ public class ArticleAssistantService {
     private final ArticleAssistantMessageRepository messageRepository;
     private final AssistantService assistantService;
 
+    /**
+     * Creates the service with the collaborators required for chat persistence and response generation.
+     *
+     * @param chatRepository    repository for assistant chat entities
+     * @param messageRepository repository for assistant message entities
+     * @param assistantService  service that produces assistant responses
+     */
     public ArticleAssistantService(
             ArticleAssistantChatRepository chatRepository,
             ArticleAssistantMessageRepository messageRepository,
@@ -38,6 +55,12 @@ public class ArticleAssistantService {
         this.assistantService = assistantService;
     }
 
+/**
+ * Returns create chat.
+ * @param articleId the articleId
+ * @param title the title
+ * @return the result of the operation
+ */
     public AssistantChatResponse createChat(UUID articleId, String title) {
         ArticleAssistantChat chat = new ArticleAssistantChat();
         chat.setArticleId(articleId);
@@ -46,12 +69,23 @@ public class ArticleAssistantService {
         return AssistantChatResponse.fromEntity(saved);
     }
 
+/**
+ * Returns list chats.
+ * @param articleId the articleId
+ * @return the result of the operation
+ */
     public List<AssistantChatResponse> listChats(UUID articleId) {
         return chatRepository.findByArticleIdOrderByCreatedAtDesc(articleId).stream()
                 .map(AssistantChatResponse::fromEntity)
                 .toList();
     }
 
+/**
+ * Returns list messages.
+ * @param articleId the articleId
+ * @param chatId the chatId
+ * @return the result of the operation
+ */
     public List<AssistantMessageResponse> listMessages(UUID articleId, UUID chatId) {
         ArticleAssistantChat chat = getChat(articleId, chatId);
         return messageRepository.findByChatOrderByCreatedAtAsc(chat).stream()
@@ -87,6 +121,12 @@ public class ArticleAssistantService {
         return new AssistantSendMessageResponse(chatId, AssistantMessageResponse.fromEntity(savedAssistant));
     }
 
+/**
+ * Returns get chat.
+ * @param articleId the articleId
+ * @param chatId the chatId
+ * @return the result of the operation
+ */
     private ArticleAssistantChat getChat(UUID articleId, UUID chatId) {
         ArticleAssistantChat chat = chatRepository.findById(chatId)
                 .orElseThrow(() -> new ResponseStatusException(NOT_FOUND));

@@ -15,12 +15,19 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
 
+/**
+ * Defines profile page controller.
+ */
 @RestController
 @RequestMapping("/api/v1/profile-page")
 public class ProfilePageController {
 
     private final ProfilePageFacadeService profilePageFacadeService;
 
+/**
+ * Performs profile page controller.
+ * @param profilePageFacadeService the profilePageFacadeService
+ */
     public ProfilePageController(ProfilePageFacadeService profilePageFacadeService) {
         this.profilePageFacadeService = profilePageFacadeService;
     }

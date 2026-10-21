@@ -5,6 +5,9 @@ import com.articles.entities.Article;
 
 import java.util.UUID;
 
+/**
+ * Carries article embedding request.
+ */
 public record ArticleEmbeddingRequest(
         UUID id,
         String content,
@@ -13,6 +16,13 @@ public record ArticleEmbeddingRequest(
         String image,
         boolean published
 ) {
+/**
+ * Returns from article.
+ * @param article the article
+ * @param author the author
+ * @param contentOverride the contentOverride
+ * @return the result of the operation
+ */
     public static ArticleEmbeddingRequest fromArticle(Article article, UserBriefResponse author, String contentOverride) {
         String authorName = author == null ? "Unknown" : author.name();
         String markdownContent = article.getMarkdownContent() == null ? "" : article.getMarkdownContent();

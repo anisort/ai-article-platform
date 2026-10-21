@@ -16,15 +16,27 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+/**
+ * Defines user integration service.
+ */
 @Service
 public class UserIntegrationService {
 
     private final RestClient restClient;
 
+/**
+ * Performs user integration service.
+ * @return the result of the operation
+ */
     public UserIntegrationService(@Qualifier("userRestClient") RestClient restClient) {
         this.restClient = restClient;
     }
 
+/**
+ * Returns get users.
+ * @param ids the ids
+ * @return the result of the operation
+ */
     public List<UserBriefResponse> getUsers(List<UUID> ids) {
         return restClient.post()
                 .uri("/api/v1/internal/users/batch")
@@ -33,6 +45,11 @@ public class UserIntegrationService {
                 .body(new ParameterizedTypeReference<>() {});
     }
 
+/**
+ * Returns get authors.
+ * @param articles the articles
+ * @return the result of the operation
+ */
     public Map<UUID, UserBriefResponse> getAuthors(List<Article> articles) {
 
         List<UUID> authorIds = articles.stream()
@@ -47,6 +64,11 @@ public class UserIntegrationService {
                 ));
     }
 
+/**
+ * Returns get my profile.
+ * @param authorizationHeader the authorizationHeader
+ * @return the result of the operation
+ */
     public UserProfileResponse getMyProfile(String authorizationHeader) {
         return restClient.get()
                 .uri("/api/v1/users/me")
@@ -55,6 +77,12 @@ public class UserIntegrationService {
                 .body(UserProfileResponse.class);
     }
 
+/**
+ * Returns get profile by id.
+ * @param userId the userId
+ * @param authorizationHeader the authorizationHeader
+ * @return the result of the operation
+ */
     public UserProfileResponse getProfileById(UUID userId, String authorizationHeader) {
         RestClient.RequestHeadersSpec<?> request = restClient.get()
                 .uri("/api/v1/users/{userId}/profile", userId);

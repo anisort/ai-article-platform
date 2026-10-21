@@ -9,12 +9,19 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+/**
+ * Defines article search controller.
+ */
 @RestController
 @RequestMapping("/api/v1/search/articles")
 public class ArticleSearchController {
 
     private final ArticleSearchFacadeService articleSearchFacadeService;
 
+/**
+ * Performs article search controller.
+ * @param articleSearchFacadeService the articleSearchFacadeService
+ */
     public ArticleSearchController(ArticleSearchFacadeService articleSearchFacadeService) {
         this.articleSearchFacadeService = articleSearchFacadeService;
     }

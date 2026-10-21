@@ -10,12 +10,19 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
+/**
+ * Defines article media controller.
+ */
 @RestController
 @RequestMapping("/api/v1/articles")
 public class ArticleMediaController {
 
     private final ArticleMediaFacadeService articleMediaFacadeService;
 
+/**
+ * Performs article media controller.
+ * @param articleMediaFacadeService the articleMediaFacadeService
+ */
     public ArticleMediaController(ArticleMediaFacadeService articleMediaFacadeService) {
         this.articleMediaFacadeService = articleMediaFacadeService;
     }

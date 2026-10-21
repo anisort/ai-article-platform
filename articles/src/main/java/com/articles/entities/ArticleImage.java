@@ -6,6 +6,9 @@ import lombok.Setter;
 
 import java.util.UUID;
 
+/**
+ * Defines article image.
+ */
 @Entity
 @Table(name = "article_image")
 @Getter

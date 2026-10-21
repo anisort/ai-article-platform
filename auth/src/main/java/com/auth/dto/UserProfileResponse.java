@@ -3,6 +3,9 @@ package com.auth.dto;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Carries user profile response.
+ */
 public record UserProfileResponse(
         UUID id,
         String username,

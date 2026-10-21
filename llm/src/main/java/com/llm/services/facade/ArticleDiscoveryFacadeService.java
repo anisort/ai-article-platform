@@ -9,6 +9,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+/**
+ * Defines article discovery facade service.
+ */
 @Service
 public class ArticleDiscoveryFacadeService {
 
@@ -25,6 +28,11 @@ public class ArticleDiscoveryFacadeService {
         this.articleRecommendationService = articleRecommendationService;
     }
 
+/**
+ * Returns search articles.
+ * @param request the request
+ * @return the result of the operation
+ */
     public ArticleIdsResponse searchArticles(SemanticSearchRequest request) {
         double threshold = request.similarityThreshold() == null ? 0.6 : request.similarityThreshold();
         int topK = request.topK() == null ? 20 : request.topK();
@@ -44,6 +52,11 @@ public class ArticleDiscoveryFacadeService {
         }
     }
 
+/**
+ * Returns recommend articles.
+ * @param request the request
+ * @return the result of the operation
+ */
     public ArticleIdsResponse recommendArticles(ArticleRecommendationRequest request) {
         int topK = request.topK() == null ? 20 : request.topK();
         return ArticleIdsResponse.of(

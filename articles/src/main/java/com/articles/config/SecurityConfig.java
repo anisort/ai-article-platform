@@ -15,11 +15,19 @@ import org.springframework.security.web.SecurityFilterChain;
 import java.util.ArrayList;
 import java.util.Collection;
 
+/**
+ * Defines security config.
+ */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
     @Bean
+/**
+ * Returns filter chain.
+ * @param http the http
+ * @return the result of the operation
+ */
     public SecurityFilterChain filterChain(HttpSecurity http) {
         http
                 .csrf(AbstractHttpConfigurer::disable)
@@ -46,6 +54,10 @@ public class SecurityConfig {
     }
 
     @Bean
+/**
+ * Returns jwt authentication converter.
+ * @return the result of the operation
+ */
     public JwtAuthenticationConverter jwtAuthenticationConverter() {
         JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
         converter.setJwtGrantedAuthoritiesConverter(jwt -> {

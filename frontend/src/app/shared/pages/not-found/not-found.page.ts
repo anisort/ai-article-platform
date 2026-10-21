@@ -10,4 +10,7 @@ import { PageIntroComponent } from '../../components/page-intro/page-intro.compo
   templateUrl: './not-found.page.html',
   styleUrl: './not-found.page.scss',
 })
+/**
+ * Defines the not found page class.
+ */
 export class NotFoundPage {}

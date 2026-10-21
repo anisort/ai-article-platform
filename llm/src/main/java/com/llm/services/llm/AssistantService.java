@@ -16,6 +16,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
 
+/**
+ * Defines assistant service.
+ */
 @Service
 public class AssistantService {
 
@@ -23,12 +26,24 @@ public class AssistantService {
     private final ChatMemory chatMemory;
     private final VectorStore vectorStore;
 
+/**
+ * Performs assistant service.
+ * @param chatModel the chatModel
+ * @param chatMemory the chatMemory
+ * @param vectorStore the vectorStore
+ */
     public AssistantService(VertexAiGeminiChatModel chatModel, ChatMemory chatMemory, VectorStore vectorStore) {
         this.chatModel = chatModel;
         this.chatMemory = chatMemory;
         this.vectorStore = vectorStore;
     }
 
+/**
+ * Returns get response.
+ * @param prompt the prompt
+ * @param chatId the chatId
+ * @return the result of the operation
+ */
     public ChatResponse getResponse(String prompt, UUID chatId) {
         String systemMessage = "You are a helpful assistant.";
         return ChatClient.builder(chatModel)
@@ -42,6 +57,13 @@ public class AssistantService {
                 .chatResponse();
     }
 
+/**
+ * Returns get multimodal response.
+ * @param prompt the prompt
+ * @param chatId the chatId
+ * @param file the file
+ * @return the result of the operation
+ */
     public ChatResponse getMultimodalResponse(String prompt, UUID chatId, MultipartFile file) {
         String systemMessage = "You are a helpful assistant.";
         String contentType = file.getContentType();
@@ -63,10 +85,25 @@ public class AssistantService {
                 .chatResponse();
     }
 
+/**
+ * Returns get article assistant response.
+ * @param prompt the prompt
+ * @param chatId the chatId
+ * @param mode the mode
+ * @return the result of the operation
+ */
     public ChatResponse getArticleAssistantResponse(String prompt, UUID chatId, AssistantResponseMode mode) {
         return getArticleAssistantResponse(prompt, chatId, mode, false);
     }
 
+/**
+ * Returns get article assistant response.
+ * @param prompt the prompt
+ * @param chatId the chatId
+ * @param mode the mode
+ * @param useKnowledgeBase the useKnowledgeBase
+ * @return the result of the operation
+ */
     public ChatResponse getArticleAssistantResponse(String prompt, UUID chatId, AssistantResponseMode mode, boolean useKnowledgeBase) {
         ChatClient.Builder builder = ChatClient.builder(chatModel);
         if (useKnowledgeBase) {
@@ -89,6 +126,11 @@ public class AssistantService {
                 .chatResponse();
     }
 
+/**
+ * Returns article assistant system prompt.
+ * @param mode the mode
+ * @return the result of the operation
+ */
     private String articleAssistantSystemPrompt(AssistantResponseMode mode) {
         AssistantResponseMode safeMode = mode == null ? AssistantResponseMode.THINKING : mode;
         return switch (safeMode) {

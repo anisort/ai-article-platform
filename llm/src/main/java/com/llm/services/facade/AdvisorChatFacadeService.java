@@ -8,15 +8,27 @@ import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
+/**
+ * Defines advisor chat facade service.
+ */
 @Service
 public class AdvisorChatFacadeService {
 
     private final AdvisorService advisorService;
 
+/**
+ * Performs advisor chat facade service.
+ * @param advisorService the advisorService
+ */
     public AdvisorChatFacadeService(AdvisorService advisorService) {
         this.advisorService = advisorService;
     }
 
+/**
+ * Returns advisor chat.
+ * @param request the request
+ * @return the result of the operation
+ */
     public AdvisorChatResponse advisorChat(AdvisorChatRequest request) {
         UUID conversationId = request.conversationId() == null ? UUID.randomUUID() : request.conversationId();
         ChatResponse response = advisorService.getAdvice(request.message(), conversationId);

@@ -21,15 +21,27 @@ import org.springframework.web.client.RestClient;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Defines llm integration service.
+ */
 @Service
 public class LlmIntegrationService {
 
     private final RestClient llmRestClient;
 
+/**
+ * Performs llm integration service.
+ * @return the result of the operation
+ */
     public LlmIntegrationService(@Qualifier("llmRestClient") RestClient llmRestClient) {
         this.llmRestClient = llmRestClient;
     }
 
+/**
+ * Returns generate description.
+ * @param payload the payload
+ * @return the result of the operation
+ */
     public String generateDescription(ArticleEmbeddingRequest payload) {
         ArticleDescriptionResponse response = requestWithAuth("/api/v1/assistant/description")
                 .body(payload)
@@ -38,6 +50,10 @@ public class LlmIntegrationService {
         return response == null ? null : response.description();
     }
 
+/**
+ * Performs add to vector store.
+ * @param payload the payload
+ */
     public void addToVectorStore(ArticleEmbeddingRequest payload) {
         requestWithAuth("/api/v1/vector/articles")
                 .body(payload)
@@ -45,6 +61,10 @@ public class LlmIntegrationService {
                 .toBodilessEntity();
     }
 
+/**
+ * Performs delete from vector store.
+ * @param articleId the articleId
+ */
     public void deleteFromVectorStore(UUID articleId) {
         RestClient.RequestHeadersSpec<?> requestSpec = llmRestClient.delete()
                 .uri("/api/v1/vector/articles/{articleId}", articleId);
@@ -55,6 +75,11 @@ public class LlmIntegrationService {
         requestSpec.retrieve().toBodilessEntity();
     }
 
+/**
+ * Returns search article ids.
+ * @param query the query
+ * @return the result of the operation
+ */
     public List<UUID> searchArticleIds(String query) {
         if (!StringUtils.hasText(query)) {
             return List.of();
@@ -80,6 +105,13 @@ public class LlmIntegrationService {
         return List.of();
     }
 
+/**
+ * Returns recommend article ids.
+ * @param likedArticleIds the likedArticleIds
+ * @param excludeArticleIds the excludeArticleIds
+ * @param topK the topK
+ * @return the result of the operation
+ */
     public List<UUID> recommendArticleIds(List<UUID> likedArticleIds, List<UUID> excludeArticleIds, int topK) {
         if (likedArticleIds == null || likedArticleIds.isEmpty()) {
             return List.of();
@@ -97,6 +129,11 @@ public class LlmIntegrationService {
         return response.articleIds();
     }
 
+/**
+ * Returns list article chats.
+ * @param articleId the articleId
+ * @return the result of the operation
+ */
     public List<ArticleAssistantChatSummary> listArticleChats(UUID articleId) {
         RestClient.RequestHeadersSpec<?> requestSpec = llmRestClient.get()
                 .uri("/api/v1/assistant/articles/{articleId}/chats", articleId);
@@ -107,6 +144,12 @@ public class LlmIntegrationService {
         return requestSpec.retrieve().body(new ParameterizedTypeReference<>() {});
     }
 
+/**
+ * Returns list article chat messages.
+ * @param articleId the articleId
+ * @param chatId the chatId
+ * @return the result of the operation
+ */
     public List<ArticleAssistantMessageSummary> listArticleChatMessages(UUID articleId, UUID chatId) {
         RestClient.RequestHeadersSpec<?> requestSpec = llmRestClient.get()
                 .uri("/api/v1/assistant/articles/{articleId}/chats/{chatId}/messages", articleId, chatId);
@@ -117,6 +160,11 @@ public class LlmIntegrationService {
         return requestSpec.retrieve().body(new ParameterizedTypeReference<>() {});
     }
 
+/**
+ * Returns request with auth.
+ * @param uri the uri
+ * @return the result of the operation
+ */
     private RestClient.RequestBodySpec requestWithAuth(String uri) {
         RestClient.RequestBodySpec requestSpec = llmRestClient.post().uri(uri);
         String bearerToken = bearerTokenOrNull();
@@ -126,6 +174,10 @@ public class LlmIntegrationService {
         return requestSpec;
     }
 
+/**
+ * Returns bearer token or null.
+ * @return the result of the operation
+ */
     private String bearerTokenOrNull() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !(authentication.getPrincipal() instanceof Jwt jwt)) {

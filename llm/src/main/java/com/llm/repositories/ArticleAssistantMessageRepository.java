@@ -7,6 +7,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Declares article assistant message repository.
+ */
 public interface ArticleAssistantMessageRepository extends JpaRepository<ArticleAssistantMessage, UUID> {
     List<ArticleAssistantMessage> findByChatOrderByCreatedAtAsc(ArticleAssistantChat chat);
 }

@@ -1,3 +1,6 @@
+/**
+ * Defines the article response interface.
+ */
 export interface ArticleResponse {
   id: string;
   title: string;
@@ -10,6 +13,9 @@ export interface ArticleResponse {
   likedByRequester: boolean;
 }
 
+/**
+ * Defines the user brief response interface.
+ */
 export interface UserBriefResponse {
   id: string;
   username: string;
@@ -17,6 +23,9 @@ export interface UserBriefResponse {
   avatar?: string | null;
 }
 
+/**
+ * Defines the article with user response interface.
+ */
 export interface ArticleWithUserResponse {
   articleResponse: ArticleResponse;
   authorResponse: UserBriefResponse;

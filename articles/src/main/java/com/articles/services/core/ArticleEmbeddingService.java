@@ -9,22 +9,38 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+/**
+ * Defines article embedding service.
+ */
 @Service
 public class ArticleEmbeddingService {
     private static final Logger log = LoggerFactory.getLogger(ArticleEmbeddingService.class);
 
     private final LlmIntegrationService llmIntegrationService;
 
+/**
+ * Performs article embedding service.
+ * @param llmIntegrationService the llmIntegrationService
+ */
     public ArticleEmbeddingService(LlmIntegrationService llmIntegrationService) {
         this.llmIntegrationService = llmIntegrationService;
     }
 
+/**
+ * Performs sync article embedding.
+ * @param article the article
+ * @param author the author
+ */
     public void syncArticleEmbedding(Article article, UserBriefResponse author) {
         ArticleEmbeddingRequest payload = ArticleEmbeddingRequest.fromArticle(article, author, null);
         String description = loadDescription(payload, article.getId());
         syncVector(ArticleEmbeddingRequest.fromArticle(article, author, description), article.getId());
     }
 
+/**
+ * Performs delete article embedding.
+ * @param articleId the articleId
+ */
     public void deleteArticleEmbedding(java.util.UUID articleId) {
         try {
             llmIntegrationService.deleteFromVectorStore(articleId);
@@ -33,6 +49,12 @@ public class ArticleEmbeddingService {
         }
     }
 
+/**
+ * Returns load description.
+ * @param payload the payload
+ * @param articleId the articleId
+ * @return the result of the operation
+ */
     private String loadDescription(ArticleEmbeddingRequest payload, java.util.UUID articleId) {
         String description;
         try {
@@ -50,6 +72,11 @@ public class ArticleEmbeddingService {
         return description;
     }
 
+/**
+ * Performs sync vector.
+ * @param payload the payload
+ * @param articleId the articleId
+ */
     private void syncVector(ArticleEmbeddingRequest payload, java.util.UUID articleId) {
         try {
             llmIntegrationService.addToVectorStore(payload);

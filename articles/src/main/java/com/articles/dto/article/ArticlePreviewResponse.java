@@ -7,6 +7,9 @@ import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
+/**
+ * Carries article preview response.
+ */
 public record ArticlePreviewResponse(
         UUID id,
         String title,
@@ -15,6 +18,12 @@ public record ArticlePreviewResponse(
         boolean published,
         UserBriefResponse author
 ) implements Serializable {
+/**
+ * Returns from entity.
+ * @param article the article
+ * @param author the author
+ * @return the result of the operation
+ */
     public static ArticlePreviewResponse fromEntity(Article article, UserBriefResponse author) {
         return new ArticlePreviewResponse(
                 article.getId(),

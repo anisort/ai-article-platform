@@ -26,6 +26,9 @@ import { AuthValidationService } from '../../services/auth-validation.service';
   templateUrl: './user-register.page.html',
   styleUrl: './user-register.page.scss'
 })
+/**
+ * Defines the user register page class.
+ */
 export class UserRegisterPage implements OnInit {
   registerForm!: FormGroup;
   loading = signal<boolean>(false);
@@ -37,10 +40,16 @@ export class UserRegisterPage implements OnInit {
   private authValidationService = inject(AuthValidationService);
   private destroyRef = inject(DestroyRef);
 
+/**
+ * Performs the ng on init operation.
+ */
   ngOnInit() {
     this.initForm();
   }
 
+/**
+ * Performs the init form operation.
+ */
   initForm() {
     this.registerForm = new FormGroup({
         username: new FormControl('', {
@@ -63,6 +72,9 @@ export class UserRegisterPage implements OnInit {
     )
   }
 
+/**
+ * Performs the on register operation.
+ */
   onRegister() {
     this.submitted.set(true);
     if (!this.registerForm.valid) {
@@ -87,15 +99,28 @@ export class UserRegisterPage implements OnInit {
       });
   }
 
+/**
+ * Performs the on login operation.
+ */
   onLogin() {
     this.authService.login();
   }
 
+/**
+ * Performs the has control error operation.
+ * @param controlName the controlName
+ * @param errorKey the errorKey
+ * @returns the operation result
+ */
   hasControlError(controlName: string, errorKey: string): boolean {
     const control = this.registerForm.get(controlName);
     return !!control && control.hasError(errorKey) && (control.dirty || this.submitted());
   }
 
+/**
+ * Performs the show password mismatch error operation.
+ * @returns the operation result
+ */
   showPasswordMismatchError(): boolean {
     const repeatPasswordControl = this.registerForm.get('repeatPassword');
     return !!repeatPasswordControl

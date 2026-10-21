@@ -8,6 +8,9 @@ import { Component, input, output } from '@angular/core';
   templateUrl: './message-bubble.component.html',
   styleUrl: './message-bubble.component.scss',
 })
+/**
+ * Defines the message bubble component class.
+ */
 export class MessageBubbleComponent {
   readonly html = input.required<string>();
   readonly isUser = input<boolean>(false);

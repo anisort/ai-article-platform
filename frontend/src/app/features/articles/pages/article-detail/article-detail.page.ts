@@ -19,6 +19,9 @@ import { MarkdownRenderService } from '../../../../shared/services/markdown-rend
   templateUrl: './article-detail.page.html',
   styleUrl: './article-detail.page.scss',
 })
+/**
+ * Defines the article detail page class.
+ */
 export class ArticleDetailPage implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
@@ -59,6 +62,9 @@ export class ArticleDetailPage implements OnInit {
     };
   });
 
+/**
+ * Performs the ng on init operation.
+ */
   ngOnInit(): void {
     const articleId = this.route.snapshot.paramMap.get('id');
 
@@ -83,10 +89,17 @@ export class ArticleDetailPage implements OnInit {
     });
   }
 
+/**
+ * Performs the can like operation.
+ * @returns the operation result
+ */
   canLike(): boolean {
     return this.authService.isAuthenticated();
   }
 
+/**
+ * Performs the toggle like operation.
+ */
   toggleLike(): void {
     const articleId = this.articleData()?.id;
 
@@ -107,6 +120,9 @@ export class ArticleDetailPage implements OnInit {
     });
   }
 
+/**
+ * Performs the delete article operation.
+ */
   deleteArticle(): void {
     const articleId = this.articleData()?.id;
     if (!articleId || !this.isAuthor() || this.deleteLoading()) {
@@ -130,6 +146,10 @@ export class ArticleDetailPage implements OnInit {
     });
   }
 
+/**
+ * Performs the content markdown operation.
+ * @returns the operation result
+ */
   contentMarkdown(): string {
     const article = this.articleData();
     if (!article) {
@@ -138,6 +158,10 @@ export class ArticleDetailPage implements OnInit {
     return this.markdownRenderService.render(article.markdownContent ?? '');
   }
 
+/**
+ * Performs the on article content click operation.
+ * @param event the event
+ */
   onArticleContentClick(event: MouseEvent): void {
     const target = event.target instanceof Element ? event.target : null;
     const copyButton = target?.closest('.article-code-copy') as HTMLElement | null;
@@ -147,6 +171,12 @@ export class ArticleDetailPage implements OnInit {
     this.copyCodeToClipboard(copyButton, code);
   }
 
+/**
+ * Performs the copy code to clipboard operation.
+ * @param button the button
+ * @param value the value
+ * @returns the operation result
+ */
   private async copyCodeToClipboard(button: HTMLElement, value: string): Promise<void> {
     if (!value.trim()) {
       return;
@@ -177,6 +207,11 @@ export class ArticleDetailPage implements OnInit {
     }
   }
 
+/**
+ * Performs the format likes count operation.
+ * @param value the value
+ * @returns the operation result
+ */
   private formatLikesCount(value: number): string {
     return new Intl.NumberFormat(undefined, {
       notation: 'compact',

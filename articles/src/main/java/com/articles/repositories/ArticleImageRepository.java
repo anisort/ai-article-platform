@@ -7,6 +7,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Declares article image repository.
+ */
 public interface ArticleImageRepository extends JpaRepository<ArticleImage, UUID> {
     List<ArticleImage> findByArticleIdOrderByIdDesc(UUID articleId);
     Optional<ArticleImage> findByIdAndArticleId(UUID id, UUID articleId);

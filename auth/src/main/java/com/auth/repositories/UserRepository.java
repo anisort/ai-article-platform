@@ -8,6 +8,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
+/**
+ * Declares user repository.
+ */
 public interface UserRepository extends JpaRepository<CustomUserDetails, UUID> {
     Optional<CustomUserDetails> findByUsername(String username);
     Optional<CustomUserDetails> findByEmail(String email);

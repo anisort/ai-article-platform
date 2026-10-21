@@ -6,6 +6,9 @@ import lombok.Setter;
 
 import java.util.UUID;
 
+/**
+ * Defines user follow.
+ */
 @Getter
 @Setter
 @Entity

@@ -13,6 +13,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
+/**
+ * Defines advisor service.
+ */
 @Service
 public class AdvisorService {
 
@@ -23,12 +26,24 @@ public class AdvisorService {
     @Value("${llm.prompts.advisor-system}")
     private String systemMessage;
 
+/**
+ * Performs advisor service.
+ * @param chatModel the chatModel
+ * @param vectorStore the vectorStore
+ * @param chatMemory the chatMemory
+ */
     public AdvisorService(VertexAiGeminiChatModel chatModel, VectorStore vectorStore, ChatMemory chatMemory) {
         this.chatModel = chatModel;
         this.vectorStore = vectorStore;
         this.chatMemory = chatMemory;
     }
 
+/**
+ * Returns get advice.
+ * @param prompt the prompt
+ * @param conversationId the conversationId
+ * @return the result of the operation
+ */
     public ChatResponse getAdvice(String prompt, UUID conversationId) {
         return ChatClient.builder(chatModel)
                 .defaultAdvisors(

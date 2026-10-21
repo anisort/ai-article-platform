@@ -1,3 +1,6 @@
+/**
+ * Defines the create user request interface.
+ */
 export interface CreateUserRequest {
   username: string;
   name: string;

@@ -20,6 +20,9 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+/**
+ * Defines article recommendation facade service.
+ */
 @Service
 public class ArticleRecommendationFacadeService {
     private static final int PERSONALIZED_LIKES_WINDOW = 20;
@@ -46,6 +49,12 @@ public class ArticleRecommendationFacadeService {
             key = "#limit",
             condition = "#userId == null"
     )
+/**
+ * Returns get recommendations.
+ * @param userId the userId
+ * @param limit the limit
+ * @return the result of the operation
+ */
     public List<ArticlePreviewResponse> getRecommendations(UUID userId, int limit) {
         int safeLimit = Math.max(1, Math.min(limit, 50));
         List<Article> latest = articleService.getPublishedArticles();

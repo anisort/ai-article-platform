@@ -5,23 +5,38 @@ import {authConfig} from '../config/auth-config';
 @Injectable({
   providedIn: 'root'
 })
+/**
+ * Defines the auth service class.
+ */
 export class AuthService {
   private oauthService = inject(OAuthService);
 
+/**
+ * Performs the init operation.
+ */
   async init() {
     this.oauthService.setStorage(localStorage);
     this.oauthService.configure(authConfig);
     await this.oauthService.loadDiscoveryDocumentAndTryLogin();
   }
 
+/**
+ * Performs the login operation.
+ */
   login() {
     this.oauthService.initLoginFlow();
   }
 
+/**
+ * Performs the logout operation.
+ */
   logout() {
     this.oauthService.logOut();
   }
 
+/**
+ * Performs the is authenticated operation.
+ */
   isAuthenticated() {
     return this.oauthService.hasValidAccessToken();
   }

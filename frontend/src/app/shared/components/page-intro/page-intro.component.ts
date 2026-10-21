@@ -6,6 +6,9 @@ import { Component, input } from '@angular/core';
   templateUrl: './page-intro.component.html',
   styleUrl: './page-intro.component.scss',
 })
+/**
+ * Defines the page intro component class.
+ */
 export class PageIntroComponent {
   kicker = input('');
   title = input.required<string>();

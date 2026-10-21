@@ -18,6 +18,9 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
+/**
+ * Defines article assistant message.
+ */
 @Entity
 @Table(name = "article_assistant_message")
 @Getter

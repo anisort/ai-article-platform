@@ -1,5 +1,8 @@
 import { CanDeactivateFn } from '@angular/router';
 
+/**
+ * Defines the pending changes component interface.
+ */
 export interface PendingChangesComponent {
   hasPendingChanges(): boolean;
 }

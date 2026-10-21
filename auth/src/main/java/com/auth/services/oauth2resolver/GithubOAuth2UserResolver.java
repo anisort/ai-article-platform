@@ -6,22 +6,39 @@ import com.auth.repositories.UserRepository;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Component;
 
+/**
+ * Defines github oauth2 user resolver.
+ */
 @Component
 public class GithubOAuth2UserResolver implements OAuth2ProviderUserResolver {
 
     private final UserRepository userRepository;
 
+/**
+ * Performs github oauth2 user resolver.
+ * @param userRepository the userRepository
+ */
     public GithubOAuth2UserResolver(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
     @Override
+/**
+ * Returns supports.
+ * @param principal the principal
+ * @return the result of the operation
+ */
     public boolean supports(OAuth2User principal) {
         Object id = principal.getAttribute("id");
         return id != null;
     }
 
     @Override
+/**
+ * Returns resolve.
+ * @param principal the principal
+ * @return the result of the operation
+ */
     public CustomUserDetails resolve(OAuth2User principal) {
         Object id = principal.getAttribute("id");
         if (id == null) {

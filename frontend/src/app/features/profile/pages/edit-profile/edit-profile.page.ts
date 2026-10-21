@@ -16,6 +16,9 @@ import { AuthValidationService } from '../../../auth/services/auth-validation.se
   templateUrl: './edit-profile.page.html',
   styleUrl: './edit-profile.page.scss'
 })
+/**
+ * Defines the edit profile page class.
+ */
 export class EditProfilePage implements OnInit, OnDestroy {
   private readonly profileService = inject(ProfileService);
   private readonly authValidationService = inject(AuthValidationService);
@@ -38,6 +41,9 @@ export class EditProfilePage implements OnInit, OnDestroy {
     name: new FormControl('', [Validators.required, Validators.minLength(2)])
   });
 
+/**
+ * Performs the ng on init operation.
+ */
   ngOnInit(): void {
     this.profileService.getProfilePage().subscribe({
       next: response => {
@@ -56,10 +62,17 @@ export class EditProfilePage implements OnInit, OnDestroy {
     });
   }
 
+/**
+ * Performs the ng on destroy operation.
+ */
   ngOnDestroy(): void {
     this.revokeAvatarObjectUrl();
   }
 
+/**
+ * Performs the on avatar selected operation.
+ * @param event the event
+ */
   onAvatarSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0] ?? null;
@@ -76,6 +89,9 @@ export class EditProfilePage implements OnInit, OnDestroy {
     this.avatarPreview.set(this.avatarObjectUrl);
   }
 
+/**
+ * Performs the on submit operation.
+ */
   onSubmit(): void {
     this.submitted.set(true);
     if (this.form.invalid || this.saving()) {
@@ -102,6 +118,9 @@ export class EditProfilePage implements OnInit, OnDestroy {
       });
   }
 
+/**
+ * Performs the revoke avatar object url operation.
+ */
   private revokeAvatarObjectUrl(): void {
     if (!this.avatarObjectUrl) {
       return;
